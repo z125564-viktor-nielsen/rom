@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Contact & Feedback | ROMHACKS.NET{% endblock %}
+
+{% block meta_description %}Report broken links or request corrections for ROM hacks and game ports.{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12 max-w-2xl">
+    <h1 class="text-4xl font-bold text-white mb-2 pixel-font">Contact & Feedback</h1>
+    <p class="text-gray-400 mb-8">Help us keep the site up to date by reporting broken links or requesting corrections.</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <!-- Report Broken Link -->
+        <div class="bg-gradient-to-br from-red-900/20 to-gray-900/50 border border-red-500/30 p-6 rounded-lg backdrop-blur-sm">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-red-400 text-xl">link_off</span>
+                <h3 class="text-lg font-bold text-red-400">Report Broken Link</h3>
+            </div>
+            <p class="text-sm text-gray-400 mb-4">Found a broken download link or dead resource? Let us know so we can fix it.</p>
+            <button class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition" onclick="openFeedbackModal('broken-link')">
+                Report Link
+            </button>
+        </div>
+        
+        <!-- Request Correction -->
+        <div class="bg-gradient-to-br from-blue-900/20 to-gray-900/50 border border-blue-500/30 p-6 rounded-lg backdrop-blur-sm">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-blue-400 text-xl">edit</span>
+                <h3 class="text-lg font-bold text-blue-400">Request Correction</h3>
+            </div>
+            <p class="text-sm text-gray-400 mb-4">See incorrect information on a game page? Help us improve by suggesting corrections.</p>
+            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition" onclick="openFeedbackModal('correction')">
+                Request Correction
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm" id="feedback-modal">
+    <div class="bg-[#1a1a20] w-full max-w-lg border border-blue-500/30 shadow-2xl relative flex flex-col p-8 rounded-lg max-h-[90vh] overflow-y-auto">
+        <button class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl" onclick="closeFeedbackModal()">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+        
+        <h2 class="text-2xl font-bold text-white mb-6 pixel-font" id="modal-title">Report Issue</h2>
+        
+        <div class="space-y-4 mb-6">
+            <div id="status-div" class="hidden p-4 rounded text-sm font-bold"></div>
+            
+            <div>
+                <label class="block text-xs text-gray-500 uppercase mb-1">Issue Type</label>
+                <select id="feedback-type" class="input-dark w-full">
+                    <option value="">Select a type...</option>
+                    <option value="broken-link">Broken Link</option>
+                    <option value="correction">Correction Request</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-xs text-gray-500 uppercase mb-1">Game Title</label>
+                <input type="text" id="feedback-title" class="input-dark" placeholder="e.g., Pokemon Fire Red Enhanced">
+            </div>
+            
+            <div>
+                <label class="block text-xs text-gray-500 uppercase mb-1">URL (if broken link)</label>
+                <input type="url" id="feedback-url" class="input-dark" placeholder="https://...">
+            </div>
+            
+            <div>
+                <label class="block text-xs text-gray-500 uppercase mb-1">Description</label>
+                <textarea id="feedback-description" class="input-dark w-full h-24 resize-none" placeholder="Please describe the issue..."></textarea>
+            </div>
+            
+            <div>
+                <label class="block text-xs text-gray-500 uppercase mb-1">Email (optional)</label>
+                <input type="email" id="feedback-email" class="input-dark" placeholder="your@email.com">
+            </div>
+        </div>
+        
+        <div class="flex gap-3">
+            <button class="flex-1 bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition" onclick="closeFeedbackModal()">
+                Cancel
+            </button>
+            <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition" onclick="submitFeedback()">
+                Submit
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .input-dark {
+        @apply bg-[#0f0f12] border border-gray-700 rounded px-3 py-2 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition;
+    }
+</style>
+
+<script>
+    function openFeedbackModal(type) {
+        const modal = document.getElementById('feedback-modal');
+        const typeSelect = document.getElementById('feedback-type');
+        const modalTitle = document.getElementById('modal-title');
+        
+        typeSelect.value = type;
+        if (type === 'broken-link') {
+            modalTitle.textContent = 'Report Broken Link';
+        } else {
+            modalTitle.textContent = 'Request Correction';
+        }
+        
+        // Reset form
+        document.getElementById('feedback-title').value = '';
+        document.getElementById('feedback-url').value = '';
+        document.getElementById('feedback-description').value = '';
+        document.getElementById('feedback-email').value = '';
+        document.getElementById('status-div').classList.add('hidden');
+        
+        modal.classList.remove('hidden');
+    }
+    
+    function closeFeedbackModal() {
+        document.getElementById('feedback-modal').classList.add('hidden');
+    }
+    
+    function submitFeedback() {
+        const type = document.getElementById('feedback-type').value;
+        const title = document.getElementById('feedback-title').value;
+        const url = document.getElementById('feedback-url').value;
+        const description = document.getElementById('feedback-description').value;
+        const email = document.getElementById('feedback-email').value;
+        const statusDiv = document.getElementById('status-div');
+        
+        if (!type) {
+            statusDiv.textContent = '❌ Please select an issue type';
+            statusDiv.classList.remove('hidden', 'text-green-400');
+            statusDiv.classList.add('text-red-400');
+            return;
+        }
+        
+        if (!description.trim()) {
+            statusDiv.textContent = '❌ Please describe the issue';
+            statusDiv.classList.remove('hidden', 'text-green-400');
+            statusDiv.classList.add('text-red-400');
+            return;
+        }
+        
+        fetch('/api/feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                type: type,
+                title: title,
+                url: url,
+                description: description,
+                email: email
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                statusDiv.textContent = '✅ Thank you! Your feedback has been submitted.';
+                statusDiv.classList.remove('hidden', 'text-red-400');
+                statusDiv.classList.add('text-green-400');
+                
+                // Close modal after 2 seconds
+                setTimeout(() => {
+                    closeFeedbackModal();
+                }, 2000);
+            } else {
+                statusDiv.textContent = '❌ Error: ' + (data.message || 'Failed to submit feedback');
+                statusDiv.classList.remove('hidden', 'text-green-400');
+                statusDiv.classList.add('text-red-400');
+            }
+        })
+        .catch(error => {
+            statusDiv.textContent = '❌ Error submitting feedback: ' + error;
+            statusDiv.classList.remove('hidden', 'text-green-400');
+            statusDiv.classList.add('text-red-400');
+        });
+    }
+</script>
+{% endblock %}

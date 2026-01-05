@@ -1,8 +1,18 @@
 from flask import Flask, render_template, abort, send_from_directory, request, jsonify
-from database import get_db_connection, init_db, get_games, get_ports, get_game_by_id, get_port_by_id, track_download, get_download_count
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from database import get_db_connection, init_db, get_games, get_ports, get_game_by_id, get_port_by_id, track_download, get_download_count, submit_feedback, hash_string
 import json
 
 app = Flask(__name__)
+
+# Initialize rate limiter
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
 
 # Initialize database on startup
 init_db()
@@ -46,6 +56,10 @@ def romhacks():
 def patcher():
     return render_template('patcher.html')
 
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
 @app.route('/logo/<filename>')
 def logo_file(filename):
     return send_from_directory('logo', filename)
@@ -66,6 +80,7 @@ def game_page(game_id):
     return render_template('game.html', game=game, styles=styles, download_count=download_count)
 
 @app.route('/api/track-download/<game_id>', methods=['POST'])
+@limiter.limit("30 per hour")
 def track_download_endpoint(game_id):
     client_ip = request.remote_addr
     # If behind a proxy, try to get the real IP
@@ -74,6 +89,36 @@ def track_download_endpoint(game_id):
     
     result = track_download(game_id, client_ip)
     return jsonify({'success': result})
+
+@app.route('/api/feedback', methods=['POST'])
+@limiter.limit("10 per hour")
+def submit_feedback_endpoint():
+    data = request.get_json()
+    
+    # Validate required fields
+    if not data or not data.get('description'):
+        return jsonify({'success': False, 'message': 'Description is required'}), 400
+    
+    feedback_type = data.get('type', '').strip()
+    if feedback_type not in ['broken-link', 'correction']:
+        return jsonify({'success': False, 'message': 'Invalid feedback type'}), 400
+    
+    # Get client IP
+    client_ip = request.remote_addr
+    if request.headers.get('X-Forwarded-For'):
+        client_ip = request.headers.get('X-Forwarded-For').split(',')[0].strip()
+    
+    # Submit feedback
+    feedback_id = submit_feedback(
+        feedback_type=feedback_type,
+        title=data.get('title', '').strip(),
+        url=data.get('url', '').strip(),
+        description=data.get('description', '').strip(),
+        email=data.get('email', '').strip(),
+        ip_address=client_ip
+    )
+    
+    return jsonify({'success': True, 'id': feedback_id})
 
 if __name__ == '__main__':
     app.run(debug=True)

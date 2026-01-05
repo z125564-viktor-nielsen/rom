@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>{% block title %}{{ site_name or 'Romhacks.NET' }}{% endblock %}</title>
+    <title>{% block title %}{{ site_name or 'romhacks_' }}{% endblock %}</title>
 
     {# ---- SEO defaults (override per-template with blocks) ---- #}
     {#
@@ -44,7 +44,7 @@
         </style>
 
     {# Open Graph #}
-    <meta property="og:site_name" content="{{ site_name or 'Romhacks.NET' }}">
+    <meta property="og:site_name" content="{{ site_name or 'romhacks_' }}">
     <meta property="og:title" content="{{ _meta_title }}">
     <meta property="og:description" content="{{ _meta_description }}">
     <meta property="og:type" content="{{ _og_type }}">
@@ -64,7 +64,6 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <link rel="icon" type="image/png" href="{{ url_for('logo_file', filename='favico.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
     <script src="{{ url_for('static', filename='js/lzma.js') }}"></script>
@@ -82,7 +81,7 @@
             "@graph": [
                 {
                     "@type": "WebSite",
-                    "name": {{ (site_name or 'Romhacks.NET') | tojson }},
+                    "name": {{ (site_name or 'romhacks_') | tojson }},
                     "url": {{ (site_url or request.url_root.rstrip('/')) | tojson }}
                 },
                 {
@@ -104,7 +103,7 @@
         <div class="container mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center gap-6">
                 <div class="flex items-center gap-3 group cursor-pointer" onclick="window.location.href='/'">
-                    <a href="/" class="text-xl md:text-2xl font-bold pixel-font text-blue-400 tracking-tighter uppercase group-hover:text-blue-300 transition-colors shake-logo" style="text-decoration:none">Romhacks.NET</a>
+                    <a href="/" class="text-xl md:text-2xl font-bold pixel-font text-blue-400 tracking-tighter group-hover:text-blue-300 transition-colors shake-logo" style="text-decoration:none">romhacks_</a>
                 </div>
                 
                 <nav class="hidden md:flex gap-6 items-center">
@@ -134,7 +133,7 @@
             <div class="flex items-center gap-6">
                 <button onclick="document.getElementById('request-modal').classList.remove('hidden')" class="bg-gray-800 hover:bg-gray-700 text-blue-400 border border-blue-500/50 px-3 py-1 rounded text-xs uppercase tracking-wider flex items-center gap-2 transition-all">
                     <span class="material-symbols-outlined text-sm">add_circle</span>
-                    <span class="hidden sm:inline">Request Hack</span>
+                    <span class="hidden sm:inline">Request hack/mod</span>
                     <span class="inline sm:hidden">Request</span>
                 </button>
 
@@ -176,7 +175,12 @@ Users must legally own any original games referenced. Piracy and copyright infri
             </div>
 
             <div class="border-t border-gray-800 pt-6 text-center">
-                <p class="text-[10px] text-gray-700">© 2026 Romhacks.NET All rights reserved. Made by Natto</p>
+                <div class="flex justify-center gap-6 mb-4 flex-wrap">
+                    <a href="{{ url_for('contact') }}" class="text-xs text-blue-400 hover:text-blue-300 transition">Report broken link</a>
+                    <span class="text-gray-700">•</span>
+                    <a href="{{ url_for('contact') }}" class="text-xs text-blue-400 hover:text-blue-300 transition">Request correction</a>
+                </div>
+                <p class="text-[10px] text-gray-700">© 2026 romhacks_ All rights reserved. Made by Natto</p>
                 <p class="text-[9px] text-gray-800 mt-2">This is a fan community project. All trademarks and copyrights belong to their respective owners.</p>
             </div>
         </div>
@@ -187,7 +191,7 @@ Users must legally own any original games referenced. Piracy and copyright infri
             <h2 class="text-2xl font-bold text-white mb-6 pixel-font text-blue-400">Request Hack</h2>
             <div class="space-y-4 mb-6">
                 <div>
-                    <label class="block text-xs text-gray-500 uppercase mb-1">Hack Title</label>
+                    <label class="block text-xs text-gray-500 uppercase mb-1">Hack/Mod Title</label>
                     <input type="text" id="request-title" class="input-dark" placeholder="e.g., Pokemon Fire Red Enhanced">
                 </div>
                 <div>
@@ -220,7 +224,7 @@ Users must legally own any original games referenced. Piracy and copyright infri
                     <input type="text" id="request-author" class="input-dark" placeholder="Creator name">
                 </div>
                 <div>
-                    <label class="block text-xs text-gray-500 uppercase mb-1">Why This Hack?</label>
+                    <label class="block text-xs text-gray-500 uppercase mb-1">Why This Hack/Mod?</label>
                     <textarea id="request-notes" class="input-dark resize-none" rows="3" placeholder="What makes this hack special?"></textarea>
                 </div>
             </div>

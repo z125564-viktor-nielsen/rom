@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ game.title }} - ROMHACKS.NET{% endblock %}
+{% block title %}{{ game.title }} | ROMHACKS.NET{% endblock %}
 
 {% block og_type %}article{% endblock %}
 {% block meta_image %}{{ game.image_url }}{% endblock %}
@@ -27,7 +27,7 @@
 {% block content %}
 <div class="flex flex-col gap-8 max-w-5xl mx-auto">
     <div class="relative h-[300px] rounded-lg overflow-hidden border border-gray-800 shadow-2xl">
-        <img src="{{ game.image_url }}" class="w-full h-full object-cover opacity-40">
+        <img src="{{ game.image_url }}" class="w-full h-full object-cover opacity-40" alt="{{ game.title }} - {{ game.base_game }} ROM Hack Cover Art">
         <div class="absolute inset-0 bg-gradient-to-t from-[#050507] to-transparent"></div>
         <div class="absolute bottom-0 left-0 p-8 w-full">
             <div class="flex items-center gap-4 mb-4">
@@ -90,6 +90,38 @@
                     <div class="text-xs text-gray-500 mt-2">Version/Region: <span class="text-gray-300">{{ game.version_region }}</span></div>
                     {% endif %}
                 </div>
+                
+                {% if game.base_region or game.base_revision or game.base_header or game.base_checksum_crc32 or game.base_checksum_md5 or game.base_checksum_sha1 or game.patch_format or game.patch_output_ext %}
+                <div class="mb-6 bg-black/30 p-4 rounded border border-gray-700">
+                    <div class="text-xs text-gray-500 uppercase font-bold mb-3">Base Game Requirements</div>
+                    <div class="space-y-2 text-xs">
+                        {% if game.base_region %}
+                        <div><span class="text-gray-400">Region:</span> <span class="text-gray-200 font-mono">{{ game.base_region }}</span></div>
+                        {% endif %}
+                        {% if game.base_revision %}
+                        <div><span class="text-gray-400">Revision:</span> <span class="text-gray-200 font-mono">{{ game.base_revision }}</span></div>
+                        {% endif %}
+                        {% if game.base_header %}
+                        <div><span class="text-gray-400">Header:</span> <span class="text-gray-200 font-mono">{{ game.base_header }}</span></div>
+                        {% endif %}
+                        {% if game.base_checksum_crc32 %}
+                        <div class="break-all"><span class="text-gray-400">CRC32:</span> <span class="text-gray-200 font-mono text-[10px]">{{ game.base_checksum_crc32 }}</span></div>
+                        {% endif %}
+                        {% if game.base_checksum_md5 %}
+                        <div class="break-all"><span class="text-gray-400">MD5:</span> <span class="text-gray-200 font-mono text-[10px]">{{ game.base_checksum_md5 }}</span></div>
+                        {% endif %}
+                        {% if game.base_checksum_sha1 %}
+                        <div class="break-all"><span class="text-gray-400">SHA-1:</span> <span class="text-gray-200 font-mono text-[10px]">{{ game.base_checksum_sha1 }}</span></div>
+                        {% endif %}
+                        {% if game.patch_format %}
+                        <div><span class="text-gray-400">Patch Format:</span> <span class="text-gray-200 font-mono">{{ game.patch_format }}</span></div>
+                        {% endif %}
+                        {% if game.patch_output_ext %}
+                        <div><span class="text-gray-400">Output Extension:</span> <span class="text-gray-200 font-mono">{{ game.patch_output_ext }}</span></div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
                 
                 <a href="{{ game.download_link }}" target="_blank" onclick="trackDownload('{{ game.id }}')" class="btn-retro w-full justify-center text-center py-4 mb-4">
                     Download Patch

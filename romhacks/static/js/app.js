@@ -27,6 +27,7 @@ function applyPatchVCD(sourceData, patchData, ignoreChecksums) { var patchStream
    ========================================= */
 
 let activeConsole = 'all';
+let activeOriginalPlatform = 'all';
 let currentPage = 1;
 const gamesPerPage = 12;
 let allCards = [];
@@ -38,14 +39,16 @@ function updatePagination() {
     // First, get all cards that match the current filters
     const filteredCards = allCards.filter(card => {
         const cardConsole = (card.dataset.console || '').toLowerCase();
+        const cardOriginalPlatform = (card.dataset.originalPlatform || '').toLowerCase();
         const cardTitle = card.querySelector('h3').innerText.toLowerCase();
 
         const consoles = cardConsole.split(/\s+/).filter(Boolean);
         
         const matchConsole = (activeConsole === 'all' || consoles.includes(activeConsole));
+        const matchOriginalPlatform = (activeOriginalPlatform === 'all' || cardOriginalPlatform === activeOriginalPlatform);
         const matchSearch = (query === '' || cardTitle.includes(query));
         
-        return matchConsole && matchSearch;
+        return matchConsole && matchOriginalPlatform && matchSearch;
     });
     
     const totalPages = Math.ceil(filteredCards.length / gamesPerPage);
@@ -73,16 +76,58 @@ function filterHacks(selectedConsole) {
         activeConsole = selectedConsole;
         currentPage = 1; // Reset to first page on filter change
         
+        // Determine page type to use correct color classes
+        const isRomhacksPage = document.body.classList.contains('romhacks-page') || 
+                               window.location.pathname === '/romhacks';
+        
+        const activeClasses = isRomhacksPage 
+            ? ['active', 'bg-blue-900/50', 'text-blue-300', 'border-blue-500']
+            : ['active', 'bg-green-900/50', 'text-green-300', 'border-green-500'];
+        
+        const inactiveClasses = ['bg-gray-800', 'text-gray-400', 'border-gray-700'];
+        
         // Visual Update for Buttons
         const buttons = document.querySelectorAll('.filter-btn');
         buttons.forEach(btn => {
-            btn.classList.remove('active', 'bg-green-900/50', 'text-green-300', 'border-green-500');
-            btn.classList.add('bg-gray-800', 'text-gray-400', 'border-gray-700');
+            btn.classList.remove(...activeClasses, ...inactiveClasses);
+            btn.classList.add(...inactiveClasses);
         });
         
         if(event && event.currentTarget && event.currentTarget.classList.contains('filter-btn')) {
-            event.currentTarget.classList.remove('bg-gray-800', 'text-gray-400', 'border-gray-700');
-            event.currentTarget.classList.add('active', 'bg-green-900/50', 'text-green-300', 'border-green-500');
+            event.currentTarget.classList.remove(...inactiveClasses);
+            event.currentTarget.classList.add(...activeClasses);
+        }
+    }
+
+    updatePagination();
+}
+
+function filterByOriginal(selectedOriginal) {
+    // If a button was clicked, update the active original platform
+    if (selectedOriginal) {
+        activeOriginalPlatform = selectedOriginal;
+        currentPage = 1; // Reset to first page on filter change
+        
+        // Determine page type to use correct color classes
+        const isPortsPage = document.body.classList.contains('ports-page') || 
+                            window.location.pathname === '/ports';
+        
+        const activeClasses = isPortsPage
+            ? ['active', 'bg-blue-900/50', 'text-blue-300', 'border-blue-500']
+            : ['active', 'bg-green-900/50', 'text-green-300', 'border-green-500'];
+        
+        const inactiveClasses = ['bg-gray-800', 'text-gray-400', 'border-gray-700'];
+        
+        // Visual Update for Buttons
+        const buttons = document.querySelectorAll('.original-filter-btn');
+        buttons.forEach(btn => {
+            btn.classList.remove(...activeClasses, ...inactiveClasses);
+            btn.classList.add(...inactiveClasses);
+        });
+        
+        if(event && event.currentTarget && event.currentTarget.classList.contains('original-filter-btn')) {
+            event.currentTarget.classList.remove(...inactiveClasses);
+            event.currentTarget.classList.add(...activeClasses);
         }
     }
 
@@ -102,14 +147,16 @@ function nextPage() {
     
     const filteredCards = allCards.filter(card => {
         const cardConsole = (card.dataset.console || '').toLowerCase();
+        const cardOriginalPlatform = (card.dataset.originalPlatform || '').toLowerCase();
         const cardTitle = card.querySelector('h3').innerText.toLowerCase();
 
         const consoles = cardConsole.split(/\s+/).filter(Boolean);
         
         const matchConsole = (activeConsole === 'all' || consoles.includes(activeConsole));
+        const matchOriginalPlatform = (activeOriginalPlatform === 'all' || cardOriginalPlatform === activeOriginalPlatform);
         const matchSearch = (query === '' || cardTitle.includes(query));
         
-        return matchConsole && matchSearch;
+        return matchConsole && matchOriginalPlatform && matchSearch;
     });
     
     const totalPages = Math.ceil(filteredCards.length / gamesPerPage);

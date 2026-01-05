@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}ROMHACKS.NET - ROM Hacks{% endblock %}
+{% block title %}ROM Hacks Database | ROMHACKS.NET{% endblock %}
 
 {% block meta_description %}Browse the full ROM hack database: FireRed, Emerald, SNES, N64, DS and more. View details, features, release dates, and download patch links.{% endblock %}
 {% block meta_keywords %}rom hacks, romhacks, pokemon rom hacks, gba rom hacks, snes rom hacks, n64 rom hacks, nds rom hacks, patch files{% endblock %}
@@ -73,7 +73,7 @@
     {% for game in games %}
     <div class="hack-card bg-[#151518] border border-gray-800 hover:border-blue-500 transition-all group overflow-hidden flex flex-col" data-console="{{ game.console }}" data-release-date="{{ game.release_date }}">
         <a href="{{ url_for('game_page', game_id=game.id) }}" class="block relative h-48 overflow-hidden cursor-pointer">
-            <img src="{{ game.image_url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+            <img src="{{ game.image_url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="{{ game.title }} - {{ game.console }} ROM Hack Cover">
             <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
             <div class="absolute bottom-3 left-3">
                 <span class="{{ styles.get(game.console, styles['default']) }} text-[10px] font-bold px-2 py-1 rounded border uppercase mb-1 inline-block">{{ game.console }}</span>

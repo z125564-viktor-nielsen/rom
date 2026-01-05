@@ -88,6 +88,14 @@ def init_db():
             download_link TEXT,
             base_game TEXT,
             version_region TEXT,
+            base_region TEXT,
+            base_revision TEXT,
+            base_header TEXT,
+            base_checksum_crc32 TEXT,
+            base_checksum_md5 TEXT,
+            base_checksum_sha1 TEXT,
+            patch_format TEXT,
+            patch_output_ext TEXT,
             popular INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -100,6 +108,31 @@ def init_db():
         cursor.execute("ALTER TABLE games ADD COLUMN instruction INTEGER DEFAULT 0")
     if 'instruction_text' not in game_cols:
         cursor.execute("ALTER TABLE games ADD COLUMN instruction_text TEXT")
+    if 'base_region' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN base_region TEXT")
+    if 'base_revision' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN base_revision TEXT")
+    if 'base_header' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN base_header TEXT")
+    if 'base_checksum_crc32' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN base_checksum_crc32 TEXT")
+    if 'base_checksum_md5' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN base_checksum_md5 TEXT")
+    if 'base_checksum_sha1' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN base_checksum_sha1 TEXT")
+    if 'patch_format' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN patch_format TEXT")
+    if 'patch_output_ext' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN patch_output_ext TEXT")
+    
+    # Remove old generic hash columns if they exist
+    if 'base_hash' in game_cols:
+        # Can't drop columns in SQLite, so we'll leave them but not use them
+        pass
+    if 'base_hash_type' in game_cols:
+        pass
+    if 'output_extension' in game_cols:
+        pass
     
     # Ports table
     cursor.execute('''
@@ -116,6 +149,15 @@ def init_db():
             screenshots TEXT,
             download_link TEXT,
             base_game TEXT,
+            original_platform TEXT,
+            base_region TEXT,
+            base_revision TEXT,
+            base_header TEXT,
+            base_checksum_crc32 TEXT,
+            base_checksum_md5 TEXT,
+            base_checksum_sha1 TEXT,
+            patch_format TEXT,
+            patch_output_ext TEXT,
             popular INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -127,6 +169,24 @@ def init_db():
         cursor.execute("ALTER TABLE ports ADD COLUMN instruction INTEGER DEFAULT 0")
     if 'instruction_text' not in port_cols:
         cursor.execute("ALTER TABLE ports ADD COLUMN instruction_text TEXT")
+    if 'original_platform' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN original_platform TEXT")
+    if 'base_region' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN base_region TEXT")
+    if 'base_revision' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN base_revision TEXT")
+    if 'base_header' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN base_header TEXT")
+    if 'base_checksum_crc32' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN base_checksum_crc32 TEXT")
+    if 'base_checksum_md5' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN base_checksum_md5 TEXT")
+    if 'base_checksum_sha1' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN base_checksum_sha1 TEXT")
+    if 'patch_format' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN patch_format TEXT")
+    if 'patch_output_ext' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN patch_output_ext TEXT")
     
     # Requests table
     cursor.execute('''
@@ -163,6 +223,22 @@ def init_db():
             UNIQUE(game_id, ip_hash)
         )
     ''')
+
+    # Feedback table for broken link reports and correction requests
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            type TEXT NOT NULL,
+            title TEXT,
+            url TEXT,
+            description TEXT NOT NULL,
+            email TEXT,
+            submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            status TEXT DEFAULT 'new',
+            admin_notes TEXT,
+            ip_hash TEXT
+        )
+    ''')
     
     conn.commit()
     conn.close()
@@ -195,9 +271,11 @@ def load_games_from_json():
                 id, title, console, version, release_date, author,
                 description, features, image_url, screenshots,
                 download_link, base_game, version_region, popular,
-                instruction, instruction_text
+                instruction, instruction_text, base_region, base_revision,
+                base_header, base_checksum_crc32, base_checksum_md5,
+                base_checksum_sha1, patch_format, patch_output_ext
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 title = excluded.title,
                 console = excluded.console,
@@ -213,7 +291,15 @@ def load_games_from_json():
                 version_region = excluded.version_region,
                 popular = excluded.popular,
                 instruction = COALESCE(excluded.instruction, games.instruction),
-                instruction_text = COALESCE(excluded.instruction_text, games.instruction_text)
+                instruction_text = COALESCE(excluded.instruction_text, games.instruction_text),
+                base_region = COALESCE(excluded.base_region, games.base_region),
+                base_revision = COALESCE(excluded.base_revision, games.base_revision),
+                base_header = COALESCE(excluded.base_header, games.base_header),
+                base_checksum_crc32 = COALESCE(excluded.base_checksum_crc32, games.base_checksum_crc32),
+                base_checksum_md5 = COALESCE(excluded.base_checksum_md5, games.base_checksum_md5),
+                base_checksum_sha1 = COALESCE(excluded.base_checksum_sha1, games.base_checksum_sha1),
+                patch_format = COALESCE(excluded.patch_format, games.patch_format),
+                patch_output_ext = COALESCE(excluded.patch_output_ext, games.patch_output_ext)
         ''', (
             game.get('id'),
             game.get('title'),
@@ -231,6 +317,14 @@ def load_games_from_json():
             1 if game.get('popular', False) else 0,
             instruction_value,
             instruction_text,
+            game.get('base_region'),
+            game.get('base_revision'),
+            game.get('base_header'),
+            game.get('base_checksum_crc32'),
+            game.get('base_checksum_md5'),
+            game.get('base_checksum_sha1'),
+            game.get('patch_format'),
+            game.get('patch_output_ext'),
         ))
     
     conn.commit()
@@ -431,6 +525,61 @@ def track_download(game_id, ip_address):
         conn.close()
         return False
 
+def submit_feedback(feedback_type, title, url, description, email, ip_address):
+    """Submit feedback (broken link report or correction request)"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Hash the IP for privacy
+    ip_hash = hash_string(ip_address)
+    
+    cursor.execute('''
+        INSERT INTO feedback (type, title, url, description, email, ip_hash)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (feedback_type, title, url, description, email, ip_hash))
+    
+    conn.commit()
+    feedback_id = cursor.lastrowid
+    conn.close()
+    
+    return feedback_id
+
+def get_feedback(status=None, feedback_type=None):
+    """Get feedback, optionally filtered by status or type"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    query = 'SELECT * FROM feedback WHERE 1=1'
+    params = []
+    
+    if status:
+        query += ' AND status = ?'
+        params.append(status)
+    if feedback_type:
+        query += ' AND type = ?'
+        params.append(feedback_type)
+    
+    query += ' ORDER BY submitted_at DESC'
+    
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+    conn.close()
+    
+    return [dict(row) for row in rows]
+
+def update_feedback_status(feedback_id, status, admin_notes=None):
+    """Update the status of a feedback entry"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        UPDATE feedback SET status = ?, admin_notes = ? WHERE id = ?
+    ''', (status, admin_notes, feedback_id))
+    
+    conn.commit()
+    conn.close()
+    
+    return cursor.rowcount > 0
 def get_download_count(game_id):
     """Get the number of unique IPs that have downloaded a game."""
     conn = get_db_connection()

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}ROMHACKS.NET - Home{% endblock %}
+{% block title %}ROM Hacks & Decompiled Ports | ROMHACKS.NET{% endblock %}
 
 {% block meta_description %}Discover popular ROM hacks and decompiled ports. Browse the database, read feature lists, and download patch files. Use the built-in web patcher locally in your browser.{% endblock %}
 {% block meta_keywords %}rom hacks, romhacks, pokemon rom hacks, decompiled ports, web patcher, patch files{% endblock %}
@@ -47,7 +47,7 @@
 
 {% block content %}
 <section class="relative h-[400px] flex items-center justify-center overflow-hidden border-b border-blue-900/30 -mt-12 mb-12">
-    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80" class="absolute inset-0 w-full h-full object-cover opacity-20">
+    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80" class="absolute inset-0 w-full h-full object-cover opacity-20" alt="Gaming background with retro controllers and pixels">
     <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f12] via-transparent to-transparent"></div>
     <div class="relative z-10 text-center px-4 max-w-4xl">
         <h2 class="text-3xl md:text-5xl font-bold mb-4 pixel-font text-white drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">Revive Your Library</h2>
@@ -86,7 +86,7 @@
     {% for game in games %}
     <div class="hack-card bg-[#151518] border border-gray-800 hover:border-blue-500 transition-all group overflow-hidden flex flex-col" data-console="{{ game.console }}">
         <a href="{{ url_for('game_page', game_id=game.id) }}" class="block relative h-48 overflow-hidden cursor-pointer">
-            <img src="{{ game.image_url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+            <img src="{{ game.image_url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="{{ game.title }} - {{ game.console }} ROM Hack by {{ game.author }}">
             <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
             <div class="absolute bottom-3 left-3">
                 <span class="{{ styles.get(game.console, styles['default']) }} text-[10px] font-bold px-2 py-1 rounded border uppercase mb-1 inline-block">{{ game.console }}</span>
@@ -125,7 +125,7 @@
     {% for port in ports %}
     <div class="hack-card bg-[#151518] border border-gray-800 hover:border-sky-500 transition-all group overflow-hidden flex flex-col" data-console="{{ (port.consoles or [port.console]) | join(' ') }}">
         <a href="{{ url_for('game_page', game_id=port.id) }}" class="block relative h-48 overflow-hidden cursor-pointer">
-            <img src="{{ port.image_url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+            <img src="{{ port.image_url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="{{ port.title }} - {{ (port.consoles or [port.console]) | join('/') }} Decompiled Port by {{ port.author }}">
             <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
             <div class="absolute bottom-3 left-3">
                 {% for c in (port.consoles or [port.console]) %}
