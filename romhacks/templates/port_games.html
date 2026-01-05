@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ game.title }} - ROMHACKS.NET{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block meta_image %}{{ game.image_url }}{% endblock %}
+{% block meta_description %}{{ (game.description or '') | truncate(155, True, '…') }}{% endblock %}
+{% block meta_keywords %}{{ game.title }}, decompiled port, {{ (game.consoles or [game.console]) | join(', ') }}, pc port, android port, download{% endblock %}
+
+{% block json_ld %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": {{ (game.title or '') | tojson }},
+    "description": {{ (game.description or '') | tojson }},
+    "url": {{ url_for('port_page', port_id=game.id, _external=True) | tojson }},
+    "image": {{ (game.image_url or '') | tojson }},
+    "author": {{ (game.author or '') | tojson }},
+    "datePublished": {{ (game.release_date or '') | tojson }},
+    "version": {{ (game.version or '') | tojson }},
+    "isBasedOn": {{ (game.base_game or '') | tojson }}
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-8 max-w-5xl mx-auto">
+    <div class="relative h-[300px] rounded-lg overflow-hidden border border-gray-800 shadow-2xl">
+        <img src="{{ game.image_url }}" class="w-full h-full object-cover opacity-40">
+        <div class="absolute inset-0 bg-gradient-to-t from-[#050507] to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-8 w-full">
+            <div class="flex items-center gap-4 mb-4">
+                {% for c in (game.consoles or [game.console]) %}
+                <span class="{{ styles.get(c, styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[10px] font-bold px-3 py-1 rounded border uppercase bg-opacity-80">{{ c }}</span>
+                {% endfor %}
+                <span class="text-xs font-mono text-gray-400 border border-gray-700 px-2 py-1 bg-black/50">Released: {{ game.release_date }}</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-bold text-white pixel-font mb-2">{{ game.title }}</h1>
+            <div class="text-blue-400 font-mono text-sm uppercase">Authored by {{ game.author }}</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="md:col-span-2 space-y-8">
+            <section>
+                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Overview</h3>
+                <p class="text-gray-300 leading-relaxed text-sm">{{ game.description }}</p>
+            </section>
+
+           {% if game.instructions %}
+            <section>
+                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Instructions</h3>
+                <div class="p-6 rounded-lg bg-[#151518] border border-gray-800">
+                <p class="text-xs text-gray-400 leading-relaxed whitespace-pre-line">
+      {{ game.instructions.replace('\\n', '\n') }}
+    </p>
+  </div>
+</section>
+{% endif %}
+
+            {% if game.instructions %}
+            <section>
+                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Instructions</h3>
+                <div class="grid gap-4 md:grid-cols-2">
+                    {% for step in game.instructions %}
+                    <div class="p-6 rounded-lg bg-[#151518] border border-gray-800">
+                        <div class="text-blue-500 font-bold text-3xl mb-2 opacity-50 pixel-font">
+                            {{ "%02d"|format(loop.index) }}
+                        </div>
+                        <p class="text-xs text-gray-400 leading-relaxed whitespace-pre-line">{{ step }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+        </div>
+
+        <div class="md:col-span-1 space-y-6">
+            <div class="bg-gray-900/50 border border-gray-800 p-6 rounded-lg sticky top-24">
+                <div class="mb-6">
+                    <div class="text-xs text-gray-500 uppercase font-bold mb-1">Latest Version</div>
+                    <div class="text-2xl text-white font-mono">{{ game.version }}</div>
+                </div>
+                <div class="mb-6">
+                    <div class="text-xs text-gray-500 uppercase font-bold mb-1">Base Game</div>
+                    <div class="text-sm text-gray-300">{{ game.base_game }}</div>
+                </div>
+
+                <a href="{{ game.download_link }}" target="_blank" onclick="trackDownload('{{ game.id }}')" class="btn-retro w-full justify-center text-center py-4 mb-4">
+                    Download Patch
+                </a>
+
+                <div class="text-center text-xs text-gray-500 mb-4">
+                    <span id="download-count">{{ download_count }}</span> unique downloads
+                </div>
+
+                <div class="border-t border-gray-800 pt-4 mt-4">
+                    <p class="text-[10px] text-gray-500 mb-2">Have the file?</p>
+                    <a href="/patcher" class="block text-center text-blue-400 text-xs hover:text-white border border-blue-500/30 hover:border-blue-500 py-2 transition-all">
+                        Go to Web Patcher
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if game.screenshots %}
+    <section class="border-t border-gray-800 pt-8 mt-4 no-crt-filter">
+        <h3 class="text-xl font-bold text-white mb-6 pixel-font flex items-center gap-2">
+            <span class="material-symbols-outlined text-blue-500">photo_library</span> Screenshots
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for shot in game.screenshots %}
+            <div class="relative h-48 rounded-lg overflow-hidden border border-gray-800 group cursor-pointer bg-black/20">
+                <img src="{{ shot }}" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" alt="{{ game.title }} Screenshot">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                    <span class="text-[10px] text-blue-400 font-mono uppercase bg-black/80 px-2 py-1 border border-blue-500/30 rounded">View Full</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+{% endblock %}

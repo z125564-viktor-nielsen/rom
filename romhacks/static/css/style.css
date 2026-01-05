@@ -1,0 +1,153 @@
+/* Custom Font Definition */
+@font-face {
+    font-family: 'Press Start 2P';
+    src: url('../fonts/PressStart2P-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Global Styles */
+body {
+    font-family: 'Share Tech Mono', monospace;
+    background-color: #0f0f12;
+    color: #e0e0e0;
+}
+
+.pixel-font {
+    font-family: 'Press Start 2P', cursive;
+}
+
+/* CRT Scanline Effect */
+.scanline {
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background: linear-gradient(0deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.25) 50%), 
+                linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06));
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+/* Remove scanline from screenshot sections and modals */
+.no-crt-filter {
+    position: relative;
+    z-index: 20;
+    isolation: isolate;
+}
+
+#screenshot-modal {
+    z-index: 60 !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #1a1a20; }
+::-webkit-scrollbar-thumb { background: #60a5fa; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+
+/* Glitch Text Effect */
+.glitch-text:hover {
+    animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+    color: #60a5fa;
+}
+
+@keyframes glitch {
+    0% { transform: translate(0) }
+    20% { transform: translate(-2px, 2px) }
+    40% { transform: translate(-2px, -2px) }
+    60% { transform: translate(2px, 2px) }
+    80% { transform: translate(2px, -2px) }
+    100% { transform: translate(0) }
+}
+
+/* Cards & UI Elements */
+.step-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+}
+.step-card:hover {
+    border-color: #60a5fa;
+    background: rgba(96,165,250,0.05);
+}
+
+.btn-retro {
+    background-color: #1d4ed8;
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    border: 2px solid #60a5fa;
+    box-shadow: 4px 4px 0px 0px rgba(59, 130, 246, 0.5);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.1s;
+    text-decoration: none;
+}
+.btn-retro:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 6px 6px 0px 0px rgba(59, 130, 246, 0.6);
+}
+
+.input-dark {
+    background: #0f0f12;
+    border: 1px solid #333;
+    color: white;
+    padding: 8px 12px;
+    width: 100%;
+    font-family: 'Share Tech Mono', monospace;
+}
+.input-dark:focus {
+    outline: none;
+    border-color: #60a5fa;
+}
+
+/* Patcher Specific Styles */
+.drop-zone {
+    border: 2px dashed #4b5563;
+    transition: all 0.3s ease;
+}
+.drop-zone:hover, .drop-zone.dragover {
+    background-color: rgba(96, 165, 250, 0.1);
+    border-color: #60a5fa;
+    transform: scale(1.02);
+    cursor: pointer;
+}
+.drop-zone.active-file {
+    border-color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+details > summary {
+    list-style: none;
+}
+details > summary::-webkit-details-marker {
+    display: none;
+}
+
+/* --- NEW: SHAKE ANIMATION --- */
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.shake-logo:hover {
+  animation: shake 0.5s;
+  animation-iteration-count: infinite;
+}

@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ game.title }} - ROMHACKS.NET{% endblock %}
+
+{% block og_type %}article{% endblock %}
+{% block meta_image %}{{ game.image_url }}{% endblock %}
+{% block meta_description %}{{ (game.description or '') | truncate(155, True, '…') }}{% endblock %}
+{% block meta_keywords %}{{ game.title }}, rom hack, patch, {{ game.console }}, {{ game.base_game }}{% endblock %}
+
+{% block json_ld %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "name": {{ (game.title or '') | tojson }},
+    "description": {{ (game.description or '') | tojson }},
+    "url": {{ url_for('game_page', game_id=game.id, _external=True) | tojson }},
+    "image": {{ (game.image_url or '') | tojson }},
+    "author": {{ (game.author or '') | tojson }},
+    "datePublished": {{ (game.release_date or '') | tojson }},
+    "version": {{ (game.version or '') | tojson }},
+    "isBasedOn": {{ (game.base_game or '') | tojson }}
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-8 max-w-5xl mx-auto">
+    <div class="relative h-[300px] rounded-lg overflow-hidden border border-gray-800 shadow-2xl">
+        <img src="{{ game.image_url }}" class="w-full h-full object-cover opacity-40">
+        <div class="absolute inset-0 bg-gradient-to-t from-[#050507] to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-8 w-full">
+            <div class="flex items-center gap-4 mb-4">
+                {% if game.consoles %}
+                    {% for c in game.consoles %}
+                    <span class="{{ styles.get(c, styles['default']) }} text-[10px] font-bold px-3 py-1 rounded border uppercase bg-opacity-80">{{ c }}</span>
+                    {% endfor %}
+                {% else %}
+                    <span class="{{ styles.get(game.console, styles['default']) }} text-[10px] font-bold px-3 py-1 rounded border uppercase bg-opacity-80">{{ game.console }}</span>
+                {% endif %}
+                <span class="text-xs font-mono text-gray-400 border border-gray-700 px-2 py-1 bg-black/50">Released: {{ game.release_date }}</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-bold text-white pixel-font mb-2">{{ game.title }}</h1>
+            <div class="text-white-400 font-mono text-sm uppercase">Original Creator: {{ game.author }}</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="md:col-span-2 space-y-8">
+            <section>
+                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Overview</h3>
+                <p class="text-gray-300 leading-relaxed text-sm">{{ game.description }}</p>
+            </section>
+            
+            {% if game.features %}
+            <section>
+                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Key Features</h3>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {% for feature in game.features %}
+                    <li class="flex items-center gap-3 bg-gray-900/50 p-3 rounded border border-gray-800">
+                        <span class="material-symbols-outlined text-blue-500 text-sm">check_circle</span> 
+                        <span class="text-sm text-gray-300">{{ feature }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            {% endif %}
+
+            {% set _instructions = game.instruction_text or game.instructions or game.special_instructions or game.instruction_notes or '' %}
+            {% if _instructions and _instructions not in ['1', '0', 'None'] %}
+            <section>
+                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Instructions</h3>
+                <div class="bg-amber-900/10 border border-amber-500/30 rounded p-4">
+                    <div class="text-amber-100 leading-relaxed text-sm whitespace-pre-line">{{ _instructions | replace('\\n', '\n') }}</div>
+                </div>
+            </section>
+            {% endif %}
+        </div>
+
+        <div class="md:col-span-1 space-y-6">
+            <div class="bg-gray-900/50 border border-gray-800 p-6 rounded-lg sticky top-24">
+                <div class="mb-6">
+                    <div class="text-xs text-gray-500 uppercase font-bold mb-1">Latest Version</div>
+                    <div class="text-2xl text-white font-mono">{{ game.version }}</div>
+                </div>
+                <div class="mb-6">
+                    <div class="text-xs text-gray-500 uppercase font-bold mb-1">Base Game</div>
+                    <div class="text-sm text-gray-300">{{ game.base_game }}</div>
+                    {% if game.version_region %}
+                    <div class="text-xs text-gray-500 mt-2">Version/Region: <span class="text-gray-300">{{ game.version_region }}</span></div>
+                    {% endif %}
+                </div>
+                
+                <a href="{{ game.download_link }}" target="_blank" onclick="trackDownload('{{ game.id }}')" class="btn-retro w-full justify-center text-center py-4 mb-4">
+                    Download Patch
+                </a>
+                
+                <div class="text-center text-xs text-gray-500 mb-4">
+                    <span id="download-count">{{ download_count }}</span> unique downloads
+                </div>
+                
+                <div class="border-t border-gray-800 pt-4 mt-4">
+                    <p class="text-[10px] text-gray-500 mb-2">Have the base file?</p>
+                    <a href="/patcher" class="block text-center text-blue-400 text-xs hover:text-white border border-blue-500/30 hover:border-blue-500 py-2 transition-all">
+                        Go to Web Patcher
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if game.screenshots %}
+    <section class="border-t border-gray-800 pt-8 mt-4 no-crt-filter">
+        <h3 class="text-xl font-bold text-white mb-6 pixel-font flex items-center gap-2">
+            <span class="material-symbols-outlined text-blue-500">photo_library</span> Screenshots
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for shot in game.screenshots %}
+            <div class="relative h-48 rounded-lg overflow-hidden border border-gray-800 group cursor-pointer bg-black/20" onclick="openGallery({{ loop.index0 }})">
+                <img src="{{ shot }}" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500" alt="{{ game.title }} Screenshot">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                    <span class="text-[10px] text-blue-400 font-mono uppercase bg-black/80 px-2 py-1 border border-blue-500/30 rounded">View Full</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+
+<!-- Screenshot Gallery Modal -->
+<div id="screenshot-modal" class="fixed inset-0 bg-black/98 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm" onclick="closeGallery(event)">
+    <div class="relative w-full h-full flex items-center justify-center" onclick="event.stopPropagation()">
+        <!-- Main Image -->
+        <img id="gallery-image" src="" class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg" alt="Screenshot">
+        
+        <!-- Close Button -->
+        <button onclick="closeGallery()" class="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors p-2">
+            <span class="material-symbols-outlined text-3xl">close</span>
+        </button>
+        
+        <!-- Previous Button -->
+        <button onclick="prevScreenshot()" class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors p-2" id="prev-btn">
+            <span class="material-symbols-outlined text-4xl">chevron_left</span>
+        </button>
+        
+        <!-- Next Button -->
+        <button onclick="nextScreenshot()" class="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors p-2" id="next-btn">
+            <span class="material-symbols-outlined text-4xl">chevron_right</span>
+        </button>
+        
+        <!-- Counter -->
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/80 text-gray-300 px-4 py-2 rounded font-mono text-sm border border-gray-700">
+            <span id="gallery-counter">1 / 1</span>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentGalleryIndex = 0;
+const galleryScreenshots = [
+    {% for shot in game.screenshots %}'{{ shot }}'{{ "," if not loop.last }}{% endfor %}
+];
+
+function openGallery(index) {
+    if (galleryScreenshots.length === 0) return;
+    currentGalleryIndex = index;
+    updateGallery();
+    document.getElementById('screenshot-modal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeGallery(event) {
+    if (event && event.target !== document.getElementById('screenshot-modal')) return;
+    document.getElementById('screenshot-modal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+function updateGallery() {
+    const img = document.getElementById('gallery-image');
+    const counter = document.getElementById('gallery-counter');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    
+    img.src = galleryScreenshots[currentGalleryIndex];
+    counter.textContent = `${currentGalleryIndex + 1} / ${galleryScreenshots.length}`;
+    
+    prevBtn.style.opacity = currentGalleryIndex === 0 ? '0.3' : '1';
+    prevBtn.style.pointerEvents = currentGalleryIndex === 0 ? 'none' : 'auto';
+    nextBtn.style.opacity = currentGalleryIndex === galleryScreenshots.length - 1 ? '0.3' : '1';
+    nextBtn.style.pointerEvents = currentGalleryIndex === galleryScreenshots.length - 1 ? 'none' : 'auto';
+}
+
+function prevScreenshot() {
+    if (currentGalleryIndex > 0) {
+        currentGalleryIndex--;
+        updateGallery();
+    }
+}
+
+function nextScreenshot() {
+    if (currentGalleryIndex < galleryScreenshots.length - 1) {
+        currentGalleryIndex++;
+        updateGallery();
+    }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+    const modal = document.getElementById('screenshot-modal');
+    if (modal.classList.contains('hidden')) return;
+    
+    if (e.key === 'ArrowLeft') prevScreenshot();
+    if (e.key === 'ArrowRight') nextScreenshot();
+    if (e.key === 'Escape') closeGallery();
+});
+</script>
+{% endblock %}

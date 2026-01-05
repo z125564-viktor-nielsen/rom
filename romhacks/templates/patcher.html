@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}ROMHACKS.NET - Web Patcher{% endblock %}
+
+{% block meta_description %}Patch ROM hacks locally in your browser. Load your clean ROM + patch file (IPS/BPS/UPS/XDELTA) and export the patched ROM—no uploads.{% endblock %}
+{% block meta_keywords %}rom patcher, web patcher, ips patcher, bps patcher, ups patcher, xdelta patcher, patch rom online{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-16">
+    
+    <section>
+        <h3 class="text-lg font-bold text-white mb-6 pixel-font flex items-center gap-2">
+            <span class="material-symbols-outlined text-blue-500">checklist</span> Instructions
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="step-card p-6 rounded-lg bg-[#151518]">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="material-symbols-outlined text-3xl text-green-500">upload_file</span>
+                    <span class="pixel-font text-2xl text-gray-700 font-bold opacity-30">01</span>
+                </div>
+                <h4 class="font-bold text-white mb-2 uppercase tracking-wide">Load ROM</h4>
+                <p class="text-xs text-gray-400 leading-relaxed">Select your clean, legally dumped ROM file (e.g. .gba, .sfc, .z64). Ensure it matches the version required by the hack.</p>
+            </div>
+            <div class="step-card p-6 rounded-lg bg-[#151518]">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="material-symbols-outlined text-3xl text-green-500">folder_zip</span>
+                    <span class="pixel-font text-2xl text-gray-700 font-bold opacity-30">02</span>
+                </div>
+                <h4 class="font-bold text-white mb-2 uppercase tracking-wide">Load Patch</h4>
+                <p class="text-xs text-gray-400 leading-relaxed">Select the patch file. We support IPS, BPS, UPS, APS, MOD, PPF, and XDELTA formats.</p>
+            </div>
+            <div class="step-card p-6 rounded-lg bg-[#151518]">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="material-symbols-outlined text-3xl text-green-500">download</span>
+                    <span class="pixel-font text-2xl text-gray-700 font-bold opacity-30">03</span>
+                </div>
+                <h4 class="font-bold text-white mb-2 uppercase tracking-wide">Apply & Save</h4>
+                <p class="text-xs text-gray-400 leading-relaxed">Click 'Apply Patch'. The browser processes the file instantly. Save the patched ROM to your device.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="border border-blue-500/30 bg-[#151518] p-1 relative overflow-hidden group shadow-[0_0_15px_rgba(59,130,246,0.1)]">
+        <div class="absolute top-0 right-0 p-2">
+            <div class="w-16 h-16 border-t-2 border-r-2 border-blue-500/50 rounded-tr-xl"></div>
+        </div>
+
+        <div class="p-6 md:p-10 relative z-10">
+            <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8 border-b border-gray-800 pb-6">
+                <span class="material-symbols-outlined text-4xl text-blue-400 bg-blue-900/20 p-3 rounded w-fit">construction</span>
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold pixel-font text-white mb-2">ROM Patcher</h2>
+                    <p class="text-gray-400 text-xs md:text-sm font-mono leading-relaxed">
+                        Supports: <strong class="text-blue-400">(IPS/BPS/UPS/APS/MOD/PPF/XDELTA)</strong>
+                        <br class="hidden md:block">
+                        Consoles: <span class="text-gray-500">GBA, SNES, NES, N64, NDS, GB, GBC, GEN, WII & more.</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div class="flex justify-end">
+                        <label class="flex items-center gap-2 text-xs text-gray-500 hover:text-blue-400 cursor-pointer select-none">
+                            <input id="ignore-checksum" type="checkbox" class="accent-blue-500 w-4 h-4 rounded border-gray-700 bg-gray-900">
+                            Ignore Checksum Errors
+                        </label>
+                    </div>
+
+                    <div id="rom-drop-zone" class="drop-zone rounded-lg p-8 text-center bg-[#0f0f12]">
+                        <input id="rom-file" type="file" class="hidden" accept=".gba,.sfc,.z64,.nes,.bin,.md,.smc,.iso,.nds" />
+                        <span class="material-symbols-outlined text-4xl text-gray-500 mb-2">videogame_asset</span>
+                        <h3 class="text-lg font-bold text-gray-300 mb-1">Base ROM File</h3>
+                        <p id="rom-label" class="text-xs text-gray-500 font-mono">Drag & drop or click to select</p>
+                    </div>
+
+                    <div id="patch-drop-zone" class="drop-zone rounded-lg p-8 text-center bg-[#0f0f12]">
+                        <input id="patch-file" type="file" class="hidden" accept=".ips,.bps,.ups,.xdelta,.ppf,.mod" />
+                        <span class="material-symbols-outlined text-4xl text-gray-500 mb-2">medical_services</span>
+                        <h3 class="text-lg font-bold text-gray-300 mb-1">Patch File</h3>
+                        <p id="patch-label" class="text-xs text-gray-500 font-mono">Drag & drop patch file</p>
+                    </div>
+
+                    <button id="apply-patch-btn" class="w-full bg-gray-700 text-gray-400 font-bold py-4 rounded cursor-not-allowed uppercase pixel-font text-xs tracking-wider transition-all border border-transparent disabled:opacity-50" disabled>
+                        Apply Patch
+                    </button>
+
+                    <div id="export-rom-btn" class="hidden w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded uppercase pixel-font text-xs tracking-wider flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all cursor-pointer transform active:scale-95">
+                        <span class="material-symbols-outlined">save_alt</span> Save Patched ROM
+                    </div>
+                </div>
+
+                <div class="flex flex-col h-full min-h-[400px]">
+                    <div class="bg-black border border-gray-700 rounded-t p-3 flex justify-between items-center">
+                        <span class="text-xs text-gray-500 uppercase font-bold tracking-wider">System Log</span>
+                        <div class="flex gap-2">
+                            <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                            <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                        </div>
+                    </div>
+                    <div class="bg-black border-x border-b border-gray-700 rounded-b p-4 font-mono text-xs md:text-sm flex-grow overflow-y-auto shadow-inner relative" id="console-output">
+                        <div class="text-green-500 mb-1">> SYSTEM_READY</div>
+                        <div class="text-gray-500 mb-1">> Core: PATCHER_MODULE_LOADED</div>
+                        <div class="text-gray-500 mb-1">> Waiting for input...</div>
+                    </div>
+                    <div class="mt-4 bg-[#1a1a20] rounded-full h-3 overflow-hidden border border-gray-700">
+                        <div id="progress-bar" class="h-full bg-green-500 transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="max-w-4xl mx-auto">
+        <h3 class="text-lg font-bold text-white mb-6 pixel-font flex items-center gap-2 text-center justify-center">
+            <span class="material-symbols-outlined text-blue-500">quiz</span> Frequently Asked Questions
+        </h3>
+        
+        <div class="space-y-4">
+            <details class="bg-[#151518] border border-gray-800 rounded group open:border-blue-500/50 transition-all">
+                <summary class="flex justify-between items-center p-4 cursor-pointer">
+                    <h4 class="font-bold text-gray-300 text-sm uppercase group-hover:text-white">I don't understand, what's a patcher?</h4>
+                    <span class="material-symbols-outlined text-gray-500 group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <div class="px-4 pb-4 text-xs text-gray-400 leading-relaxed border-t border-gray-800/50 pt-4">
+                    A patcher is a tool that takes a normal ROM (the original game file) and applies a patch (the ROM hack) to it. The base ROM is the original, unmodified game the hack is built from (for example: Pokémon FireRed), and the patch contains all the changes that turn that ROM into the hacked version.
+                </div>
+            </details>
+
+            <details class="bg-[#151518] border border-gray-800 rounded group open:border-blue-500/50 transition-all">
+                <summary class="flex justify-between items-center p-4 cursor-pointer">
+                    <h4 class="font-bold text-gray-300 text-sm uppercase group-hover:text-white">Is it safe to use this online patcher?</h4>
+                    <span class="material-symbols-outlined text-gray-500 group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <div class="px-4 pb-4 text-xs text-gray-400 leading-relaxed border-t border-gray-800/50 pt-4">
+                    Yes. This tool runs entirely in your browser using JavaScript (Client-Side). Your ROM files are never uploaded to any server. The patching process happens locally on your device's memory.
+                </div>
+            </details>
+
+            <details class="bg-[#151518] border border-gray-800 rounded group open:border-blue-500/50 transition-all">
+                <summary class="flex justify-between items-center p-4 cursor-pointer">
+                    <h4 class="font-bold text-gray-300 text-sm uppercase group-hover:text-white">What formats are supported?</h4>
+                    <span class="material-symbols-outlined text-gray-500 group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <div class="px-4 pb-4 text-xs text-gray-400 leading-relaxed border-t border-gray-800/50 pt-4">
+                    We support the most common patching formats: <strong>IPS, BPS, UPS, APS, MOD, PPF, and XDELTA/VCDIFF</strong>. We support ROMs for GBA, SNES, NES, N64, NDS, Genesis, Wii, GameCube, and more.
+                </div>
+            </details>
+
+            <details class="bg-[#151518] border border-gray-800 rounded group open:border-blue-500/50 transition-all">
+                <summary class="flex justify-between items-center p-4 cursor-pointer">
+                    <h4 class="font-bold text-gray-300 text-sm uppercase group-hover:text-white">The patch didn't work / Game glitches?</h4>
+                    <span class="material-symbols-outlined text-gray-500 group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <div class="px-4 pb-4 text-xs text-gray-400 leading-relaxed border-t border-gray-800/50 pt-4">
+                    This usually happens if your base ROM version doesn't match the one the patch was made for.
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                        <li>Check if you need a "Headered" or "Unheadered" ROM (common for SNES).</li>
+                        <li>Ensure the region matches (USA vs Europe vs Japan).</li>
+                        <li>Check the file revision (Rev A, v1.0, v1.1).</li>
+                    </ul>
+                </div>
+            </details>
+            
+            <details class="bg-[#151518] border border-gray-800 rounded group open:border-blue-500/50 transition-all">
+                <summary class="flex justify-between items-center p-4 cursor-pointer">
+                    <h4 class="font-bold text-gray-300 text-sm uppercase group-hover:text-white">How do I fix "Checksum Mismatch"?</h4>
+                    <span class="material-symbols-outlined text-gray-500 group-open:rotate-180 transition-transform">expand_more</span>
+                </summary>
+                <div class="px-4 pb-4 text-xs text-gray-400 leading-relaxed border-t border-gray-800/50 pt-4">
+                    Formats like BPS and UPS verify the original file before patching. If you get an error, your ROM is likely different from the required one. You can try checking the "Ignore Checksum Errors" box, but the game might crash or contain bugs.
+                </div>
+            </details>
+        </div>
+    </section>
+</div>
+{% endblock %}
