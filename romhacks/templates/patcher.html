@@ -86,42 +86,87 @@
                         </label>
                     </div>
 
-                    <!-- Cached ROMs Section -->
+                    <!-- SECTION 1: Cache a ROM to Browser -->
+                    <div class="bg-purple-900/20 border border-purple-600/30 rounded-lg p-4 space-y-3">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="material-symbols-outlined text-purple-400">save</span>
+                            <h4 class="text-sm font-bold text-purple-300 uppercase tracking-wide">Cache ROM to Browser</h4>
+                        </div>
+                        <p class="text-xs text-gray-400 leading-relaxed">Upload a ROM once to save it locally. It will be available for quick selection later—no need to re-upload!</p>
+                        <div id="cache-rom-drop-zone" class="drop-zone rounded-lg p-4 text-center bg-[#0f0f12] cursor-pointer border-2 border-dashed border-purple-600/40 hover:border-purple-500 transition" style="user-select: none;">
+                            <input id="cache-rom-file" type="file" class="hidden" accept=".gba,.sfc,.z64,.nes,.bin,.md,.smc,.iso,.nds,.3ds,.cia" />
+                            <span class="material-symbols-outlined text-2xl text-purple-400 mb-1 pointer-events-none">cloud_upload</span>
+                            <p class="text-xs text-purple-300 font-mono pointer-events-none">Click or drag ROM to cache it</p>
+                        </div>
+                        <p id="cache-status" class="text-xs text-gray-500 text-center hidden"></p>
+                    </div>
+
+                    <!-- Cached ROMs Library -->
                     <div id="cached-roms-section" class="hidden space-y-3">
                         <div class="flex items-center justify-between">
-                            <h4 class="text-sm font-bold text-blue-300 uppercase tracking-wide">Cached ROMs</h4>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-blue-400 text-lg">folder_special</span>
+                                <h4 class="text-sm font-bold text-blue-300 uppercase tracking-wide">Your ROM Library</h4>
+                            </div>
                             <span id="cache-size" class="text-xs text-gray-500 font-mono">0 MB</span>
                         </div>
                         <div id="cached-roms-list" class="space-y-2 max-h-48 overflow-y-auto">
                         </div>
                         <button id="clear-cache-btn" class="w-full text-xs bg-red-900/30 hover:bg-red-900/50 text-red-400 border border-red-600/30 py-2 rounded transition">
-                            Clear Cache
+                            Clear All Cached ROMs
                         </button>
                     </div>
 
-                    <!-- ROM Cache Info -->
-                    <div class="bg-blue-900/20 border border-blue-600/30 rounded-lg p-4">
-                        <div class="flex gap-3">
-                            <span class="material-symbols-outlined text-blue-400 flex-shrink-0">info</span>
-                            <div class="text-xs text-gray-300 leading-relaxed">
-                                <p class="font-bold text-blue-300 mb-1">💾 Smart ROM Caching</p>
-                                <p>Upload your ROM once and it's saved locally in your browser. Next time you want to patch a different hack, just select it from "Cached ROMs" instead of uploading again—instantly ready to go!</p>
-                            </div>
-                        </div>
+                    <!-- Divider -->
+                    <div class="flex items-center gap-3 py-2">
+                        <div class="flex-1 border-t border-gray-700"></div>
+                        <span class="text-xs text-gray-500 uppercase tracking-wider">Select ROM for Patching</span>
+                        <div class="flex-1 border-t border-gray-700"></div>
                     </div>
 
-                    <div id="rom-drop-zone" class="drop-zone rounded-lg p-5 md:p-8 text-center bg-[#0f0f12] cursor-pointer" style="user-select: none;">
-                        <input id="rom-file" type="file" class="hidden" accept=".gba,.sfc,.z64,.nes,.bin,.md,.smc,.iso,.nds,.3ds,.cia" />
-                        <span class="material-symbols-outlined text-3xl md:text-4xl text-gray-500 mb-2 pointer-events-none">videogame_asset</span>
-                        <h3 class="text-base md:text-lg font-bold text-gray-300 mb-1 pointer-events-none">Base ROM File</h3>
-                        <p id="rom-label" class="text-xs text-gray-500 font-mono pointer-events-none">Tap or drag & drop to select</p>
+                    <!-- SECTION 2: Select ROM for Patching -->
+                    <div class="bg-green-900/20 border border-green-600/30 rounded-lg p-4 space-y-3">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="material-symbols-outlined text-green-400">videogame_asset</span>
+                            <h4 class="text-sm font-bold text-green-300 uppercase tracking-wide">Base ROM for Patching</h4>
+                        </div>
+                        
+                        <!-- Select from cached ROMs dropdown -->
+                        <div id="select-cached-rom-wrapper" class="hidden">
+                            <label class="text-xs text-gray-400 mb-1 block">Pick from your cached ROMs:</label>
+                            <select id="select-cached-rom" class="w-full bg-[#0f0f12] border border-green-600/40 rounded p-3 text-sm text-gray-300 cursor-pointer hover:border-green-500 transition">
+                                <option value="">-- Select a cached ROM --</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Or upload new -->
+                        <div class="flex items-center gap-3 py-1" id="or-upload-divider">
+                            <div class="flex-1 border-t border-gray-700/50"></div>
+                            <span class="text-xs text-gray-600">or upload new</span>
+                            <div class="flex-1 border-t border-gray-700/50"></div>
+                        </div>
+                        
+                        <div id="rom-drop-zone" class="drop-zone rounded-lg p-4 text-center bg-[#0f0f12] cursor-pointer border-2 border-dashed border-green-600/40 hover:border-green-500 transition" style="user-select: none;">
+                            <input id="rom-file" type="file" class="hidden" accept=".gba,.sfc,.z64,.nes,.bin,.md,.smc,.iso,.nds,.3ds,.cia" />
+                            <span class="material-symbols-outlined text-2xl text-gray-500 mb-1 pointer-events-none">upload_file</span>
+                            <p id="rom-label" class="text-xs text-gray-500 font-mono pointer-events-none">Click or drag ROM to use</p>
+                        </div>
+                        
+                        <!-- Selected ROM indicator -->
+                        <div id="selected-rom-indicator" class="hidden bg-green-900/40 border border-green-500/50 rounded p-3 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-green-400">check_circle</span>
+                                <span id="selected-rom-name" class="text-xs text-green-300 font-mono truncate"></span>
+                            </div>
+                            <button id="clear-selected-rom" class="text-xs text-red-400 hover:text-red-300 transition">Clear</button>
+                        </div>
                     </div>
 
                     <!-- Privacy Disclaimer -->
                     <div class="bg-gray-900/50 border border-gray-700 rounded-lg p-3 flex gap-2">
                         <span class="material-symbols-outlined text-gray-500 flex-shrink-0 text-sm">lock</span>
                         <p class="text-xs text-gray-400 leading-relaxed">
-                            <strong class="text-gray-300">Privacy Notice:</strong> Your ROM is automatically saved to your browser's local storage for future use. Nothing is ever uploaded to any server.
+                            <strong class="text-gray-300">Privacy Notice:</strong> Cached ROMs are saved to your browser's local storage. Nothing is ever uploaded to any server.
                         </p>
                     </div>
 
@@ -230,25 +275,33 @@
 <script>
     let currentROM = null;
     let currentPatch = null;
+    let currentROMName = null;
 
     // Initialize cache UI on page load
     document.addEventListener('DOMContentLoaded', async function() {
         await updateCachedROMsList();
+        await updateCachedROMsDropdown();
     });
 
-    // Update cached ROMs list UI
+    // Update cached ROMs list UI (the library view)
     async function updateCachedROMsList() {
         const roms = await romCache.getAllROMs();
         const section = document.getElementById('cached-roms-section');
         const list = document.getElementById('cached-roms-list');
         const cacheSize = document.getElementById('cache-size');
+        const selectWrapper = document.getElementById('select-cached-rom-wrapper');
+        const orDivider = document.getElementById('or-upload-divider');
         
         if (roms.length === 0) {
             section.classList.add('hidden');
+            selectWrapper.classList.add('hidden');
+            orDivider.classList.add('hidden');
             return;
         }
         
         section.classList.remove('hidden');
+        selectWrapper.classList.remove('hidden');
+        orDivider.classList.remove('hidden');
         list.innerHTML = '';
         
         const totalSize = await romCache.getTotalSize();
@@ -263,8 +316,6 @@
                     <p class="text-xs text-gray-500">${formatBytes(rom.size)} • CRC32: ${rom.crc32.toString(16).toUpperCase().padStart(8, '0')}</p>
                 </div>
                 <div class="flex gap-2 ml-3">
-                    <button class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded transition" 
-                            onclick="selectCachedROM('${rom.id}')">Load</button>
                     <button class="text-xs bg-red-900/50 hover:bg-red-900 text-red-400 px-3 py-1 rounded transition"
                             onclick="deleteCachedROM('${rom.id}')">Delete</button>
                 </div>
@@ -273,23 +324,67 @@
         });
     }
 
-    async function selectCachedROM(id) {
+    // Update the dropdown for selecting cached ROMs for patching
+    async function updateCachedROMsDropdown() {
+        const roms = await romCache.getAllROMs();
+        const select = document.getElementById('select-cached-rom');
+        
+        // Clear existing options except the first one
+        select.innerHTML = '<option value="">-- Select a cached ROM --</option>';
+        
+        roms.sort((a, b) => b.timestamp - a.timestamp).forEach(rom => {
+            const option = document.createElement('option');
+            option.value = rom.id;
+            option.textContent = `${rom.filename} (${formatBytes(rom.size)})`;
+            select.appendChild(option);
+        });
+    }
+
+    // Handle selecting a ROM from dropdown for patching
+    document.getElementById('select-cached-rom').addEventListener('change', async function(e) {
+        const id = e.target.value;
+        if (!id) return;
+        
         const rom = await romCache.getROM(id);
         if (rom) {
             currentROM = new Uint8Array(rom.data);
-            document.getElementById('rom-label').textContent = `✓ ${rom.filename} (${formatBytes(rom.size)})`;
-            document.getElementById('rom-label').className = 'text-xs text-green-400 font-mono';
-            document.getElementById('rom-drop-zone').classList.add('bg-green-900/20', 'border-green-600/30');
-            document.getElementById('rom-drop-zone').classList.remove('bg-[#0f0f12]');
+            currentROMName = rom.filename;
+            showSelectedROMIndicator(rom.filename, rom.size);
             updateApplyButtonState();
-            logToConsole(`Loaded cached ROM: ${rom.filename}`);
+            logToConsole(`✓ Selected cached ROM: ${rom.filename}`);
         }
+    });
+
+    // Show the selected ROM indicator
+    function showSelectedROMIndicator(filename, size) {
+        const indicator = document.getElementById('selected-rom-indicator');
+        const nameSpan = document.getElementById('selected-rom-name');
+        nameSpan.textContent = `${filename} (${formatBytes(size)})`;
+        indicator.classList.remove('hidden');
+        
+        // Update the drop zone to show it's been used
+        document.getElementById('rom-drop-zone').classList.add('opacity-50');
+        document.getElementById('rom-label').textContent = 'ROM selected above';
     }
+
+    // Clear selected ROM
+    document.getElementById('clear-selected-rom').addEventListener('click', function() {
+        currentROM = null;
+        currentROMName = null;
+        document.getElementById('selected-rom-indicator').classList.add('hidden');
+        document.getElementById('select-cached-rom').value = '';
+        document.getElementById('rom-drop-zone').classList.remove('opacity-50', 'bg-green-900/20', 'border-green-600/30');
+        document.getElementById('rom-label').textContent = 'Click or drag ROM to use';
+        document.getElementById('rom-label').className = 'text-xs text-gray-500 font-mono pointer-events-none';
+        updateApplyButtonState();
+        logToConsole('ROM selection cleared');
+    });
 
     async function deleteCachedROM(id) {
         if (confirm('Delete this cached ROM?')) {
             await romCache.deleteROM(id);
             await updateCachedROMsList();
+            await updateCachedROMsDropdown();
             logToConsole('Cached ROM deleted');
         }
     }
@@ -298,34 +393,95 @@
         if (confirm('Clear all cached ROMs? This cannot be undone.')) {
             await romCache.clearAll();
             await updateCachedROMsList();
+            await updateCachedROMsDropdown();
             logToConsole('Cache cleared');
         }
     });
 
-    // Existing ROM file handler - cache the ROM when uploaded
+    // ===== CACHE ROM SECTION (Purple box - just for caching) =====
+    const cacheRomFileInput = document.getElementById('cache-rom-file');
+    const cacheRomDropZone = document.getElementById('cache-rom-drop-zone');
+    const cacheStatus = document.getElementById('cache-status');
+
+    cacheRomDropZone.addEventListener('click', () => cacheRomFileInput.click());
+    
+    cacheRomDropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        cacheRomDropZone.style.borderColor = '#a855f7';
+    });
+    
+    cacheRomDropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        cacheRomDropZone.style.borderColor = '';
+    });
+    
+    cacheRomDropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        cacheRomDropZone.style.borderColor = '';
+        if (e.dataTransfer.files.length) {
+            handleCacheROMFile(e.dataTransfer.files[0]);
+        }
+    });
+
+    cacheRomFileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            handleCacheROMFile(e.target.files[0]);
+            cacheRomFileInput.value = '';
+        }
+    });
+
+    async function handleCacheROMFile(file) {
+        cacheStatus.classList.remove('hidden');
+        cacheStatus.textContent = 'Caching ROM...';
+        cacheStatus.className = 'text-xs text-yellow-400 text-center';
+        
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                await romCache.addROM(file, e.target.result);
+                await updateCachedROMsList();
+                await updateCachedROMsDropdown();
+                
+                cacheStatus.textContent = `✓ ${file.name} cached successfully!`;
+                cacheStatus.className = 'text-xs text-green-400 text-center';
+                logToConsole(`✓ ROM cached: ${file.name}`);
+                
+                // Hide status after 3 seconds
+                setTimeout(() => {
+                    cacheStatus.classList.add('hidden');
+                }, 3000);
+            } catch (err) {
+                cacheStatus.textContent = `Error: ${err.message}`;
+                cacheStatus.className = 'text-xs text-red-400 text-center';
+                logToConsole(`Error caching ROM: ${err.message}`);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // ===== ROM FOR PATCHING SECTION (Green box - upload new ROM) =====
     const romFileInput = document.getElementById('rom-file');
     const romDropZone = document.getElementById('rom-drop-zone');
     
-    // Click to open file picker - only on the zone itself
     romDropZone.addEventListener('click', (e) => {
         romFileInput.click();
     }, { once: false });
     
-    // Drag over
     romDropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        romDropZone.style.borderColor = '#3b82f6';
+        romDropZone.style.borderColor = '#22c55e';
     });
     
-    // Drag leave
     romDropZone.addEventListener('dragleave', (e) => {
         e.preventDefault();
         e.stopPropagation();
         romDropZone.style.borderColor = '';
     });
     
-    // Drop
     romDropZone.addEventListener('drop', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -335,7 +491,6 @@
         }
     });
 
-    // File input change - only process once
     let isProcessingROM = false;
     romFileInput.addEventListener('change', (e) => {
         if (isProcessingROM) return;
@@ -351,20 +506,21 @@
         const reader = new FileReader();
         reader.onload = async (e) => {
             currentROM = new Uint8Array(e.target.result);
+            currentROMName = file.name;
             
-            // Auto-save to cache
+            // Also auto-cache it for convenience
             try {
                 await romCache.addROM(file, e.target.result);
                 await updateCachedROMsList();
-                logToConsole(`✓ ROM loaded and saved to browser cache: ${file.name}`);
+                await updateCachedROMsDropdown();
+                logToConsole(`✓ ROM loaded and cached: ${file.name}`);
             } catch (err) {
-                logToConsole(`Warning: Could not cache ROM - ${err.message}`);
+                logToConsole(`ROM loaded (cache failed: ${err.message})`);
             }
             
-            document.getElementById('rom-label').textContent = `✓ ${file.name} (${formatBytes(file.size)})`;
-            document.getElementById('rom-label').className = 'text-xs text-green-400 font-mono';
-            document.getElementById('rom-drop-zone').classList.add('bg-green-900/20', 'border-green-600/30');
-            document.getElementById('rom-drop-zone').classList.remove('bg-[#0f0f12]');
+            // Show selected indicator
+            showSelectedROMIndicator(file.name, file.size);
+            document.getElementById('select-cached-rom').value = '';
             
             updateApplyButtonState();
         };

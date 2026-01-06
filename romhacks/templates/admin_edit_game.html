@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ item.title }} | Admin | ROMHACKS.NET{% endblock %}
+{% block meta_description %}Edit {% if item_type == 'port' %}port{% else %}ROM hack{% endif %} details.{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mb-12">
+    <div class="mb-8 flex justify-between items-start flex-wrap gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-white pixel-font mb-2">Edit {{ item.title }}</h1>
+            <p class="text-gray-400">{% if item_type == 'port' %}Port{% else %}ROM Hack{% endif %} ID: <code class="text-blue-400">{{ item.id }}</code></p>
+        </div>
+        <div class="flex gap-3">
+            {% if item_type == 'port' %}
+            <a href="{{ url_for('admin_ports') }}" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-600 rounded-lg transition-colors text-sm font-bold">
+                ← Back to Ports
+            </a>
+            {% else %}
+            <a href="{{ url_for('admin_games') }}" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-600 rounded-lg transition-colors text-sm font-bold">
+                ← Back to Games
+            </a>
+            {% endif %}
+            <a href="{{ url_for('game_page', game_id=item.id) }}" target="_blank" class="px-4 py-2 bg-blue-900/50 hover:bg-blue-900 text-blue-300 border border-blue-600 rounded-lg transition-colors text-sm font-bold">
+                View Page →
+            </a>
+        </div>
+    </div>
+
+    <form method="POST" class="space-y-6">
+        <!-- Basic Information -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">info</span>
+                Basic Information
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Title *</label>
+                    <input type="text" name="title" value="{{ item.title }}" required
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Author</label>
+                    <input type="text" name="author" value="{{ item.author or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">{% if item_type == 'port' %}Platform{% else %}Console{% endif %}</label>
+                    <input type="text" name="console" value="{{ item.console or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                           placeholder="e.g. GBA, PC, Android">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Version</label>
+                    <input type="text" name="version" value="{{ item.version or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Release Date</label>
+                    <input type="text" name="release_date" value="{{ item.release_date or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                           placeholder="YYYY-MM-DD">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Base Game</label>
+                    <input type="text" name="base_game" value="{{ item.base_game or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                </div>
+                {% if item_type == 'port' %}
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Original Platform</label>
+                    <input type="text" name="original_platform" value="{{ item.original_platform or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                </div>
+                {% else %}
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Version Region</label>
+                    <input type="text" name="version_region" value="{{ item.version_region or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Dev Stage</label>
+                    <select name="dev_stage" class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                        <option value="">-- Select --</option>
+                        <option value="alpha" {% if item.dev_stage == 'alpha' %}selected{% endif %}>Alpha</option>
+                        <option value="beta" {% if item.dev_stage == 'beta' %}selected{% endif %}>Beta</option>
+                        <option value="release" {% if item.dev_stage == 'release' %}selected{% endif %}>Release</option>
+                        <option value="complete" {% if item.dev_stage == 'complete' %}selected{% endif %}>Complete</option>
+                    </select>
+                </div>
+                {% endif %}
+            </div>
+            <div class="mt-4">
+                <label class="block text-sm font-bold text-gray-300 mb-2">Description</label>
+                <textarea name="description" rows="4"
+                          class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">{{ item.description or '' }}</textarea>
+            </div>
+            <div class="mt-4">
+                <label class="block text-sm font-bold text-gray-300 mb-2">Features (comma-separated)</label>
+                <input type="text" name="features" value="{{ item.features|join(', ') if item.features else '' }}"
+                       class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                       placeholder="Feature 1, Feature 2, Feature 3">
+            </div>
+            <div class="mt-4 flex flex-wrap gap-6">
+                <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
+                    <input type="checkbox" name="popular" {% if item.popular %}checked{% endif %}
+                           class="w-4 h-4 rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500">
+                    <span>Popular</span>
+                </label>
+                <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
+                    <input type="checkbox" name="online_play" {% if item.online_play %}checked{% endif %}
+                           class="w-4 h-4 rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500">
+                    <span>Online Play</span>
+                </label>
+                <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
+                    <input type="checkbox" name="instruction" {% if item.instruction %}checked{% endif %}
+                           class="w-4 h-4 rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500">
+                    <span>Has Special Instructions</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Media -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">image</span>
+                Media
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Cover Image URL</label>
+                    <input type="url" name="image_url" value="{{ item.image_url or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                    {% if item.image_url %}
+                    <img src="{{ item.image_url }}" alt="Preview" class="mt-2 h-24 object-contain rounded">
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Download Link</label>
+                    <input type="url" name="download_link" value="{{ item.download_link or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+            <div class="mt-4">
+                <label class="block text-sm font-bold text-gray-300 mb-2">Screenshots (one URL per line)</label>
+                <textarea name="screenshots" rows="3"
+                          class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 font-mono text-sm">{{ item.screenshots|join('\n') if item.screenshots else '' }}</textarea>
+            </div>
+        </div>
+
+        <!-- ROM/Patch Information -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">memory</span>
+                ROM/Patch Information
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Base Region</label>
+                    <input type="text" name="base_region" value="{{ item.base_region or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                           placeholder="e.g. USA, EUR, JPN">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Base Revision</label>
+                    <input type="text" name="base_revision" value="{{ item.base_revision or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                           placeholder="e.g. Rev 0, Rev 1">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Base Header</label>
+                    <input type="text" name="base_header" value="{{ item.base_header or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                           placeholder="e.g. Headered, No-Intro">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Patch Format</label>
+                    <input type="text" name="patch_format" value="{{ item.patch_format or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                           placeholder="e.g. IPS, BPS, UPS, xdelta">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Output Extension</label>
+                    <input type="text" name="patch_output_ext" value="{{ item.patch_output_ext or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                           placeholder="e.g. .gba, .sfc, .z64">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">CRC32</label>
+                    <input type="text" name="base_checksum_crc32" value="{{ item.base_checksum_crc32 or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 font-mono text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">MD5</label>
+                    <input type="text" name="base_checksum_md5" value="{{ item.base_checksum_md5 or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 font-mono text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">SHA1</label>
+                    <input type="text" name="base_checksum_sha1" value="{{ item.base_checksum_sha1 or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 font-mono text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Platform Instructions -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">description</span>
+                Platform Instructions
+            </h2>
+            <div class="mb-4">
+                <label class="block text-sm font-bold text-gray-300 mb-2">General Instruction Text</label>
+                <textarea name="instruction_text" rows="3"
+                          class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">{{ item.instruction_text or '' }}</textarea>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for platform in ['pc', 'android', 'linux', 'web', 'ios', 'mac', 'switch', 'ps4', 'xbox'] %}
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">{{ platform|upper }} Instructions</label>
+                    <textarea name="instructions_{{ platform }}" rows="2"
+                              class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 text-sm">{{ item['instructions_' + platform] or '' }}</textarea>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Community Links -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">link</span>
+                Community & Support Links
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Discord URL</label>
+                    <input type="url" name="discord_url" value="{{ item.discord_url or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Reddit URL</label>
+                    <input type="url" name="reddit_url" value="{{ item.reddit_url or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Support Forum URL</label>
+                    <input type="url" name="support_forum_url" value="{{ item.support_forum_url or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Troubleshooting URL</label>
+                    <input type="url" name="troubleshooting_url" value="{{ item.troubleshooting_url or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">ROM Checker URL</label>
+                    <input type="url" name="rom_checker_url" value="{{ item.rom_checker_url or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="flex gap-4 justify-end">
+            {% if item_type == 'port' %}
+            <a href="{{ url_for('admin_ports') }}" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-bold transition-colors">
+                Cancel
+            </a>
+            {% else %}
+            <a href="{{ url_for('admin_games') }}" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-bold transition-colors">
+                Cancel
+            </a>
+            {% endif %}
+            <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined">save</span>
+                Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+{% endblock %}

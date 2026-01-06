@@ -19,6 +19,10 @@ from database import (
     update_submission_status,
     reject_submission,
     approve_submission,
+    update_game,
+    update_port,
+    delete_game,
+    delete_port,
 )
 import json
 import os
@@ -122,6 +126,128 @@ def api_submission_status(submission_id):
     })
 
 
+# --- Admin Game/Port Management Routes ---
+
+@app.route('/admin/games')
+@login_required
+def admin_games():
+    """Admin page to manage games (romhacks)"""
+    games = get_games()
+    attach_download_counts(games)
+    games.sort(key=lambda g: g.get('title', '').lower())
+    return render_template('admin_games.html', items=games, item_type='game')
+
+
+@app.route('/admin/ports')
+@login_required
+def admin_ports():
+    """Admin page to manage ports"""
+    ports_data = get_ports()
+    attach_download_counts(ports_data)
+    ports_data.sort(key=lambda p: p.get('title', '').lower())
+    return render_template('admin_games.html', items=ports_data, item_type='port')
+
+
+@app.route('/admin/game/<game_id>/edit', methods=['GET', 'POST'])
+@login_required
+def admin_edit_game(game_id):
+    """Edit a game (romhack)"""
+    game = get_game_by_id(game_id)
+    if not game:
+        abort(404)
+    
+    if request.method == 'POST':
+        data = {}
+        # Extract form data
+        for field in ['title', 'console', 'version', 'release_date', 'author',
+                      'description', 'base_game', 'version_region', 'download_link',
+                      'image_url', 'base_region', 'base_revision', 'base_header',
+                      'base_checksum_crc32', 'base_checksum_md5', 'base_checksum_sha1',
+                      'patch_format', 'patch_output_ext', 'dev_stage', 'instruction_text',
+                      'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
+                      'rom_checker_url', 'instructions_pc', 'instructions_android',
+                      'instructions_linux', 'instructions_web', 'instructions_ios',
+                      'instructions_mac', 'instructions_switch', 'instructions_ps4', 'instructions_xbox']:
+            if field in request.form:
+                data[field] = request.form.get(field, '').strip()
+        
+        # Handle features as comma-separated list
+        features_str = request.form.get('features', '')
+        data['features'] = [f.strip() for f in features_str.split(',') if f.strip()]
+        
+        # Handle screenshots as newline-separated list
+        screenshots_str = request.form.get('screenshots', '')
+        data['screenshots'] = [s.strip() for s in screenshots_str.split('\n') if s.strip()]
+        
+        # Boolean fields
+        data['popular'] = 'popular' in request.form
+        data['online_play'] = 'online_play' in request.form
+        data['instruction'] = 'instruction' in request.form
+        
+        update_game(game_id, data)
+        return redirect(url_for('admin_games'))
+    
+    return render_template('admin_edit_game.html', item=game, item_type='game')
+
+
+@app.route('/admin/port/<port_id>/edit', methods=['GET', 'POST'])
+@login_required
+def admin_edit_port(port_id):
+    """Edit a port"""
+    port = get_port_by_id(port_id)
+    if not port:
+        abort(404)
+    
+    if request.method == 'POST':
+        data = {}
+        # Extract form data
+        for field in ['title', 'console', 'version', 'release_date', 'author',
+                      'description', 'base_game', 'original_platform', 'download_link',
+                      'image_url', 'base_region', 'base_revision', 'base_header',
+                      'base_checksum_crc32', 'base_checksum_md5', 'base_checksum_sha1',
+                      'patch_format', 'patch_output_ext', 'instruction_text',
+                      'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
+                      'rom_checker_url', 'instructions_pc', 'instructions_android',
+                      'instructions_linux', 'instructions_web', 'instructions_ios',
+                      'instructions_mac', 'instructions_switch', 'instructions_ps4', 'instructions_xbox']:
+            if field in request.form:
+                data[field] = request.form.get(field, '').strip()
+        
+        # Handle features as comma-separated list
+        features_str = request.form.get('features', '')
+        data['features'] = [f.strip() for f in features_str.split(',') if f.strip()]
+        
+        # Handle screenshots as newline-separated list
+        screenshots_str = request.form.get('screenshots', '')
+        data['screenshots'] = [s.strip() for s in screenshots_str.split('\n') if s.strip()]
+        
+        # Boolean fields
+        data['popular'] = 'popular' in request.form
+        data['online_play'] = 'online_play' in request.form
+        data['instruction'] = 'instruction' in request.form
+        
+        update_port(port_id, data)
+        return redirect(url_for('admin_ports'))
+    
+    return render_template('admin_edit_game.html', item=port, item_type='port')
+
+
+@app.route('/api/admin/game/<game_id>/delete', methods=['POST'])
+@login_required
+def api_delete_game(game_id):
+    """API to delete a game"""
+    success = delete_game(game_id)
+    return jsonify({'success': success})
+
+
+@app.route('/api/admin/port/<port_id>/delete', methods=['POST'])
+@login_required
+def api_delete_port(port_id):
+    """API to delete a port"""
+    success = delete_port(port_id)
+    return jsonify({'success': success})
+
+
 def attach_download_counts(items):
     """Annotate each item with its download count."""
     if not items:
@@ -189,6 +315,7 @@ CONSOLE_STYLES = {
     'nds': 'bg-pink-900/80 text-pink-300 border-pink-500/50',
     '3ds': 'bg-orange-900/80 text-orange-300 border-orange-500/50',
     'wii': 'bg-cyan-900/80 text-cyan-300 border-cyan-500/50',
+    'gcn': 'bg-violet-900/80 text-violet-300 border-violet-500/50',
     'default': 'bg-gray-800 text-gray-300 border-gray-600'
 }
 PLATFORM_STYLE = {

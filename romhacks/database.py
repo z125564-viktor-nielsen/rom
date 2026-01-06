@@ -886,3 +886,143 @@ def reject_submission(submission_id, reason):
 def approve_submission(submission_id):
     """Approve a submission"""
     return update_submission_status(submission_id, 'approved', None)
+
+
+def update_game(game_id, data):
+    """Update a game's data in the games table"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Build dynamic update query based on provided fields
+    allowed_fields = [
+        'title', 'console', 'version', 'release_date', 'author',
+        'description', 'features', 'image_url', 'screenshots',
+        'download_link', 'base_game', 'version_region', 'popular',
+        'instruction', 'instruction_text', 'base_region', 'base_revision',
+        'base_header', 'base_checksum_crc32', 'base_checksum_md5',
+        'base_checksum_sha1', 'patch_format', 'patch_output_ext',
+        'online_play', 'dev_stage', 'social_links',
+        'support_forum_url', 'discord_url', 'reddit_url',
+        'troubleshooting_url', 'rom_checker_url',
+        'instructions_pc', 'instructions_android', 'instructions_linux',
+        'instructions_web', 'instructions_ios', 'instructions_mac',
+        'instructions_switch', 'instructions_ps4', 'instructions_xbox'
+    ]
+    
+    update_parts = []
+    values = []
+    
+    for field in allowed_fields:
+        if field in data:
+            update_parts.append(f'{field} = ?')
+            value = data[field]
+            # Convert lists to JSON strings
+            if isinstance(value, (list, dict)):
+                value = json.dumps(value)
+            # Convert booleans to integers
+            if isinstance(value, bool):
+                value = 1 if value else 0
+            values.append(value)
+    
+    if not update_parts:
+        conn.close()
+        return False
+    
+    values.append(game_id)
+    query = f"UPDATE games SET {', '.join(update_parts)} WHERE id = ?"
+    
+    try:
+        cursor.execute(query, values)
+        conn.commit()
+        success = cursor.rowcount > 0
+        conn.close()
+        return success
+    except Exception as e:
+        conn.close()
+        raise e
+
+
+def update_port(port_id, data):
+    """Update a port's data in the ports table"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Build dynamic update query based on provided fields
+    allowed_fields = [
+        'title', 'console', 'version', 'release_date', 'author',
+        'description', 'features', 'image_url', 'screenshots',
+        'download_link', 'base_game', 'original_platform', 'popular',
+        'instruction', 'instruction_text', 'base_region', 'base_revision',
+        'base_header', 'base_checksum_crc32', 'base_checksum_md5',
+        'base_checksum_sha1', 'patch_format', 'patch_output_ext',
+        'online_play', 'social_links',
+        'support_forum_url', 'discord_url', 'reddit_url',
+        'troubleshooting_url', 'rom_checker_url',
+        'instructions_pc', 'instructions_android', 'instructions_linux',
+        'instructions_web', 'instructions_ios', 'instructions_mac',
+        'instructions_switch', 'instructions_ps4', 'instructions_xbox'
+    ]
+    
+    update_parts = []
+    values = []
+    
+    for field in allowed_fields:
+        if field in data:
+            update_parts.append(f'{field} = ?')
+            value = data[field]
+            # Convert lists to JSON strings
+            if isinstance(value, (list, dict)):
+                value = json.dumps(value)
+            # Convert booleans to integers
+            if isinstance(value, bool):
+                value = 1 if value else 0
+            values.append(value)
+    
+    if not update_parts:
+        conn.close()
+        return False
+    
+    values.append(port_id)
+    query = f"UPDATE ports SET {', '.join(update_parts)} WHERE id = ?"
+    
+    try:
+        cursor.execute(query, values)
+        conn.commit()
+        success = cursor.rowcount > 0
+        conn.close()
+        return success
+    except Exception as e:
+        conn.close()
+        raise e
+
+
+def delete_game(game_id):
+    """Delete a game from the games table"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute('DELETE FROM games WHERE id = ?', (game_id,))
+        conn.commit()
+        success = cursor.rowcount > 0
+        conn.close()
+        return success
+    except Exception as e:
+        conn.close()
+        raise e
+
+
+def delete_port(port_id):
+    """Delete a port from the ports table"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute('DELETE FROM ports WHERE id = ?', (port_id,))
+        conn.commit()
+        success = cursor.rowcount > 0
+        conn.close()
+        return success
+    except Exception as e:
+        conn.close()
+        raise e

@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage {% if item_type == 'port' %}Ports{% else %}Games{% endif %} | Admin | ROMHACKS.NET{% endblock %}
+{% block meta_description %}Admin panel for managing {% if item_type == 'port' %}ports{% else %}ROM hacks{% endif %}.{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto mb-12">
+    <div class="mb-8 flex justify-between items-start flex-wrap gap-4">
+        <div>
+            <h1 class="text-4xl font-bold text-white pixel-font mb-2">
+                Manage {% if item_type == 'port' %}Ports{% else %}ROM Hacks{% endif %}
+            </h1>
+            <p class="text-gray-400">Edit or delete {% if item_type == 'port' %}ports{% else %}ROM hacks{% endif %}</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('admin_dashboard') }}" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-600 rounded-lg transition-colors text-sm font-bold">
+                ← Back to Dashboard
+            </a>
+            {% if item_type == 'port' %}
+            <a href="{{ url_for('admin_games') }}" class="px-4 py-2 bg-purple-900/50 hover:bg-purple-900 text-purple-300 border border-purple-600 rounded-lg transition-colors text-sm font-bold">
+                Manage ROM Hacks
+            </a>
+            {% else %}
+            <a href="{{ url_for('admin_ports') }}" class="px-4 py-2 bg-green-900/50 hover:bg-green-900 text-green-300 border border-green-600 rounded-lg transition-colors text-sm font-bold">
+                Manage Ports
+            </a>
+            {% endif %}
+            <a href="{{ url_for('admin_logout') }}" class="px-4 py-2 bg-red-900/50 hover:bg-red-900 text-red-300 border border-red-600 rounded-lg transition-colors text-sm font-bold">
+                Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Search box -->
+    <div class="mb-6">
+        <input type="text" id="searchBox" placeholder="Search by title, author, or base game..." 
+               class="w-full max-w-md px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500">
+    </div>
+
+    <!-- Items count -->
+    <p class="text-gray-400 mb-4">Total: <span id="itemCount">{{ items|length }}</span> {% if item_type == 'port' %}ports{% else %}ROM hacks{% endif %}</p>
+
+    <!-- Items Table -->
+    {% if items %}
+    <div class="bg-[#1a1a20] border border-gray-800 rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-900/50 border-b border-gray-700">
+                    <tr>
+                        <th class="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase">Image</th>
+                        <th class="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase">Title</th>
+                        <th class="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase">{% if item_type == 'port' %}Platform{% else %}Console{% endif %}</th>
+                        <th class="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase">Base Game</th>
+                        <th class="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase">Author</th>
+                        <th class="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase">Downloads</th>
+                        <th class="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsTableBody" class="divide-y divide-gray-700">
+                    {% for item in items %}
+                    <tr class="hover:bg-gray-900/30 transition-colors item-row" 
+                        data-title="{{ item.title|lower }}" 
+                        data-author="{{ (item.author or '')|lower }}"
+                        data-base="{{ (item.base_game or '')|lower }}">
+                        <td class="px-4 py-3">
+                            {% if item.image_url %}
+                            <img src="{{ item.image_url }}" alt="{{ item.title }}" class="w-12 h-12 object-cover rounded">
+                            {% else %}
+                            <div class="w-12 h-12 bg-gray-800 rounded flex items-center justify-center">
+                                <span class="material-symbols-outlined text-gray-600">image</span>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            <a href="{{ url_for('game_page', game_id=item.id) }}" target="_blank" class="font-semibold text-white hover:text-blue-400 transition-colors">
+                                {{ item.title }}
+                            </a>
+                            {% if item.popular %}
+                            <span class="ml-2 px-1.5 py-0.5 text-xs bg-yellow-900/50 text-yellow-300 rounded">Popular</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-gray-300">
+                            {{ item.consoles|join(', ')|upper if item.consoles else item.console|upper }}
+                        </td>
+                        <td class="px-4 py-3 text-gray-400 truncate max-w-[150px]">{{ item.base_game or '-' }}</td>
+                        <td class="px-4 py-3 text-gray-400">{{ item.author or '-' }}</td>
+                        <td class="px-4 py-3 text-gray-400">{{ item.download_count|download_count_label }}</td>
+                        <td class="px-4 py-3">
+                            <div class="flex gap-2">
+                                {% if item_type == 'port' %}
+                                <a href="{{ url_for('admin_edit_port', port_id=item.id) }}" 
+                                   class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded transition-colors">
+                                    Edit
+                                </a>
+                                <button onclick="deleteItem('{{ item.id }}', '{{ item.title|e }}')" 
+                                        class="px-3 py-1 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded transition-colors">
+                                    Delete
+                                </button>
+                                {% else %}
+                                <a href="{{ url_for('admin_edit_game', game_id=item.id) }}" 
+                                   class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded transition-colors">
+                                    Edit
+                                </a>
+                                <button onclick="deleteItem('{{ item.id }}', '{{ item.title|e }}')" 
+                                        class="px-3 py-1 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded transition-colors">
+                                    Delete
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-gray-900/50 border border-gray-700 rounded-lg p-12 text-center">
+        <span class="material-symbols-outlined text-gray-500 text-5xl mb-4 block">folder_off</span>
+        <p class="text-gray-400 text-lg">No {% if item_type == 'port' %}ports{% else %}ROM hacks{% endif %} found</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden">
+    <div class="bg-[#1a1a20] border border-gray-700 rounded-lg p-6 max-w-md w-full mx-4">
+        <h3 class="text-xl font-bold text-white mb-4">Confirm Delete</h3>
+        <p class="text-gray-300 mb-6">Are you sure you want to delete "<span id="deleteItemTitle" class="text-red-400"></span>"? This action cannot be undone.</p>
+        <div class="flex gap-3 justify-end">
+            <button onclick="closeDeleteModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-bold transition-colors">
+                Cancel
+            </button>
+            <button id="confirmDeleteBtn" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-bold transition-colors">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+
+<script>
+    const itemType = '{{ item_type }}';
+    let deleteItemId = null;
+
+    // Search functionality
+    document.getElementById('searchBox').addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.item-row');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const title = row.dataset.title || '';
+            const author = row.dataset.author || '';
+            const base = row.dataset.base || '';
+            
+            if (query === '' || title.includes(query) || author.includes(query) || base.includes(query)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        document.getElementById('itemCount').textContent = visibleCount;
+    });
+
+    function deleteItem(id, title) {
+        deleteItemId = id;
+        document.getElementById('deleteItemTitle').textContent = title;
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.add('hidden');
+        deleteItemId = null;
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+        if (!deleteItemId) return;
+
+        const endpoint = itemType === 'port' 
+            ? `/api/admin/port/${deleteItemId}/delete`
+            : `/api/admin/game/${deleteItemId}/delete`;
+
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Failed to delete item');
+            }
+        } catch (error) {
+            alert('Error deleting item: ' + error.message);
+        }
+        
+        closeDeleteModal();
+    });
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeDeleteModal();
+        }
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDeleteModal();
+        }
+    });
+</script>
+{% endblock %}
