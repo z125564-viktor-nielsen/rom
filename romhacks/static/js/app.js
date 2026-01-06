@@ -28,6 +28,8 @@ function applyPatchVCD(sourceData, patchData, ignoreChecksums) { var patchStream
 
 let activeConsole = 'all';
 let activeOriginalPlatform = 'all';
+let activeGameFilter = '';
+let netplayFilter = false;
 let currentPage = 1;
 const gamesPerPage = 12;
 let allCards = [];
@@ -40,15 +42,27 @@ function updatePagination() {
     const filteredCards = allCards.filter(card => {
         const cardConsole = (card.dataset.console || '').toLowerCase();
         const cardOriginalPlatform = (card.dataset.originalPlatform || '').toLowerCase();
+        const cardBaseGame = (card.dataset.baseGame || '').toLowerCase();
         const cardTitle = card.querySelector('h3').innerText.toLowerCase();
+        
+        // Check if card has any element containing "Online" text
+        const hasOnlinePlay = Array.from(card.querySelectorAll('*')).some(el => el.textContent.includes('Online'));
 
         const consoles = cardConsole.split(/\s+/).filter(Boolean);
         
-        const matchConsole = (activeConsole === 'all' || consoles.includes(activeConsole));
+        // Check console filter
+        let matchConsole = (activeConsole === 'all' || consoles.includes(activeConsole));
+        
+        // Check netplay filter
+        let matchNetplay = !netplayFilter || hasOnlinePlay;
+        
+        // Check game filter
+        let matchGame = (activeGameFilter === '' || cardBaseGame === activeGameFilter);
+        
         const matchOriginalPlatform = (activeOriginalPlatform === 'all' || cardOriginalPlatform === activeOriginalPlatform);
         const matchSearch = (query === '' || cardTitle.includes(query));
         
-        return matchConsole && matchOriginalPlatform && matchSearch;
+        return matchConsole && matchNetplay && matchGame && matchOriginalPlatform && matchSearch;
     });
     
     const totalPages = Math.ceil(filteredCards.length / gamesPerPage);
@@ -74,7 +88,14 @@ function filterHacks(selectedConsole) {
     // 1. If a button was clicked, update the active console
     if (selectedConsole) {
         activeConsole = selectedConsole;
+        activeGameFilter = ''; // Reset game filter when console changes
         currentPage = 1; // Reset to first page on filter change
+        
+        // Reset game dropdown
+        const gameFilter = document.getElementById('game-filter');
+        if (gameFilter) {
+            gameFilter.value = '';
+        }
         
         // Determine page type to use correct color classes
         const isRomhacksPage = document.body.classList.contains('romhacks-page') || 
@@ -99,6 +120,7 @@ function filterHacks(selectedConsole) {
         }
     }
 
+    updateGameDropdown();
     updatePagination();
 }
 
@@ -134,6 +156,77 @@ function filterByOriginal(selectedOriginal) {
     updatePagination();
 }
 
+function filterByNetplay(checked) {
+    // Handle checkbox change
+    netplayFilter = checked;
+    currentPage = 1;
+    updatePagination();
+}
+
+function updateGameDropdown() {
+    const gameFilter = document.getElementById('game-filter');
+    if (!gameFilter) return;
+
+    // Get unique base games for the current console filter
+    const baseGames = new Set();
+    allCards.forEach(card => {
+        const cardConsole = (card.dataset.console || '').toLowerCase();
+        const cardBaseGame = (card.dataset.baseGame || '').trim();
+        
+        const consoles = cardConsole.split(/\s+/).filter(Boolean);
+        const normalizedConsole = normalizeConsoleForComparison(cardConsole);
+        
+        if ((activeConsole === 'all' || consoles.includes(activeConsole)) && cardBaseGame) {
+            baseGames.add(cardBaseGame);
+        }
+    });
+
+    // Sort base games alphabetically
+    const sortedGames = Array.from(baseGames).sort();
+
+    // Store current selection
+    const currentValue = gameFilter.value;
+
+    // Rebuild dropdown
+    gameFilter.innerHTML = '<option value="">All Games</option>';
+    sortedGames.forEach(baseGame => {
+        const option = document.createElement('option');
+        option.value = baseGame.toLowerCase();
+        option.textContent = baseGame;
+        gameFilter.appendChild(option);
+    });
+
+    // Restore selection if it still exists
+    gameFilter.value = currentValue;
+}
+
+function normalizeConsoleForComparison(console) {
+    const normalizedMap = {
+        'game boy': 'gb',
+        'game boy color': 'gbc',
+        'game boy advance': 'gba',
+        'super nintendo': 'snes',
+        'nintendo 64': 'n64',
+        'nintendo ds': 'nds',
+        'wii': 'wii'
+    };
+    return normalizedMap[console.toLowerCase()] || console.toLowerCase();
+}
+
+function filterByGame(baseGame) {
+    activeGameFilter = baseGame.toLowerCase();
+    currentPage = 1;
+    updateGameDropdown();
+    updatePagination();
+}
+
+function filterByNetplay(checked) {
+    // Handle checkbox change
+    netplayFilter = checked;
+    currentPage = 1;
+    updatePagination();
+}
+
 function prevPage() {
     if (currentPage > 1) {
         currentPage--;
@@ -148,15 +241,21 @@ function nextPage() {
     const filteredCards = allCards.filter(card => {
         const cardConsole = (card.dataset.console || '').toLowerCase();
         const cardOriginalPlatform = (card.dataset.originalPlatform || '').toLowerCase();
+        const cardBaseGame = (card.dataset.baseGame || '').toLowerCase();
         const cardTitle = card.querySelector('h3').innerText.toLowerCase();
+        
+        // Check if card has any element containing "Online" text
+        const hasOnlinePlay = Array.from(card.querySelectorAll('*')).some(el => el.textContent.includes('Online'));
 
         const consoles = cardConsole.split(/\s+/).filter(Boolean);
         
         const matchConsole = (activeConsole === 'all' || consoles.includes(activeConsole));
+        const matchNetplay = !netplayFilter || hasOnlinePlay;
+        const matchGame = (activeGameFilter === '' || cardBaseGame === activeGameFilter);
         const matchOriginalPlatform = (activeOriginalPlatform === 'all' || cardOriginalPlatform === activeOriginalPlatform);
         const matchSearch = (query === '' || cardTitle.includes(query));
         
-        return matchConsole && matchOriginalPlatform && matchSearch;
+        return matchConsole && matchNetplay && matchGame && matchOriginalPlatform && matchSearch;
     });
     
     const totalPages = Math.ceil(filteredCards.length / gamesPerPage);
@@ -193,6 +292,10 @@ function sortHacks(criteria) {
             const dateObjB = dateB ? new Date(dateB) : new Date(0);
             
             return dateObjA - dateObjB;
+        } else if(criteria === 'downloads') {
+            const downloadsA = parseInt(a.querySelector('[class*="download"]')?.innerText.replace(/[^0-9.k]/g, '') || '0');
+            const downloadsB = parseInt(b.querySelector('[class*="download"]')?.innerText.replace(/[^0-9.k]/g, '') || '0');
+            return downloadsB - downloadsA;
         }
         return 0;
     });
@@ -210,6 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize pagination on page load
     allCards = Array.from(document.querySelectorAll('.hack-card'));
     if (allCards.length > 0) {
+        updateGameDropdown(); // Initialize game dropdown with all games
         updatePagination();
     }
     

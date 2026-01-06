@@ -96,6 +96,7 @@ def init_db():
             base_checksum_sha1 TEXT,
             patch_format TEXT,
             patch_output_ext TEXT,
+            dev_stage TEXT,
             popular INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -124,8 +125,30 @@ def init_db():
         cursor.execute("ALTER TABLE games ADD COLUMN patch_format TEXT")
     if 'patch_output_ext' not in game_cols:
         cursor.execute("ALTER TABLE games ADD COLUMN patch_output_ext TEXT")
-    
-    # Remove old generic hash columns if they exist
+    if 'online_play' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN online_play INTEGER DEFAULT 0")
+    if 'instructions_json' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN instructions_json TEXT")
+    # Add platform-specific instruction columns
+    for platform in ['pc', 'android', 'linux', 'web', 'ios', 'mac', 'switch', 'ps4', 'xbox']:
+        col_name = f'instructions_{platform}'
+        if col_name not in game_cols:
+            cursor.execute(f"ALTER TABLE games ADD COLUMN {col_name} TEXT")
+    if 'social_links' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN social_links TEXT")
+    if 'dev_stage' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN dev_stage TEXT")
+    # Support/help link columns
+    if 'support_forum_url' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN support_forum_url TEXT")
+    if 'discord_url' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN discord_url TEXT")
+    if 'reddit_url' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN reddit_url TEXT")
+    if 'troubleshooting_url' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN troubleshooting_url TEXT")
+    if 'rom_checker_url' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN rom_checker_url TEXT")
     if 'base_hash' in game_cols:
         # Can't drop columns in SQLite, so we'll leave them but not use them
         pass
@@ -187,18 +210,54 @@ def init_db():
         cursor.execute("ALTER TABLE ports ADD COLUMN patch_format TEXT")
     if 'patch_output_ext' not in port_cols:
         cursor.execute("ALTER TABLE ports ADD COLUMN patch_output_ext TEXT")
-    
-    # Requests table
+    if 'online_play' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN online_play INTEGER DEFAULT 0")
+    if 'instructions_json' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN instructions_json TEXT")
+    # Add platform-specific instruction columns
+    for platform in ['pc', 'android', 'linux', 'web', 'ios', 'mac', 'switch', 'ps4', 'xbox']:
+        col_name = f'instructions_{platform}'
+        if col_name not in port_cols:
+            cursor.execute(f"ALTER TABLE ports ADD COLUMN {col_name} TEXT")
+    if 'social_links' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN social_links TEXT")
+    # Support/help link columns
+    if 'support_forum_url' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN support_forum_url TEXT")
+    if 'discord_url' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN discord_url TEXT")
+    if 'reddit_url' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN reddit_url TEXT")
+    if 'troubleshooting_url' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN troubleshooting_url TEXT")
+    if 'rom_checker_url' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN rom_checker_url TEXT")
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS requests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            game_type TEXT DEFAULT 'romhack',
             title TEXT NOT NULL,
             base_game TEXT,
             console TEXT,
-            app TEXT,
-            patch_page_url TEXT,
-            release_date TEXT,
             author TEXT,
+            release_date TEXT,
+            version TEXT,
+            description TEXT,
+            features TEXT,
+            download_link TEXT,
+            patch_format TEXT,
+            patch_page_url TEXT,
+            project_link TEXT,
+            base_region TEXT,
+            base_revision TEXT,
+            base_checksum_crc32 TEXT,
+            base_checksum_md5 TEXT,
+            base_checksum_sha1 TEXT,
+            image_url TEXT,
+            screenshots TEXT,
+            dev_stage TEXT,
+            online_play INTEGER DEFAULT 0,
+            email TEXT,
             notes TEXT,
             submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             status TEXT DEFAULT 'new',
@@ -210,8 +269,35 @@ def init_db():
 
     cursor.execute("PRAGMA table_info(requests)")
     request_cols = {row[1] for row in cursor.fetchall()}  # row[1] = column name
-    if 'release_date' not in request_cols:
-        cursor.execute("ALTER TABLE requests ADD COLUMN release_date TEXT")
+    
+    # Add any missing columns
+    migration_columns = {
+        'game_type': 'TEXT DEFAULT "romhack"',
+        'version': 'TEXT',
+        'description': 'TEXT',
+        'features': 'TEXT',
+        'download_link': 'TEXT',
+        'patch_format': 'TEXT',
+        'project_link': 'TEXT',
+        'base_region': 'TEXT',
+        'base_revision': 'TEXT',
+        'base_checksum_crc32': 'TEXT',
+        'base_checksum_md5': 'TEXT',
+        'base_checksum_sha1': 'TEXT',
+        'image_url': 'TEXT',
+        'screenshots': 'TEXT',
+        'dev_stage': 'TEXT',
+        'online_play': 'INTEGER DEFAULT 0',
+        'email': 'TEXT',
+        'consoles': 'TEXT',
+        'instructions_pc': 'TEXT',
+        'instructions_android': 'TEXT',
+        'instructions_linux': 'TEXT'
+    }
+    
+    for col_name, col_type in migration_columns.items():
+        if col_name not in request_cols:
+            cursor.execute(f"ALTER TABLE requests ADD COLUMN {col_name} {col_type}")
     
     # Downloads table for tracking patch downloads
     cursor.execute('''
@@ -397,6 +483,39 @@ def load_ports_from_json():
     conn.commit()
     conn.close()
 
+def insert_port(port_data):
+    """Insert a port directly into the ports table"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    port_id = port_data.get('id', port_data.get('title', 'port').lower().replace(' ', '_'))
+    
+    cursor.execute('''
+        INSERT OR REPLACE INTO ports (
+            id, title, console, version, release_date, author,
+            description, features, image_url, screenshots, download_link,
+            base_game, original_platform, popular
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        port_id,
+        port_data.get('title'),
+        port_data.get('console', 'PC'),
+        port_data.get('version'),
+        port_data.get('release_date'),
+        port_data.get('author'),
+        port_data.get('description'),
+        json.dumps(port_data.get('features', [])),
+        port_data.get('image_url'),
+        json.dumps(port_data.get('screenshots', [])),
+        port_data.get('download_link'),
+        port_data.get('base_game'),
+        port_data.get('original_platform'),
+        1 if port_data.get('popular', False) else 0,
+    ))
+    
+    conn.commit()
+    conn.close()
+
 def get_games():
     """Get all games from database"""
     conn = get_db_connection()
@@ -449,6 +568,7 @@ def get_game_by_id(game_id):
         game['features'] = json.loads(game['features'])
         game['screenshots'] = json.loads(game['screenshots'])
         game['popular'] = bool(game['popular'])
+        game['online_play'] = bool(game.get('online_play'))
         return game
     return None
 
@@ -466,6 +586,7 @@ def get_port_by_id(port_id):
         port['features'] = json.loads(port['features'])
         port['screenshots'] = json.loads(port['screenshots'])
         port['popular'] = bool(port['popular'])
+        port['online_play'] = bool(port.get('online_play'))
         return port
     return None
 
@@ -524,6 +645,89 @@ def track_download(game_id, ip_address):
         # This IP has already downloaded this game
         conn.close()
         return False
+
+def submit_game(submission_data, ip_address):
+    """Submit a new game to the requests table"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Hash the IP for privacy
+    ip_hash = hash_string(ip_address)
+    user_agent = submission_data.get('user_agent', '')
+    user_agent_hash = hash_string(user_agent)
+    
+    try:
+        cursor.execute('''
+            INSERT INTO requests (
+                game_type,
+                title,
+                base_game,
+                console,
+                consoles,
+                author,
+                release_date,
+                version,
+                description,
+                features,
+                download_link,
+                patch_format,
+                project_link,
+                base_region,
+                base_revision,
+                base_checksum_crc32,
+                base_checksum_md5,
+                base_checksum_sha1,
+                image_url,
+                screenshots,
+                dev_stage,
+                online_play,
+                email,
+                notes,
+                instructions_pc,
+                instructions_android,
+                instructions_linux,
+                ip_hash,
+                user_agent_hash
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            submission_data.get('game_type', 'romhack'),
+            submission_data.get('title'),
+            submission_data.get('base_game'),
+            submission_data.get('console'),
+            submission_data.get('consoles'),
+            submission_data.get('author'),
+            submission_data.get('release_date'),
+            submission_data.get('version'),
+            submission_data.get('description'),
+            submission_data.get('features'),
+            submission_data.get('download_link'),
+            submission_data.get('patch_format'),
+            submission_data.get('project_link'),
+            submission_data.get('base_region'),
+            submission_data.get('base_revision'),
+            submission_data.get('base_checksum_crc32'),
+            submission_data.get('base_checksum_md5'),
+            submission_data.get('base_checksum_sha1'),
+            submission_data.get('image_url'),
+            submission_data.get('screenshots'),
+            submission_data.get('dev_stage'),
+            submission_data.get('online_play', 0),
+            submission_data.get('email'),
+            submission_data.get('notes'),
+            submission_data.get('instructions_pc'),
+            submission_data.get('instructions_android'),
+            submission_data.get('instructions_linux'),
+            ip_hash,
+            user_agent_hash
+        ))
+        conn.commit()
+        request_id = cursor.lastrowid
+        conn.close()
+        return {'success': True, 'id': request_id}
+    except Exception as e:
+        conn.close()
+        return {'success': False, 'error': str(e)}
 
 def submit_feedback(feedback_type, title, url, description, email, ip_address):
     """Submit feedback (broken link report or correction request)"""
@@ -595,3 +799,90 @@ def get_download_count(game_id):
     conn.close()
     
     return row[0] if row else 0
+
+
+def get_download_counts_for_ids(game_ids):
+    """Get download counts for a batch of game or port IDs."""
+    if not game_ids:
+        return {}
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    placeholder = ','.join('?' for _ in game_ids)
+    cursor.execute(f'''
+        SELECT game_id, COUNT(DISTINCT ip_hash) as count
+        FROM downloads
+        WHERE game_id IN ({placeholder})
+        GROUP BY game_id
+    ''', tuple(game_ids))
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    return {row['game_id']: row['count'] for row in rows}
+
+
+def set_platform_instructions(game_id, platform, instructions_text, is_port=False):
+    """Set platform-specific instructions for a game or port."""
+    table = 'ports' if is_port else 'games'
+    col_name = f'instructions_{platform.lower()}'
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute(f'UPDATE {table} SET {col_name} = ? WHERE id = ?', 
+                   (instructions_text, game_id))
+    conn.commit()
+    conn.close()
+    
+    return True
+
+def get_submissions(status=None):
+    """Get all submissions from requests table, optionally filtered by status"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    if status:
+        cursor.execute('SELECT * FROM requests WHERE status = ? ORDER BY submitted_at DESC', (status,))
+    else:
+        cursor.execute('SELECT * FROM requests ORDER BY submitted_at DESC')
+    
+    rows = cursor.fetchall()
+    conn.close()
+    
+    return [dict(row) for row in rows]
+
+def get_submission_by_id(submission_id):
+    """Get a specific submission by ID"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM requests WHERE id = ?', (submission_id,))
+    row = cursor.fetchone()
+    conn.close()
+    
+    if row:
+        return dict(row)
+    return None
+
+def update_submission_status(submission_id, status, admin_notes=None):
+    """Update the status of a submission"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        UPDATE requests SET status = ?, admin_notes = ? WHERE id = ?
+    ''', (status, admin_notes, submission_id))
+    
+    conn.commit()
+    success = cursor.rowcount > 0
+    conn.close()
+    
+    return success
+
+def reject_submission(submission_id, reason):
+    """Reject a submission with a reason"""
+    return update_submission_status(submission_id, 'rejected', reason)
+
+def approve_submission(submission_id):
+    """Approve a submission"""
+    return update_submission_status(submission_id, 'approved', None)

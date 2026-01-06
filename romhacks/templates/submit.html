@@ -1,0 +1,634 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit New Game | ROMHACKS.NET{% endblock %}
+{% block meta_description %}Submit a new ROM hack or decompiled port to the ROMHACKS.NET database.{% endblock %}
+{% block meta_keywords %}submit rom hack, add game, contribute romhack, submit port, game submission{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mb-8 md:mb-12 px-1">
+    <div class="mb-6 md:mb-8">
+        <h1 class="text-2xl md:text-4xl font-bold text-white pixel-font mb-2">Submit Game</h1>
+        <p class="text-gray-400 text-sm md:text-base">Help us grow the database by submitting a new ROM hack or decompiled port</p>
+    </div>
+
+    <div class="bg-gradient-to-br from-blue-900/20 to-gray-900/20 border border-blue-500/30 p-4 md:p-6 rounded-lg mb-6 md:mb-8">
+        <div class="flex gap-3 items-start">
+            <span class="material-symbols-outlined text-blue-400 text-lg mt-1 flex-shrink-0">info</span>
+            <div class="text-sm text-blue-300 leading-relaxed space-y-2">
+                <p><strong>Before submitting:</strong> Ensure the game has a valid download link and isn't already in our database. Submissions are reviewed by our team before appearing live.</p>
+                <p><strong>Important:</strong> We only accept projects that have their own dedicated project page, forum thread, or hosting page (e.g., GitHub, PokéCommunity thread, dedicated website). Links to other ROM hacking database websites are not accepted.</p>
+                <p class="text-blue-200 text-xs pt-2 border-t border-blue-500/50"><strong>Fields marked with <span class="text-red-400">*</span> are mandatory</strong> and must be filled to submit the form.</p>
+            </div>
+        </div>
+    </div>
+
+    <form id="submit-form" class="space-y-4 md:space-y-6">
+        <!-- Game Type Selection -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-4 md:p-6">
+            <h2 class="text-base md:text-lg font-bold text-white mb-3 md:mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-400">category</span>
+                Game Type
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label class="flex items-center gap-3 p-3 md:p-4 bg-gray-900/50 border border-gray-700 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                    <input type="radio" name="game_type" value="romhack" class="w-5 h-5 cursor-pointer" checked>
+                    <span class="text-white font-semibold text-sm md:text-base">ROM Hack/Patch</span>
+                </label>
+                <label class="flex items-center gap-3 p-3 md:p-4 bg-gray-900/50 border border-gray-700 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                    <input type="radio" name="game_type" value="port" class="w-5 h-5 cursor-pointer">
+                    <span class="text-white font-semibold text-sm md:text-base">Decompiled Port</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Basic Information -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-4 md:p-6">
+            <h2 class="text-base md:text-lg font-bold text-white mb-3 md:mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-400">description</span>
+                Basic Information
+            </h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Game Title <span class="text-red-400">*</span></label>
+                    <input type="text" name="title" required class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="e.g., Pokemon Fire Red: Enhanced">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Base Game <span class="text-red-400">*</span></label>
+                    <input type="text" name="base_game" required class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="e.g., Pokemon Fire Red">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2" id="console-label">Console <span class="text-red-400">*</span></label>
+                    <div id="console-container">
+                        <select name="console" id="console-select" required class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors">
+                            <option value="">-- Select Console --</option>
+                            <option value="gb">Game Boy</option>
+                            <option value="gbc">Game Boy Color</option>
+                            <option value="gba">Game Boy Advance</option>
+                            <option value="snes">Super Nintendo</option>
+                            <option value="n64">Nintendo 64</option>
+                            <option value="nds">Nintendo DS</option>
+                            <option value="3ds">Nintendo 3DS</option>
+                            <option value="wii">Wii</option>
+                            <option value="windows">Windows</option>
+                            <option value="macos">macOS</option>
+                            <option value="android">Android</option>
+                            <option value="linux">Linux</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Author/Creator <span class="text-red-400">*</span></label>
+                    <input type="text" name="author" required class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="Creator name">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Release Date</label>
+                    <input type="date" name="release_date" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Version</label>
+                    <input type="text" name="version" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="e.g., 1.0.0">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Development Stage</label>
+                    <select name="dev_stage" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors">
+                        <option value="">-- Select Stage (Optional) --</option>
+                        <option value="beta">Beta</option>
+                        <option value="finished">Finished</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description & Details -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-400">description</span>
+                Description & Details
+            </h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Description <span class="text-red-400">*</span></label>
+                    <textarea name="description" required rows="4" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors resize-none" placeholder="Describe the game, features, and what makes it special..."></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Features (comma-separated)</label>
+                    <input type="text" name="features" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="e.g., New Pokemon, Physical/Special Split, Updated Story">
+                </div>
+
+                <div class="flex gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="online_play" class="w-4 h-4 rounded">
+                        <span class="text-sm text-gray-300">Has Online/Multiplayer Support</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Downloads & Links -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-400">link</span>
+                Downloads & Links
+            </h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Patch/Download Link <span class="text-red-400">*</span></label>
+                    <input type="url" name="download_link" required class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="https://...">
+                    <div class="mt-3 bg-gray-800/50 border border-gray-700 rounded-lg p-3">
+                        <p class="text-xs text-gray-400 flex items-start gap-2">
+                            <span class="material-symbols-outlined text-gray-500 text-sm mt-0.5">help</span>
+                            <span><strong class="text-gray-300">Why do we ask for a link?</strong> We link to the author's official download page rather than hosting patches ourselves. This way, when authors release updates, they only need to update their patch in one place. Users will always get the latest version automatically.</span>
+                        </p>
+                    </div>
+                    <div class="mt-2 bg-amber-900/30 border border-amber-500/30 rounded-lg p-3">
+                        <p class="text-xs text-amber-300 flex items-start gap-2">
+                            <span class="material-symbols-outlined text-amber-400 text-sm mt-0.5">warning</span>
+                            <span><strong>Note:</strong> Only links to the project's own page are accepted (GitHub, forum threads, dedicated websites, etc.). Links to other ROM hacking database websites will be rejected.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Project/Website Link</label>
+                    <input type="url" name="project_link" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="https://github.com/... or project website">
+                </div>
+
+                <div id="patch-format-section" class="romhack-only">
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Patch Format <span class="text-red-400">*</span></label>
+                    <select name="patch_format" id="patch-format-select" required class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors">
+                        <option value="">-- Select Patch Type --</option>
+                        <option value="ips">.IPS</option>
+                        <option value="ups">.UPS</option>
+                        <option value="bps">.BPS</option>
+                        <option value="aps">.APS</option>
+                        <option value="xdelta">.XDELTA</option>
+                        <option value="exe">Executable (.exe)</option>
+                        <option value="apk">APK (.apk)</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Base Game Requirements -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-400">info</span>
+                Base Game Requirements
+            </h2>
+            
+            <div class="bg-gray-800/50 border border-gray-700 rounded-lg p-3 mb-4">
+                <p class="text-xs text-gray-400 flex items-start gap-2">
+                    <span class="material-symbols-outlined text-gray-500 text-sm mt-0.5">help</span>
+                    <span><strong class="text-gray-300">What's this?</strong> ROM hacks are built for specific versions of the base game. Specifying the region, revision, and checksums helps users find the exact ROM that works with this patch. If you're unsure, leave these fields blank.</span>
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Region Required</label>
+                    <input type="text" name="base_region" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="e.g., USA, EUR, JAP">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Revision/Version Required</label>
+                    <input type="text" name="base_revision" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="e.g., 1.0, v1.1">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">CRC32 Checksum</label>
+                    <input type="text" name="base_checksum_crc32" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors font-mono" placeholder="Optional - helps users verify correct ROM">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">MD5 Checksum</label>
+                    <input type="text" name="base_checksum_md5" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors font-mono">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">SHA-1 Checksum</label>
+                    <input type="text" name="base_checksum_sha1" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors font-mono">
+                </div>
+            </div>
+        </div>
+
+        <!-- Images -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-400">image</span>
+                Images
+            </h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Cover Image URL</label>
+                    <input type="url" name="image_url" id="cover-image-input" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="https://example.com/image.jpg">
+                    <p class="text-xs text-gray-400 mt-1">Direct link to cover art image (PNG, JPG, WebP)</p>
+                    <div id="cover-preview" class="mt-3 hidden">
+                        <p class="text-xs text-gray-400 mb-2">Preview:</p>
+                        <img id="cover-img" src="" alt="Cover preview" class="h-32 rounded-lg border border-gray-700 object-cover">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Screenshot URLs</label>
+                    <textarea id="screenshots-input" name="screenshots" rows="4" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors resize-none font-mono text-xs" placeholder="https://example.com/screenshot1.jpg&#10;https://example.com/screenshot2.jpg&#10;https://example.com/screenshot3.jpg"></textarea>
+                    <p class="text-xs text-gray-400 mt-1">Enter one URL per line. Each screenshot must be a direct link to an image file.</p>
+                    <div id="screenshots-preview" class="mt-3 space-y-2"></div>
+                    <p class="text-xs text-gray-500 mt-3 italic">Tip: You can paste the same URL on multiple lines to test image loading</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Special Instructions for Ports -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6 port-section hidden">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-400">notes</span>
+                Platform Instructions
+            </h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Windows Instructions</label>
+                    <textarea name="instructions_windows" rows="3" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors resize-none" placeholder="Installation and setup instructions specific to Windows..."></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Android Instructions</label>
+                    <textarea name="instructions_android" rows="3" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors resize-none" placeholder="Installation and setup instructions specific to Android..."></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Linux Instructions</label>
+                    <textarea name="instructions_linux" rows="3" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors resize-none" placeholder="Installation and setup instructions specific to Linux..."></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">macOS Instructions</label>
+                    <textarea name="instructions_macos" rows="3" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors resize-none" placeholder="Installation and setup instructions specific to macOS..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-400">more_horiz</span>
+                Additional Information
+            </h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Your Email (for questions)</label>
+                    <input type="email" name="email" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="your@email.com">
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Additional Notes</label>
+                    <textarea name="notes" rows="3" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors resize-none" placeholder="Any additional information you'd like to share with the moderators..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Common Issues Resources -->
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-yellow-500">help</span>
+                Common Issues Resources
+            </h2>
+            
+            <p class="text-sm text-gray-400 mb-4">Provide helpful links for users experiencing problems with your game. These will be displayed on the game page.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Support Forum URL</label>
+                    <input type="url" name="support_forum_url" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="https://forum.example.com/...">
+                    <p class="text-xs text-gray-500 mt-1">Link to a forum or community where users can get help</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Discord Server URL</label>
+                    <input type="url" name="discord_url" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="https://discord.gg/...">
+                    <p class="text-xs text-gray-500 mt-1">Link to a Discord server for support</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Reddit Community URL</label>
+                    <input type="url" name="reddit_url" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="https://www.reddit.com/r/...">
+                    <p class="text-xs text-gray-500 mt-1">Link to a subreddit for the game or related community</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Troubleshooting/FAQ URL</label>
+                    <input type="url" name="troubleshooting_url" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="https://...">
+                    <p class="text-xs text-gray-500 mt-1">Link to a troubleshooting guide or FAQ page</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legal & Copyright Notice -->
+        <div class="bg-gradient-to-br from-amber-900/20 to-gray-900/50 border border-amber-500/30 p-6 rounded-lg">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-amber-400">info</span>
+                Legal Notice & Copyright
+            </h2>
+            <div class="space-y-3 text-sm text-amber-100/80 leading-relaxed">
+                <p>
+                    <strong class="text-amber-300">By submitting this game entry, you confirm:</strong>
+                </p>
+                <ul class="space-y-2 ml-4">
+                    <li class="flex gap-2">
+                        <span class="text-amber-400 flex-shrink-0">•</span>
+                        <span>You have the right to submit this content and it does not infringe on anyone's copyrights or intellectual property rights</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-amber-400 flex-shrink-0">•</span>
+                        <span>The download link you provide does not contain copyrighted ROM files - only patches, executables, or legally distributed content</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-amber-400 flex-shrink-0">•</span>
+                        <span>You acknowledge that game titles, logos, and artwork are the property of their respective copyright holders and are displayed for identification purposes only</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-amber-400 flex-shrink-0">•</span>
+                        <span>All information provided is accurate and to the best of your knowledge</span>
+                    </li>
+                </ul>
+                <p class="pt-2 border-t border-amber-500/30">
+                    <strong class="text-amber-300">Important:</strong> We reserve the right to reject any submissions that violate copyright laws, contain malware, or provide links to copyrighted ROM files. Submissions that violate these terms may result in being banned from future submissions.
+                </p>
+            </div>
+        </div>
+
+        <!-- Submit Status -->
+        <div id="submit-status" class="hidden mb-6" role="alert">
+            <div id="status-content" class="p-6 rounded-lg border-2">
+                <div class="flex items-start gap-4">
+                    <span id="status-icon" class="material-symbols-outlined text-3xl"></span>
+                    <div>
+                        <h3 id="status-title" class="text-lg font-bold mb-1"></h3>
+                        <p id="status-message" class="text-sm"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex gap-4 pt-6">
+            <button type="submit" id="submit-btn" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 border-2 border-blue-400 shadow-[4px_4px_0px_0px_rgba(59,130,246,0.3)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wide pixel-font text-sm rounded-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600">
+                <span id="submit-btn-content">
+                    <span class="material-symbols-outlined align-middle mr-2">send</span>
+                    Submit Game
+                </span>
+                <span id="submit-btn-loading" class="hidden">
+                    <span class="material-symbols-outlined align-middle mr-2 animate-spin">progress_activity</span>
+                    Submitting...
+                </span>
+            </button>
+            <a href="/" class="px-8 py-3 text-gray-400 hover:text-white border border-gray-700 hover:border-gray-600 rounded-lg transition-colors uppercase text-sm font-bold">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+// Show/hide port-specific fields based on game type
+const gameTypeRadios = document.querySelectorAll('input[name="game_type"]');
+const portSection = document.querySelector('.port-section');
+const consoleContainer = document.getElementById('console-container');
+const consoleLabel = document.getElementById('console-label');
+const patchFormatSection = document.getElementById('patch-format-section');
+const patchFormatSelect = document.getElementById('patch-format-select');
+
+function updateFormForGameType() {
+    const isPort = document.querySelector('input[name="game_type"]:checked').value === 'port';
+    
+    if (isPort) {
+        portSection.classList.remove('hidden');
+        patchFormatSection.classList.add('hidden');
+        patchFormatSelect.removeAttribute('required');
+        patchFormatSelect.value = '';
+        consoleLabel.innerHTML = 'Platforms <span class="text-red-400">*</span> (select multiple)';
+        
+        // Replace select with checkboxes for multiple selection
+        if (consoleContainer.querySelector('select')) {
+            const platforms = [
+                { value: 'windows', label: 'Windows' },
+                { value: 'android', label: 'Android' },
+                { value: 'linux', label: 'Linux' },
+                { value: 'web', label: 'Web' },
+                { value: 'ios', label: 'iOS' },
+                { value: 'mac', label: 'macOS' }
+            ];
+            
+            consoleContainer.innerHTML = `
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    ${platforms.map(p => `
+                        <label class="flex items-center gap-2 p-3 bg-gray-900/50 border border-gray-700 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                            <input type="checkbox" name="consoles" value="${p.value}" class="w-4 h-4 rounded cursor-pointer">
+                            <span class="text-sm text-gray-300">${p.label}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+        }
+    } else {
+        portSection.classList.add('hidden');
+        patchFormatSection.classList.remove('hidden');
+        patchFormatSelect.setAttribute('required', 'required');
+        consoleLabel.innerHTML = 'Console <span class="text-red-400">*</span>';
+        
+        // Restore single select for ROM hacks
+        if (!consoleContainer.querySelector('select')) {
+            consoleContainer.innerHTML = `
+                <select name="console" id="console-select" required class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors">
+                    <option value="">-- Select Console --</option>
+                    <option value="gb">Game Boy</option>
+                    <option value="gbc">Game Boy Color</option>
+                    <option value="gba">Game Boy Advance</option>
+                    <option value="snes">Super Nintendo</option>
+                    <option value="n64">Nintendo 64</option>
+                    <option value="nds">Nintendo DS</option>
+                    <option value="3ds">Nintendo 3DS</option>
+                    <option value="wii">Wii</option>
+                    <option value="windows">Windows</option>
+                    <option value="android">Android</option>
+                    <option value="linux">Linux</option>
+                </select>
+            `;
+        }
+    }
+}
+
+gameTypeRadios.forEach(radio => {
+    radio.addEventListener('change', updateFormForGameType);
+});
+
+// Image preview handlers
+document.getElementById('cover-image-input').addEventListener('input', (e) => {
+    const url = e.target.value.trim();
+    const preview = document.getElementById('cover-preview');
+    const img = document.getElementById('cover-img');
+    
+    if (url) {
+        img.src = url;
+        img.onerror = () => {
+            preview.classList.add('hidden');
+        };
+        img.onload = () => {
+            preview.classList.remove('hidden');
+        };
+    } else {
+        preview.classList.add('hidden');
+    }
+});
+
+document.getElementById('screenshots-input').addEventListener('input', (e) => {
+    const urls = e.target.value.split('\n').filter(url => url.trim());
+    const previewContainer = document.getElementById('screenshots-preview');
+    
+    previewContainer.innerHTML = '';
+    
+    if (urls.length > 0) {
+        const heading = document.createElement('p');
+        heading.className = 'text-xs text-gray-400 font-bold';
+        heading.textContent = `${urls.length} screenshot(s) detected`;
+        previewContainer.appendChild(heading);
+        
+        const grid = document.createElement('div');
+        grid.className = 'grid grid-cols-2 sm:grid-cols-3 gap-2';
+        
+        urls.forEach((url, idx) => {
+            const item = document.createElement('div');
+            item.className = 'relative';
+            
+            const img = document.createElement('img');
+            img.src = url.trim();
+            img.className = 'w-full h-24 rounded border border-gray-700 object-cover';
+            img.alt = `Screenshot ${idx + 1}`;
+            img.onerror = () => {
+                item.classList.add('opacity-50');
+                img.classList.add('border-red-600');
+            };
+            
+            item.appendChild(img);
+            grid.appendChild(item);
+        });
+        
+        previewContainer.appendChild(grid);
+    }
+});
+
+// Initialize form state
+updateFormForGameType();
+
+function showStatus(type, title, message) {
+    const statusDiv = document.getElementById('submit-status');
+    const statusContent = document.getElementById('status-content');
+    const statusIcon = document.getElementById('status-icon');
+    const statusTitle = document.getElementById('status-title');
+    const statusMessage = document.getElementById('status-message');
+    
+    if (type === 'success') {
+        statusContent.className = 'p-6 rounded-lg border-2 bg-green-900/30 border-green-500';
+        statusIcon.className = 'material-symbols-outlined text-3xl text-green-400';
+        statusIcon.textContent = 'check_circle';
+        statusTitle.className = 'text-lg font-bold mb-1 text-green-300';
+        statusMessage.className = 'text-sm text-green-200';
+    } else {
+        statusContent.className = 'p-6 rounded-lg border-2 bg-red-900/30 border-red-500';
+        statusIcon.className = 'material-symbols-outlined text-3xl text-red-400';
+        statusIcon.textContent = 'error';
+        statusTitle.className = 'text-lg font-bold mb-1 text-red-300';
+        statusMessage.className = 'text-sm text-red-200';
+    }
+    
+    statusTitle.textContent = title;
+    statusMessage.textContent = message;
+    statusDiv.classList.remove('hidden');
+}
+
+function setSubmitLoading(loading) {
+    const submitBtn = document.getElementById('submit-btn');
+    const btnContent = document.getElementById('submit-btn-content');
+    const btnLoading = document.getElementById('submit-btn-loading');
+    
+    if (loading) {
+        submitBtn.disabled = true;
+        btnContent.classList.add('hidden');
+        btnLoading.classList.remove('hidden');
+    } else {
+        submitBtn.disabled = false;
+        btnContent.classList.remove('hidden');
+        btnLoading.classList.add('hidden');
+    }
+}
+
+document.getElementById('submit-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Hide any previous status
+    document.getElementById('submit-status').classList.add('hidden');
+    
+    // Show loading state
+    setSubmitLoading(true);
+    
+    const formData = new FormData(document.getElementById('submit-form'));
+    const data = Object.fromEntries(formData.entries());
+    
+    // Handle multiple consoles for ports
+    const consoleCheckboxes = document.querySelectorAll('input[name="consoles"]:checked');
+    if (consoleCheckboxes.length > 0) {
+        data.consoles = Array.from(consoleCheckboxes).map(cb => cb.value).join(', ');
+        delete data.console; // Remove the old single console field
+    }
+    
+    // Convert checkbox to boolean
+    data.online_play = data.online_play ? 1 : 0;
+    
+    // Convert screenshots into array
+    if (data.screenshots) {
+        data.screenshots = JSON.stringify(
+            data.screenshots.split('\n').filter(url => url.trim()).map(url => url.trim())
+        );
+    }
+    
+    try {
+        const response = await fetch('/api/submit-game', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            showStatus('success', 'Submission Received!', 'Thank you! Your submission has been received and is now pending review. Our team will review it and add it to the database shortly.');
+            document.getElementById('submit-form').reset();
+            document.getElementById('screenshots-preview').innerHTML = '';
+            document.getElementById('cover-preview').classList.add('hidden');
+            window.scrollTo({top: document.getElementById('submit-status').offsetTop - 100, behavior: 'smooth'});
+        } else {
+            showStatus('error', 'Submission Failed', result.error || 'Failed to submit. Please check your form and try again.');
+            document.getElementById('submit-status').scrollIntoView({behavior: 'smooth', block: 'center'});
+        }
+    } catch (error) {
+        showStatus('error', 'Connection Error', 'Could not connect to the server. Please check your internet connection and try again.');
+        document.getElementById('submit-status').scrollIntoView({behavior: 'smooth', block: 'center'});
+    } finally {
+        setSubmitLoading(false);
+    }
+});
+</script>
+{% endblock %}

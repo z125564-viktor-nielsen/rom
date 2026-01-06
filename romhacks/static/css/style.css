@@ -18,6 +18,69 @@ body {
     font-family: 'Press Start 2P', cursive;
 }
 
+/* Logo Styles */
+.logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.1rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+    text-decoration: none;
+    font-size: 1.25rem;
+}
+
+.logo:hover {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+    20%, 40%, 60%, 80% { transform: translateX(3px); }
+}
+
+.logo-rom {
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: #e5f0ff;
+}
+
+.logo-hacks {
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    color: #9bb6ff;
+}
+
+.logo-underscore {
+    font-weight: 400;
+    color: #4d7cff;
+    margin-left: 0.05em;
+}
+
+@media (min-width: 768px) {
+    .logo {
+        font-size: 1.5rem;
+    }
+}
+
+/* In Development Badge */
+.dev-badge {
+    display: inline-flex !important;
+    align-items: center;
+    padding: 0.1rem 0.35rem;
+    font-size: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #fbbf24 !important;
+    background: transparent !important;
+    border: 1px solid #fbbf24;
+    border-radius: 0.2rem;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 50;
+    visibility: visible !important;
+    opacity: 0.9 !important;
+}
+
 /* CRT Scanline Effect */
 .scanline {
     width: 100%;
@@ -150,4 +213,228 @@ details > summary::-webkit-details-marker {
 .shake-logo:hover {
   animation: shake 0.5s;
   animation-iteration-count: infinite;
+}
+
+/* Pixel Grid Background */
+.pixel-grid-bg {
+    background-image: 
+        radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%),
+        linear-gradient(0deg, transparent 24%, rgba(59, 130, 246, 0.02) 25%, rgba(59, 130, 246, 0.02) 26%, transparent 27%, transparent 74%, rgba(59, 130, 246, 0.02) 75%, rgba(59, 130, 246, 0.02) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, rgba(59, 130, 246, 0.02) 25%, rgba(59, 130, 246, 0.02) 26%, transparent 27%, transparent 74%, rgba(59, 130, 246, 0.02) 75%, rgba(59, 130, 246, 0.02) 76%, transparent 77%, transparent);
+    background-size: 100% 100%, 40px 40px, 40px 40px;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================ */
+
+/* Mobile Touch Targets - minimum 44x44px for accessibility */
+@media (max-width: 767px) {
+    /* Improve tap targets */
+    .btn-retro {
+        padding: 14px 20px;
+        font-size: 0.6rem;
+        min-height: 44px;
+    }
+    
+    /* Hide CRT scanline effect on mobile for better performance */
+    .scanline {
+        display: none;
+    }
+    
+    /* Smaller font for pixel-font headings on mobile */
+    .pixel-font {
+        font-size: 0.85em;
+    }
+    
+    /* Better scrollbar for mobile */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    /* Improve form inputs for mobile */
+    .input-dark,
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    input[type="url"],
+    select,
+    textarea {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+        padding: 12px 14px;
+        min-height: 44px;
+    }
+    
+    /* Make filter buttons scrollable horizontally */
+    #filter-buttons {
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding-bottom: 8px;
+        gap: 6px;
+    }
+    
+    #filter-buttons::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .filter-btn {
+        flex-shrink: 0;
+        padding: 8px 12px;
+        min-width: 44px;
+        min-height: 36px;
+    }
+    
+    /* Cards adjustments */
+    .hack-card {
+        margin-bottom: 0;
+    }
+    
+    .hack-card .p-4 {
+        padding: 12px;
+    }
+    
+    /* Drop zone improvements for mobile */
+    .drop-zone {
+        padding: 24px 16px;
+    }
+    
+    .drop-zone:hover {
+        transform: none; /* Disable scale on mobile to prevent layout issues */
+    }
+    
+    /* Step cards mobile layout */
+    .step-card {
+        padding: 16px;
+    }
+    
+    /* Footer grid improvements */
+    footer .grid {
+        gap: 24px;
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+    .pixel-font {
+        font-size: 0.75em;
+        word-break: break-word;
+    }
+    
+    .btn-retro {
+        padding: 12px 16px;
+        font-size: 0.55rem;
+        box-shadow: 2px 2px 0px 0px rgba(59, 130, 246, 0.5);
+    }
+    
+    .btn-retro:hover {
+        box-shadow: 3px 3px 0px 0px rgba(59, 130, 246, 0.6);
+        transform: translate(-1px, -1px);
+    }
+}
+
+/* Tablet adjustments */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .container {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+/* Fix for iOS momentum scrolling */
+html {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile-friendly modal styling */
+@media (max-width: 767px) {
+    #screenshot-modal,
+    .modal {
+        padding: 10px;
+    }
+    
+    #screenshot-modal img,
+    .modal img {
+        max-height: 80vh;
+        object-fit: contain;
+    }
+}
+
+/* Prevent horizontal scroll on mobile */
+html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+/* Mobile navigation animation */
+#mobile-menu {
+    transition: all 0.3s ease-in-out;
+}
+
+#mobile-menu.hidden {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+#mobile-menu:not(.hidden) {
+    max-height: 500px;
+    opacity: 1;
+}
+
+/* Ensure proper spacing for sticky header on mobile */
+@media (max-width: 767px) {
+    main {
+        padding-top: 16px;
+        padding-bottom: 32px;
+    }
+}
+
+/* Screenshot gallery mobile improvements */
+@media (max-width: 767px) {
+    #thumbnail-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 8px;
+        justify-content: flex-start;
+    }
+    
+    #thumbnail-container button {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* Game page hero section mobile */
+@media (max-width: 767px) {
+    .game-hero,
+    [class*="h-[380px]"] {
+        height: auto;
+        min-height: 280px;
+    }
+}
+
+/* Improve social links touch targets */
+@media (max-width: 767px) {
+    .social-links a,
+    a[title*="twitter"],
+    a[title*="discord"],
+    a[title*="github"] {
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+/* Better text readability on mobile */
+@media (max-width: 767px) {
+    p, .text-gray-400, .text-gray-300 {
+        line-height: 1.6;
+    }
+    
+    .text-xs {
+        font-size: 0.8rem;
+        line-height: 1.5;
+    }
 }

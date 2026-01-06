@@ -46,137 +46,215 @@
 {% endblock %}
 
 {% block content %}
-<section class="relative h-[400px] flex items-center justify-center overflow-hidden border-b border-blue-900/30 -mt-12 mb-12">
-    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80" class="absolute inset-0 w-full h-full object-cover opacity-20" alt="Gaming background with retro controllers and pixels">
+<section class="relative min-h-[320px] md:h-[380px] flex items-center justify-center overflow-hidden rounded-2xl -mt-6 mb-6 md:mb-8 mx-2 md:mx-4 bg-gradient-to-br from-blue-950 via-gray-900 to-blue-900 pixel-grid-bg">
     <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f12] via-transparent to-transparent"></div>
-    <div class="relative z-10 text-center px-4 max-w-4xl">
-        <h2 class="text-3xl md:text-5xl font-bold mb-4 pixel-font text-white drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">Revive Your Library</h2>
-        <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto">Discover top-tier ROM hacks & Decompiled Ports for your favourite platforms</p>
-        <div class="flex flex-wrap justify-center gap-4">
-            <a href="/romhacks" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 border-2 border-blue-400 shadow-[4px_4px_0px_0px_rgba(59,130,246,0.5)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wide pixel-font text-xs decoration-0">Browse All Rom Hacks</a>
-            <a href="/ports" class="bg-transparent hover:bg-gray-800 text-blue-400 font-bold py-3 px-8 border-2 border-blue-400 shadow-[4px_4px_0px_0px_rgba(59,130,246,0.2)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wide pixel-font text-xs decoration-0">Browse All Ports</a>
-            <a href="/patcher" class="bg-transparent hover:bg-gray-800 text-blue-400 font-bold py-3 px-8 border-2 border-blue-400 shadow-[4px_4px_0px_0px_rgba(59,130,246,0.2)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wide pixel-font text-xs decoration-0">Launch Patcher</a>
+    <div class="relative z-10 text-center px-4 max-w-4xl bg-gradient-to-br from-gray-900/95 to-blue-900/95 border border-blue-500/20 rounded-2xl py-5 px-4 md:py-7 md:px-8 backdrop-blur-md shadow-[0_8px_32px_rgba(59,130,246,0.15)] mx-2">
+        <h2 class="text-xl sm:text-2xl md:text-5xl font-bold mb-3 pixel-font text-white drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">Revive Your Library</h2>
+        <p class="text-sm md:text-lg text-gray-300 mb-4 md:mb-6 max-w-xl mx-auto leading-relaxed">Discover top-tier ROM hacks & Decompiled Ports for your favourite platforms</p>
+        
+        <div class="flex flex-col sm:flex-row justify-center gap-2 md:gap-4">
+            <a href="/romhacks" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-4 md:py-3 md:px-8 border-2 border-blue-400 shadow-[4px_4px_0px_0px_rgba(59,130,246,0.5)] active:shadow-none active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wide pixel-font text-[10px] md:text-xs decoration-0">Browse All Rom Hacks</a>
+            <a href="/ports" class="bg-transparent hover:bg-blue-950/30 text-blue-300 font-bold py-2.5 px-4 md:py-3 md:px-8 border-2 border-blue-400/50 hover:border-blue-400 shadow-none hover:shadow-[2px_2px_0px_0px_rgba(59,130,246,0.3)] active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wide pixel-font text-[10px] md:text-xs decoration-0">Browse All Ports</a>
+            <a href="/patcher" class="bg-transparent hover:bg-blue-950/30 text-blue-300 font-bold py-2.5 px-4 md:py-3 md:px-8 border-2 border-blue-400/50 hover:border-blue-400 shadow-none hover:shadow-[2px_2px_0px_0px_rgba(59,130,246,0.3)] active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wide pixel-font text-[10px] md:text-xs decoration-0">Launch Patcher</a>
         </div>
     </div>
 </section>
 
-<div class="flex items-center gap-2 mb-6">
-    <span class="material-symbols-outlined text-blue-400 text-2xl">local_fire_department</span>
-    <h3 class="text-2xl font-bold text-white pixel-font">Popular Rom Hacks</h3>
-</div>
-
-<div class="mb-8 flex flex-col md:flex-row justify-between items-center gap-4 bg-[#1a1a20] p-4 border border-gray-800 rounded">
-    <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-blue-400">filter_list</span>
-        <span class="font-bold uppercase tracking-wider text-sm">Filter Console:</span>
-    </div>
-    <div class="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0" id="filter-buttons">
-        <button class="filter-btn active bg-blue-900/50 text-blue-300 border border-blue-500 px-4 py-1 text-sm uppercase hover:bg-blue-800 transition-colors whitespace-nowrap" onclick="filterHacks('all')">All</button>
-        <button class="filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterHacks('gb')">GB</button>
-        <button class="filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterHacks('gbc')">GBC</button>
-        <button class="filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterHacks('gba')">GBA</button>
-        <button class="filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterHacks('snes')">SNES</button>
-        <button class="filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterHacks('n64')">N64</button>
-        <button class="filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterHacks('nds')">DS</button>
-        <button class="filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterHacks('wii')">WII</button>
-    </div>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="popular-grid">
-    {% for game in games %}
-    <div class="hack-card bg-[#151518] border border-gray-800 hover:border-blue-500 transition-all group overflow-hidden flex flex-col" data-console="{{ game.console }}">
-        <a href="{{ url_for('game_page', game_id=game.id) }}" class="block relative h-48 overflow-hidden cursor-pointer">
-            <img src="{{ game.image_url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="{{ game.title }} - {{ game.console }} ROM Hack by {{ game.author }}">
-            <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
-            <div class="absolute bottom-3 left-3">
-                <span class="{{ styles.get(game.console, styles['default']) }} text-[10px] font-bold px-2 py-1 rounded border uppercase mb-1 inline-block">{{ game.console }}</span>
-                <h3 class="text-white font-bold text-lg leading-none shadow-black drop-shadow-md">{{ game.title }}</h3>
+<!-- Info Dropdowns Section -->
+<div class="flex flex-col md:flex-row justify-center gap-3 mb-8 md:mb-12 max-w-2xl mx-auto px-3 md:px-4">
+    <!-- What's a ROM Hack? Dropdown -->
+    <div class="flex-1">
+        <button onclick="toggleDropdown('rom-hack-info')" class="w-full text-left px-4 py-3 bg-gray-800/50 hover:bg-gray-800 border border-gray-700/50 hover:border-blue-400/50 rounded-lg transition-all flex items-center justify-between group">
+            <span class="text-sm font-bold text-gray-300 group-hover:text-blue-300 flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">help</span>
+                What's a ROM Hack?
+            </span>
+            <span class="material-symbols-outlined text-gray-400 group-hover:text-blue-300 transition-transform" id="toggle-rom-hack">expand_more</span>
+        </button>
+        <div id="rom-hack-info" class="hidden overflow-hidden transition-all duration-300 max-h-0">
+            <div class="px-4 py-4 bg-gray-900/50 border border-gray-700/30 border-t-0 rounded-b-lg text-left">
+                <p class="text-xs text-gray-400 leading-relaxed">A ROM hack is a modified version of an existing game created by fans. Using ROM hacking tools, developers modify game files to add new features, change gameplay mechanics, create new storylines, or improve graphics. Popular ROM hacks are based on games like Pokémon, Super Mario, The Legend of Zelda, and many more. You apply ROM hacks using patch files (.ips, .ups, .bps) combined with your own legally owned ROM of the original game.</p>
             </div>
-        </a>
-        <div class="p-4 flex-grow flex flex-col justify-between">
-            <div>
-                <div class="flex justify-between items-center text-xs text-gray-500 mb-3 font-mono">
-                    <span><span class="material-symbols-outlined text-[10px] align-middle">person</span> {{ game.author }}</span>
-                    <span>{{ game.release_date }}</span>
+        </div>
+    </div>
+
+    <!-- What's a Decompiled Port? Dropdown -->
+    <div class="flex-1">
+        <button onclick="toggleDropdown('port-info')" class="w-full text-left px-4 py-3 bg-gray-800/50 hover:bg-gray-800 border border-gray-700/50 hover:border-sky-400/50 rounded-lg transition-all flex items-center justify-between group">
+            <span class="text-sm font-bold text-gray-300 group-hover:text-sky-300 flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">cloud_download</span>
+                What's a Decompiled Port?
+            </span>
+            <span class="material-symbols-outlined text-gray-400 group-hover:text-sky-300 transition-transform" id="toggle-port">expand_more</span>
+        </button>
+        <div id="port-info" class="hidden overflow-hidden transition-all duration-300 max-h-0">
+            <div class="px-4 py-4 bg-gray-900/50 border border-gray-700/30 border-t-0 rounded-b-lg text-left">
+                <p class="text-xs text-gray-400 leading-relaxed">A decompiled port is a fan-made recreation of a game for modern platforms (PC, Android, etc.) using reverse-engineered source code. Developers decompile the original game's binary code back into readable source code, then recompile it to run on different systems. This preserves the original game's authenticity while enabling play on modern devices. Popular decompiled ports include games like Super Mario 64, The Legend of Zelda: Ocarina of Time, and more.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-12">
+    {# Popular ROM Hacks Section #}
+    <div>
+        <div class="flex items-center gap-2 mb-6 md:mb-8 pt-6 md:pt-8 border-t border-gradient-to-r from-transparent via-blue-500/30 to-transparent">
+            <span class="material-symbols-outlined text-blue-400 text-xl md:text-2xl">local_fire_department</span>
+            <h3 class="text-lg md:text-2xl font-bold text-white pixel-font">Popular Rom Hacks</h3>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8" id="popular-grid">
+            {% for game in games %}
+            <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-blue-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-blue-500/10" data-console="{{ game.console }}">
+                <a href="{{ url_for('game_page', game_id=game.id) }}" class="block relative h-48 overflow-hidden cursor-pointer bg-gradient-to-br from-gray-800 to-gray-900">
+                    <img src="{{ game.image_url }}" class="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105" alt="{{ game.title }} - {{ game.console }} ROM Hack by {{ game.author }}">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
+                    <div class="absolute bottom-3 left-3">
+                        <span class="{{ styles.get(game.console, styles['default']) }} text-[10px] font-bold px-2 py-1 rounded-md border uppercase mb-1 inline-block">{{ game.console }}</span>
+                        <h3 class="text-white font-bold text-lg leading-none shadow-black drop-shadow-md">{{ game.title }}</h3>
+                    </div>
+                </a>
+                <div class="p-4 flex-grow flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center text-xs text-gray-500 mb-3 font-mono">
+                            <span><span class="material-symbols-outlined text-[10px] align-middle">person</span> {{ game.author }}</span>
+                            <span>{{ game.release_date[:4] if game.release_date else '' }}</span>
+                        </div>
+                        <p class="text-gray-400 text-sm line-clamp-3 mb-4">{{ game.description }}</p>
+                    </div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-flex items-center gap-2 text-[11px] font-mono text-gray-400 bg-gray-900/50 px-3 py-1 rounded-md border border-gray-700/50">
+                            <span class="material-symbols-outlined text-[13px] text-blue-400">download</span>
+                            {{ game.download_count | default(0) | download_count_label }}
+                        </span>
+                        {% if game.online_play %}
+                        <span class="inline-flex items-center gap-1 text-[11px] font-mono text-green-300 bg-green-900/30 px-3 py-1 rounded-md border border-green-600/50">
+                            <span class="material-symbols-outlined text-[13px]">lan</span>
+                            Online
+                        </span>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('game_page', game_id=game.id) }}" class="w-full border border-gray-700/50 hover:border-blue-400/50 hover:text-blue-400 text-gray-300 py-2 px-4 text-xs uppercase tracking-widest transition-all rounded-lg text-center block" style="text-decoration:none">
+                        View Details
+                    </a>
                 </div>
-                <p class="text-gray-400 text-sm line-clamp-3 mb-4">{{ game.description }}</p>
             </div>
-            <a href="{{ url_for('game_page', game_id=game.id) }}" class="w-full border border-gray-600 hover:border-blue-400 hover:text-blue-400 text-gray-300 py-2 text-xs uppercase tracking-widest transition-colors pixel-font text-center block" style="text-decoration:none">
-                View Details
+            {% endfor %}
+        </div>
+
+        <div class="text-center mb-12 md:mb-20">
+            <a href="/romhacks" class="inline-block px-6 md:px-8 py-2.5 md:py-3 border border-blue-500/50 text-blue-400 hover:bg-blue-900/20 uppercase tracking-widest text-xs font-bold transition-all rounded-lg">
+                View All Romhacks
             </a>
         </div>
     </div>
-    {% endfor %}
-</div>
 
-<div class="text-center mb-20">
-    <a href="/romhacks" class="inline-block px-8 py-3 border border-blue-500/50 text-blue-400 hover:bg-blue-900/20 uppercase tracking-widest text-xs font-bold transition-all">
-        View All Romhacks
-    </a>
-</div>
+    {# Popular Ports Section #}
+    {% if ports %}
+    <div>
+        <div class="flex items-center gap-2 mb-6 md:mb-8 pt-6 md:pt-8 border-t border-gradient-to-r from-transparent via-sky-500/30 to-transparent">
+            <span class="material-symbols-outlined text-sky-400 text-xl md:text-2xl">cloud_download</span>
+            <h3 class="text-lg md:text-2xl font-bold text-white pixel-font">Popular Ports</h3>
+        </div>
 
-{% if ports %}
-<div class="flex items-center gap-2 mb-6">
-    <span class="material-symbols-outlined text-sky-400 text-2xl">cloud_download</span>
-    <h3 class="text-2xl font-bold text-white pixel-font">Popular Ports</h3>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="ports-grid">
-    {% for port in ports %}
-    <div class="hack-card bg-[#151518] border border-gray-800 hover:border-sky-500 transition-all group overflow-hidden flex flex-col" data-console="{{ (port.consoles or [port.console]) | join(' ') }}">
-        <a href="{{ url_for('game_page', game_id=port.id) }}" class="block relative h-48 overflow-hidden cursor-pointer">
-            <img src="{{ port.image_url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="{{ port.title }} - {{ (port.consoles or [port.console]) | join('/') }} Decompiled Port by {{ port.author }}">
-            <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
-            <div class="absolute bottom-3 left-3">
-                {% for c in (port.consoles or [port.console]) %}
-                <span class="{{ pc_styles.get(c, pc_styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[10px] font-bold px-2 py-1 rounded border uppercase mb-1 inline-block">{{ c }}</span>
-                {% endfor %}
-                <h3 class="text-white font-bold text-lg leading-none shadow-black drop-shadow-md">{{ port.title }}</h3>
-            </div>
-        </a>
-        <div class="p-4 flex-grow flex flex-col justify-between">
-            <div>
-                <div class="flex justify-between items-center text-xs text-gray-500 mb-3 font-mono">
-                    <span><span class="material-symbols-outlined text-[10px] align-middle">person</span> {{ port.author }}</span>
-                    <span>{{ port.release_date }}</span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8" id="ports-grid">
+            {% for port in ports %}
+            <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-sky-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-sky-500/10" data-console="{{ (port.consoles or [port.console]) | join(' ') }}">
+                <a href="{{ url_for('game_page', game_id=port.id) }}" class="block relative h-48 overflow-hidden cursor-pointer bg-gradient-to-br from-gray-800 to-gray-900">
+                    <img src="{{ port.image_url }}" class="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105" alt="{{ port.title }} - {{ (port.consoles or [port.console]) | join('/') }} Decompiled Port by {{ port.author }}">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
+                    <div class="absolute bottom-3 left-3">
+                        {% for c in (port.consoles or [port.console]) %}
+                        <span class="{{ platform_styles.get(c, platform_styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[10px] font-bold px-2 py-1 rounded-md border uppercase mb-1 inline-block">{{ c }}</span>
+                        {% endfor %}
+                        <h3 class="text-white font-bold text-lg leading-none shadow-black drop-shadow-md">{{ port.title }}</h3>
+                    </div>
+                </a>
+                <div class="p-4 flex-grow flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center text-xs text-gray-500 mb-3 font-mono">
+                            <span><span class="material-symbols-outlined text-[10px] align-middle">person</span> {{ port.author }}</span>
+                            <span>{{ port.release_date[:4] if port.release_date else '' }}</span>
+                        </div>
+                        <p class="text-gray-400 text-sm line-clamp-3 mb-4">{{ port.description }}</p>
+                    </div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-flex items-center gap-2 text-[11px] font-mono text-gray-400 bg-gray-900/50 px-3 py-1 rounded-md border border-gray-700/50">
+                            <span class="material-symbols-outlined text-[13px] text-sky-400">download</span>
+                            {{ port.download_count | default(0) | download_count_label }}
+                        </span>
+                        {% if port.online_play %}
+                        <span class="inline-flex items-center gap-1 text-[11px] font-mono text-green-300 bg-green-900/30 px-3 py-1 rounded-md border border-green-600/50">
+                            <span class="material-symbols-outlined text-[13px]">lan</span>
+                            Online
+                        </span>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('game_page', game_id=port.id) }}" class="w-full border border-gray-700/50 hover:border-sky-400/50 hover:text-sky-400 text-gray-300 py-2 px-4 text-xs uppercase tracking-widest transition-all rounded-lg text-center block" style="text-decoration:none">
+                        View Details
+                    </a>
                 </div>
-                <p class="text-gray-400 text-sm line-clamp-3 mb-4">{{ port.description }}</p>
             </div>
-            <a href="{{ url_for('game_page', game_id=port.id) }}" class="w-full border border-gray-600 hover:border-sky-400 hover:text-sky-400 text-gray-300 py-2 text-xs uppercase tracking-widest transition-colors pixel-font text-center block" style="text-decoration:none">
-                View Details
+            {% endfor %}
+        </div>
+
+        <div class="text-center mb-12 md:mb-20">
+            <a href="/ports" class="inline-block px-6 md:px-8 py-2.5 md:py-3 border border-sky-500/50 text-sky-400 hover:bg-sky-900/20 uppercase tracking-widest text-xs font-bold transition-all rounded-lg">
+                View All Ports
             </a>
         </div>
     </div>
-    {% endfor %}
+    {% endif %}
 </div>
 
-<div class="text-center mb-20">
-    <a href="/ports" class="inline-block px-8 py-3 border border-sky-500/50 text-sky-400 hover:bg-sky-900/20 uppercase tracking-widest text-xs font-bold transition-all">
-        View All Ports
-    </a>
-</div>
-{% endif %}
-
-<div class="mb-12">
-    <h3 class="text-lg font-bold text-white mb-6 pixel-font flex items-center gap-2">
-        <span class="material-symbols-outlined text-green-500">help</span> How To Use
+<div class="mb-8 md:mb-12">
+    <h3 class="text-sm md:text-lg font-bold text-white mb-4 md:mb-6 pixel-font flex items-center gap-2">
+        <span class="material-symbols-outlined text-blue-500">info</span> How To Patch Your Game
     </h3>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="step-card p-6 rounded-lg bg-[#151518] border border-gray-800">
-            <div class="text-green-500 font-bold text-3xl mb-2 opacity-50 pixel-font">01</div>
-            <h4 class="font-bold text-white mb-2 uppercase tracking-wide">Get the Files</h4>
-            <p class="text-xs text-gray-400 leading-relaxed">Download the patch file from the game page. Dump your own clean ROM cartridge legally.</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        <div class="step-card p-4 md:p-6 rounded-xl bg-gradient-to-br from-blue-900/20 to-gray-900/20 border border-blue-500/30 shadow-md hover:shadow-lg hover:shadow-blue-500/20 transition-all">
+            <div class="inline-flex items-center justify-center w-8 h-8 md:w-10 md:h-10 bg-blue-500/20 border border-blue-500/50 rounded mb-3 md:mb-4">
+                <span class="material-symbols-outlined text-blue-400 text-base md:text-lg">download</span>
+            </div>
+            <h4 class="font-bold text-white mb-2 uppercase tracking-wide text-xs md:text-sm">1. Download Patch</h4>
+            <p class="text-xs text-gray-400 leading-relaxed">Find the game you want and download the patch file. You need your own legally owned ROM of the base game.</p>
         </div>
-        <div class="step-card p-6 rounded-lg bg-[#151518] border border-gray-800">
-            <div class="text-green-500 font-bold text-3xl mb-2 opacity-50 pixel-font">02</div>
-            <h4 class="font-bold text-white mb-2 uppercase tracking-wide">Open Patcher</h4>
-            <p class="text-xs text-gray-400 leading-relaxed">Navigate to our Web Patcher. Load your ROM and your Patch file (.ups, .ips, etc).</p>
+        <div class="step-card p-4 md:p-6 rounded-xl bg-gradient-to-br from-blue-900/20 to-gray-900/20 border border-blue-500/30 shadow-md hover:shadow-lg hover:shadow-blue-500/20 transition-all">
+            <div class="inline-flex items-center justify-center w-8 h-8 md:w-10 md:h-10 bg-blue-500/20 border border-blue-500/50 rounded mb-3 md:mb-4">
+                <span class="material-symbols-outlined text-blue-400 text-base md:text-lg">tune</span>
+            </div>
+            <h4 class="font-bold text-white mb-2 uppercase tracking-wide text-xs md:text-sm">2. Open Web Patcher</h4>
+            <p class="text-xs text-gray-400 leading-relaxed">Go to our Web Patcher tool. Select your ROM file and the patch file (.ips, .ups, .bps, etc).</p>
         </div>
-        <div class="step-card p-6 rounded-lg bg-[#151518] border border-gray-800">
-            <div class="text-green-500 font-bold text-3xl mb-2 opacity-50 pixel-font">03</div>
-            <h4 class="font-bold text-white mb-2 uppercase tracking-wide">Patch & Save</h4>
-            <p class="text-xs text-gray-400 leading-relaxed">Click Apply. The tool runs locally in your browser. Save the new game file.</p>
+        <div class="step-card p-4 md:p-6 rounded-xl bg-gradient-to-br from-blue-900/20 to-gray-900/20 border border-blue-500/30 shadow-md hover:shadow-lg hover:shadow-blue-500/20 transition-all">
+            <div class="inline-flex items-center justify-center w-8 h-8 md:w-10 md:h-10 bg-blue-500/20 border border-blue-500/50 rounded mb-3 md:mb-4">
+                <span class="material-symbols-outlined text-blue-400 text-base md:text-lg">check_circle</span>
+            </div>
+            <h4 class="font-bold text-white mb-2 uppercase tracking-wide text-xs md:text-sm">3. Apply & Play</h4>
+            <p class="text-xs text-gray-400 leading-relaxed">Click Apply Patch. Processing happens locally in your browser. Download your patched game and enjoy!</p>
         </div>
     </div>
 </div>
+
+<script>
+function toggleDropdown(id) {
+    const element = document.getElementById(id);
+    const toggleIcon = document.getElementById(`toggle-${id.split('-')[0]}`);
+    
+    if (element.classList.contains('hidden')) {
+        // Show
+        element.classList.remove('hidden');
+        const scrollHeight = element.firstElementChild.scrollHeight;
+        element.style.maxHeight = scrollHeight + 'px';
+        toggleIcon.textContent = 'expand_less';
+    } else {
+        // Hide
+        element.style.maxHeight = '0';
+        setTimeout(() => {
+            element.classList.add('hidden');
+        }, 300);
+        toggleIcon.textContent = 'expand_more';
+    }
+}
+</script>
 {% endblock %}

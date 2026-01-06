@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="12" fill="#050816"/>
+  <text x="32" y="30" font-size="18" font-weight="600" font-family="system-ui, -apple-system, BlinkMacSystemFont, sans-serif" fill="#e5f0ff" text-anchor="middle">rh</text>
+  <rect x="18" y="40" width="28" height="3" rx="1.5" fill="#4d7cff"/>
+</svg>

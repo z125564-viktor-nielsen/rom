@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link rel="icon" type="image/svg+xml" href="/logo/favicon.svg">
     <title>{% block title %}{{ site_name or 'romhacks_' }}{% endblock %}</title>
 
     {# ---- SEO defaults (override per-template with blocks) ---- #}
@@ -99,49 +100,92 @@
     
     <div class="scanline"></div>
 
-    <header class="bg-[#1a1a20] border-b border-gray-800 sticky top-0 z-30 shadow-lg shadow-black/50">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-6">
-                <div class="flex items-center gap-3 group cursor-pointer" onclick="window.location.href='/'">
-                    <a href="/" class="text-xl md:text-2xl font-bold pixel-font text-blue-400 tracking-tighter group-hover:text-blue-300 transition-colors shake-logo" style="text-decoration:none">romhacks_</a>
+    <header class="bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-30">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-8 md:gap-12">
+                <div class="flex items-center gap-2">
+                    <a href="/" class="logo" title="ROMHACKS.NET">
+                        <span class="logo-rom">rom</span><span class="logo-hacks">hacks</span><span class="logo-underscore">_</span>
+                    </a>
+                    <span class="dev-badge">ALPHA</span>
                 </div>
                 
-                <nav class="hidden md:flex gap-6 items-center">
-                    <a class="uppercase text-sm font-bold transition-colors flex items-center gap-1 
-                              {% if request.path == '/' %} text-blue-400 {% else %} text-gray-400 hover:text-blue-400 {% endif %}" 
+                <nav class="hidden md:flex gap-1 items-center">
+                    <a class="px-4 py-2 rounded-lg text-sm font-medium transition-all
+                              {% if request.path == '/' %} bg-white/10 text-white {% else %} text-gray-400 hover:text-white hover:bg-white/5 {% endif %}" 
                        href="/">
                         Home
                     </a>
-                    <a class="uppercase text-sm font-bold transition-colors flex items-center gap-1 
-                              {% if request.path == '/romhacks' %} text-blue-400 {% else %} text-gray-400 hover:text-blue-400 {% endif %}" 
+                    <a class="px-4 py-2 rounded-lg text-sm font-medium transition-all
+                              {% if request.path == '/romhacks' %} bg-white/10 text-white {% else %} text-gray-400 hover:text-white hover:bg-white/5 {% endif %}" 
                        href="/romhacks">
                         Romhacks
                     </a>
-                    <a class="uppercase text-sm font-bold transition-colors flex items-center gap-1 
-                              {% if request.path == '/ports' %} text-blue-400 {% else %} text-gray-400 hover:text-blue-400 {% endif %}" 
+                    <a class="px-4 py-2 rounded-lg text-sm font-medium transition-all
+                              {% if request.path == '/ports' %} bg-white/10 text-white {% else %} text-gray-400 hover:text-white hover:bg-white/5 {% endif %}" 
                        href="/ports">
-                        Decomp Ports
+                        Ports
                     </a>
-                    <a class="uppercase text-sm font-bold transition-colors flex items-center gap-1 
-                              {% if request.path == '/patcher' %} text-blue-400 {% else %} text-gray-400 hover:text-blue-400 {% endif %}" 
+                    <a class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5
+                              {% if request.path == '/patcher' %} bg-white/10 text-white {% else %} text-gray-400 hover:text-white hover:bg-white/5 {% endif %}" 
                        href="/patcher">
-                        <span class="material-symbols-outlined text-sm">build</span> Web Patcher
+                        <span class="material-symbols-outlined text-[16px]">build</span>
+                        Patcher
                     </a>
                 </nav>
             </div>
             
-            <div class="flex items-center gap-6">
-                <button onclick="document.getElementById('request-modal').classList.remove('hidden')" class="bg-gray-800 hover:bg-gray-700 text-blue-400 border border-blue-500/50 px-3 py-1 rounded text-xs uppercase tracking-wider flex items-center gap-2 transition-all">
-                    <span class="material-symbols-outlined text-sm">add_circle</span>
-                    <span class="hidden sm:inline">Request hack/mod</span>
-                    <span class="inline sm:hidden">Request</span>
-                </button>
-
-                <a href="https://ko-fi.com/romhacksnet" target="_blank" class="bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-500 hover:to-amber-500 text-white border border-yellow-400/50 px-3 py-1 rounded text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-md">
-                    <span class="material-symbols-outlined text-sm">favorite</span>
-                    <span class="hidden sm:inline">Donate</span>
+            <div class="flex items-center gap-3">
+                <a href="https://ko-fi.com/romhacksnet" target="_blank" class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-amber-400 hover:bg-amber-500/10 transition-all">
+                    <span class="material-symbols-outlined text-[16px]">favorite</span>
+                    Donate
                 </a>
+                
+                <a href="{{ url_for('submit') }}" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-lg text-sm flex items-center gap-2 transition-all">
+                    <span class="material-symbols-outlined text-[16px]">add</span>
+                    <span class="hidden sm:inline">Submit</span>
+                </a>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-all" aria-label="Open menu">
+                    <span class="material-symbols-outlined text-2xl" id="menu-icon">menu</span>
+                </button>
             </div>
+        </div>
+        
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-[#0a0a0f]/95 backdrop-blur-xl border-t border-white/5">
+            <nav class="container mx-auto px-4 py-4 flex flex-col gap-2">
+                <a class="px-4 py-3 rounded-lg text-base font-medium transition-all flex items-center gap-3
+                          {% if request.path == '/' %} bg-white/10 text-white {% else %} text-gray-400 hover:text-white hover:bg-white/5 {% endif %}" 
+                   href="/">
+                    <span class="material-symbols-outlined text-[20px]">home</span>
+                    Home
+                </a>
+                <a class="px-4 py-3 rounded-lg text-base font-medium transition-all flex items-center gap-3
+                          {% if request.path == '/romhacks' %} bg-white/10 text-white {% else %} text-gray-400 hover:text-white hover:bg-white/5 {% endif %}" 
+                   href="/romhacks">
+                    <span class="material-symbols-outlined text-[20px]">sports_esports</span>
+                    Romhacks
+                </a>
+                <a class="px-4 py-3 rounded-lg text-base font-medium transition-all flex items-center gap-3
+                          {% if request.path == '/ports' %} bg-white/10 text-white {% else %} text-gray-400 hover:text-white hover:bg-white/5 {% endif %}" 
+                   href="/ports">
+                    <span class="material-symbols-outlined text-[20px]">cloud_download</span>
+                    Ports
+                </a>
+                <a class="px-4 py-3 rounded-lg text-base font-medium transition-all flex items-center gap-3
+                          {% if request.path == '/patcher' %} bg-white/10 text-white {% else %} text-gray-400 hover:text-white hover:bg-white/5 {% endif %}" 
+                   href="/patcher">
+                    <span class="material-symbols-outlined text-[20px]">build</span>
+                    Patcher
+                </a>
+                <div class="border-t border-white/10 my-2"></div>
+                <a href="https://ko-fi.com/romhacksnet" target="_blank" class="px-4 py-3 rounded-lg text-base font-medium text-amber-400 hover:bg-amber-500/10 transition-all flex items-center gap-3">
+                    <span class="material-symbols-outlined text-[20px]">favorite</span>
+                    Donate
+                </a>
+            </nav>
         </div>
     </header>
 
@@ -149,153 +193,108 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-[#151518] border-t border-gray-800 py-12 mt-auto">
+<footer class="bg-[#0f0f12] border-t border-gray-800 py-10 md:py-16 mt-auto">
         <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                <div class="bg-gradient-to-br from-blue-900/20 to-gray-900/50 border border-blue-500/30 p-6 rounded-lg backdrop-blur-sm">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="material-symbols-outlined text-blue-400 text-lg">info</span>
-                        <h3 class="text-sm font-bold text-blue-400 uppercase tracking-wider">Legal Notice</h3>
-                    </div>
-                    <p class="text-xs text-gray-400 leading-relaxed">
-                        This site hosts educational information about ROM hacks and decompiled game projects only. We do not provide or distribute copyrighted ROMs.
-Users must legally own any original games referenced. Piracy and copyright infringement are not supported or endorsed.
-                    </p>
+            {# Footer Navigation #}
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-8 md:mb-12">
+                <div>
+                    <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-3 md:mb-4"><span class="text-[#e5f0ff]">rom</span><span class="text-[#9bb6ff]">hacks</span><span class="text-[#4d7cff]">_</span></h4>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="text-gray-400 text-xs hover:text-blue-400 transition">Home</a></li>
+                        <li><a href="/romhacks" class="text-gray-400 text-xs hover:text-blue-400 transition">ROM Hacks</a></li>
+                        <li><a href="/ports" class="text-gray-400 text-xs hover:text-blue-400 transition">Decompiled Ports</a></li>
+                        <li><a href="/patcher" class="text-gray-400 text-xs hover:text-blue-400 transition">Web Patcher</a></li>
+                    </ul>
                 </div>
-
-                <div class="bg-gradient-to-br from-gray-900/50 to-blue-900/20 border border-gray-700/50 p-6 rounded-lg backdrop-blur-sm">
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="material-symbols-outlined text-gray-400 text-lg">gavel</span>
-                        <h3 class="text-sm font-bold text-gray-300 uppercase tracking-wider">Disclaimer</h3>
-                    </div>
-                    <p class="text-xs text-gray-400 leading-relaxed">
-                        By using this website, you agree to use all content responsibly and in compliance with applicable laws. We are not responsible for misuse of tools or materials. Always respect intellectual property and original creators.
-                    </p>
+                
+                <div>
+                    <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-3 md:mb-4">Community</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{{ url_for('submit') }}" class="text-gray-400 text-xs hover:text-blue-400 transition">Submit Game</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="text-gray-400 text-xs hover:text-blue-400 transition">Contact & Feedback</a></li>
+                        <li><a href="https://ko-fi.com/romhacksnet" target="_blank" class="text-gray-400 text-xs hover:text-amber-400 transition">Support Us</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-3 md:mb-4">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{{ url_for('contact') }}" class="text-gray-400 text-xs hover:text-blue-400 transition">Report Issues</a></li>
+                        <li><a href="{{ url_for('privacy_policy') }}" class="text-gray-400 text-xs hover:text-blue-400 transition">Privacy Policy</a></li>
+                        <li><a href="{{ url_for('disclaimer') }}" class="text-gray-400 text-xs hover:text-blue-400 transition">Disclaimer</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-span-2 md:col-span-1">
+                    <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-3 md:mb-4">Contact</h4>
+                    <p class="text-gray-400 text-xs mb-3 leading-relaxed">Have questions or feedback? Reach out to us directly.</p>
+                    <a href="mailto:support@romhacks.net" class="inline-flex items-center gap-1 text-blue-400 hover:text-blue-300 transition text-xs">
+                        <span class="material-symbols-outlined text-xs">mail</span>
+                        support@romhacks.net
+                    </a>
                 </div>
             </div>
 
-            <div class="border-t border-gray-800 pt-6 text-center">
-                <div class="flex justify-center gap-6 mb-4 flex-wrap">
-                    <a href="{{ url_for('contact') }}" class="text-xs text-blue-400 hover:text-blue-300 transition">Report broken link</a>
-                    <span class="text-gray-700">•</span>
-                    <a href="{{ url_for('contact') }}" class="text-xs text-blue-400 hover:text-blue-300 transition">Request correction</a>
+            {# Legal Info Section #}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8 py-6 md:py-8 border-t border-b border-gray-800">
+                <div class="bg-gradient-to-br from-blue-900/20 to-gray-900/50 border border-blue-500/30 p-5 rounded-lg backdrop-blur-sm">
+                    <div class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-blue-400 text-lg mt-0.5 flex-shrink-0">info</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-blue-300 uppercase tracking-wider mb-2">Educational Fair Use</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">This site hosts educational information about ROM hacks and decompiled game projects. We do not provide or distribute copyrighted ROM files. Users must legally own the original games. All content is provided for educational purposes under fair use guidelines.</p>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-[10px] text-gray-700">© 2026 romhacks_ All rights reserved. Made by Natto</p>
-                <p class="text-[9px] text-gray-800 mt-2">This is a fan community project. All trademarks and copyrights belong to their respective owners.</p>
+
+                <div class="bg-gradient-to-br from-amber-900/20 to-gray-900/50 border border-amber-500/30 p-5 rounded-lg backdrop-blur-sm">
+                    <div class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-amber-400 text-lg mt-0.5 flex-shrink-0">image_not_supported</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-amber-300 uppercase tracking-wider mb-2">Image & Media Rights</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">All game screenshots, artwork, logos, and promotional images are property of their respective copyright holders. These are displayed for identification and review purposes only under fair use guidelines.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-red-900/20 to-gray-900/50 border border-red-500/30 p-5 rounded-lg backdrop-blur-sm">
+                    <div class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-red-400 text-lg mt-0.5 flex-shrink-0">gavel</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-red-300 uppercase tracking-wider mb-2">Liability Disclaimer</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">We are not responsible for the legality, accuracy, or safety of third-party content. Use of tools and materials is at your own risk. Always respect intellectual property rights and comply with applicable laws in your jurisdiction.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-green-900/20 to-gray-900/50 border border-green-500/30 p-5 rounded-lg backdrop-blur-sm">
+                    <div class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-green-400 text-lg mt-0.5 flex-shrink-0">verified_user</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-green-300 uppercase tracking-wider mb-2">DMCA & Copyright</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">If you believe your copyright has been violated, please contact us immediately at legal@romhacks.net. We respect intellectual property rights and will investigate all valid claims.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Footer Bottom #}
+            <div class="pt-8 text-center border-t border-gray-800">
+                <p class="text-[11px] text-gray-500 mb-3">© 2026 <span class="text-[#e5f0ff] font-semibold">rom</span><span class="text-[#9bb6ff]">hacks</span><span class="text-[#4d7cff]">_</span> All rights reserved.</p>
+                <p class="text-[10px] text-gray-600 mb-4">Made with <span class="text-red-500">♥</span> by Natto. This is a fan project not affiliated with Nintendo or any game publisher.</p>
+                <div class="flex justify-center gap-4 text-[10px] text-gray-600 flex-wrap">
+                    <a href="mailto:support@romhacks.net" class="hover:text-gray-400 transition">Contact</a>
+                    <span class="text-gray-700">•</span>
+                    <a href="{{ url_for('contact') }}" class="hover:text-gray-400 transition">Report Issues</a>
+                    <span class="text-gray-700">•</span>
+                    <a href="{{ url_for('submit') }}" class="hover:text-gray-400 transition">Submit Game</a>
+                </div>
+                <p class="text-[9px] text-gray-700 mt-4">All trademarks, logos, and copyrighted material belong to their respective owners.</p>
             </div>
         </div>
     </footer>
 
-    <div class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm" id="request-modal">
-        <div class="bg-[#1a1a20] w-full max-w-lg border border-blue-500/30 shadow-2xl relative flex flex-col p-8">
-            <h2 class="text-2xl font-bold text-white mb-6 pixel-font text-blue-400">Request Hack</h2>
-            <div class="space-y-4 mb-6">
-                <div>
-                    <label class="block text-xs text-gray-500 uppercase mb-1">Hack/Mod Title</label>
-                    <input type="text" id="request-title" class="input-dark" placeholder="e.g., Pokemon Fire Red Enhanced">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-500 uppercase mb-1">Base Game</label>
-                    <input type="text" id="request-base-game" class="input-dark" placeholder="e.g., Pokemon Fire Red">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-500 uppercase mb-1">Link to Patch (Optional)</label>
-                    <input type="url" id="request-patch-link" class="input-dark" placeholder="https://...">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-500 uppercase mb-1">Release Date (Optional)</label>
-                    <input type="date" id="request-release-date" class="input-dark">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-500 uppercase mb-1">Console</label>
-                    <select id="request-console" class="input-dark">
-                        <option value="">-- Select Console --</option>
-                        <option value="gb">Game Boy</option>
-                        <option value="gbc">Game Boy Color</option>
-                        <option value="gba">Game Boy Advance</option>
-                        <option value="snes">Super Nintendo</option>
-                        <option value="n64">Nintendo 64</option>
-                        <option value="nds">Nintendo DS</option>
-                        <option value="wii">Wii</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-500 uppercase mb-1">Author (Optional)</label>
-                    <input type="text" id="request-author" class="input-dark" placeholder="Creator name">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-500 uppercase mb-1">Why This Hack/Mod?</label>
-                    <textarea id="request-notes" class="input-dark resize-none" rows="3" placeholder="What makes this hack special?"></textarea>
-                </div>
-            </div>
-            <div class="flex gap-4">
-                <button onclick="submitHackRequest()" class="flex-1 btn-retro justify-center text-xs">Submit Request</button>
-                <button onclick="document.getElementById('request-modal').classList.add('hidden')" class="px-4 py-2 text-gray-500 hover:text-white border border-gray-700 hover:border-white transition-all text-xs uppercase font-mono">Cancel</button>
-            </div>
-            <div id="request-status" class="mt-4 text-sm text-gray-400 hidden"></div>
-        </div>
-    </div>
-
     <script>
-    function submitHackRequest() {
-        const title = document.getElementById('request-title').value;
-        const baseGame = document.getElementById('request-base-game').value;
-        const patchLink = document.getElementById('request-patch-link').value;
-        const releaseDate = document.getElementById('request-release-date').value;
-        const console_type = document.getElementById('request-console').value;
-        const author = document.getElementById('request-author').value;
-        const notes = document.getElementById('request-notes').value;
-        const statusDiv = document.getElementById('request-status');
-        
-        if (!title || !baseGame || !console_type) {
-            statusDiv.textContent = '❌ Please fill in all required fields';
-            statusDiv.classList.remove('hidden');
-            return;
-        }
-        
-        fetch('/api/request', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                title: title,
-                base_game: baseGame,
-                patch_page_url: patchLink,
-                release_date: releaseDate,
-                console: console_type,
-                author: author,
-                notes: notes
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                statusDiv.textContent = '✅ Request submitted! Thank you!';
-                statusDiv.classList.remove('hidden');
-                statusDiv.classList.add('text-blue-400');
-                // Reset form
-                document.getElementById('request-title').value = '';
-                document.getElementById('request-base-game').value = '';
-                document.getElementById('request-patch-link').value = '';
-                document.getElementById('request-release-date').value = '';
-                document.getElementById('request-console').value = '';
-                document.getElementById('request-author').value = '';
-                document.getElementById('request-notes').value = '';
-                // Close modal after 2 seconds
-                setTimeout(() => {
-                    document.getElementById('request-modal').classList.add('hidden');
-                    statusDiv.classList.add('hidden');
-                    statusDiv.classList.remove('text-green-400');
-                }, 2000);
-            }
-        })
-        .catch(error => {
-            statusDiv.textContent = '❌ Error submitting request: ' + error;
-            statusDiv.classList.remove('hidden');
-        });
-    }
-
     function trackDownload(gameId) {
         fetch(`/api/track-download/${gameId}`, {
             method: 'POST'
@@ -315,6 +314,31 @@ Users must legally own any original games referenced. Piracy and copyright infri
     }
     </script>
 
+    <script src="{{ url_for('static', filename='js/rom-cache.js') }}"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    
+    <!-- Mobile Menu Toggle -->
+    <script>
+    (function() {
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+        
+        if (menuBtn && mobileMenu && menuIcon) {
+            menuBtn.addEventListener('click', function() {
+                const isOpen = !mobileMenu.classList.contains('hidden');
+                if (isOpen) {
+                    mobileMenu.classList.add('hidden');
+                    menuIcon.textContent = 'menu';
+                    menuBtn.setAttribute('aria-label', 'Open menu');
+                } else {
+                    mobileMenu.classList.remove('hidden');
+                    menuIcon.textContent = 'close';
+                    menuBtn.setAttribute('aria-label', 'Close menu');
+                }
+            });
+        }
+    })();
+    </script>
 </body>
 </html>

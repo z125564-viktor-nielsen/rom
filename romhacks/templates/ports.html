@@ -2,8 +2,8 @@
 
 {% block title %}Decompiled Ports Database | ROMHACKS.NET{% endblock %}
 
-{% block meta_description %}Browse decompiled game ports for PC and Android. Find project details, release info, features, and official download links.{% endblock %}
-{% block meta_keywords %}decompiled ports, decompilation, pc ports, android ports, reverse engineered games, game ports{% endblock %}
+{% block meta_description %}Browse decompiled game ports for Windows, macOS, Android, and Linux. Find project details, release info, features, and official download links.{% endblock %}
+{% block meta_keywords %}decompiled ports, decompilation, windows ports, macos ports, android ports, linux ports, reverse engineered games, game ports{% endblock %}
 
 {% block json_ld %}
 <script type="application/ld+json">
@@ -29,63 +29,85 @@
 <div class="flex justify-between items-end mb-8">
     <div>
          <h2 class="text-3xl font-bold pixel-font text-white mb-2">Ports</h2>
-         <p class="text-gray-500 text-sm">Browsing all decompiled ports for PC & Android</p>
+         <p class="text-gray-500 text-sm">Browsing all decompiled ports for Windows, macOS, Android & Linux</p>
     </div>
 </div>
 
-<div class="mb-8 flex flex-col md:flex-row justify-between items-center gap-4 bg-[#1a1a20] p-4 border border-gray-800 rounded">
-    <div class="flex flex-col gap-4 w-full">
-        <div class="flex items-center gap-4 w-full md:w-auto">
-            <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-blue-400">filter_list</span>
-                <span class="font-bold uppercase tracking-wider text-sm hidden sm:inline">Platform:</span>
-            </div>
-            <div class="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0" id="filter-buttons">
-                <button class="filter-btn active bg-blue-900/50 text-blue-300 border border-blue-500 px-4 py-1 text-sm uppercase hover:bg-blue-800 transition-colors whitespace-nowrap" onclick="filterHacks('all')">All</button>
-                <button class="filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterHacks('pc')">PC</button>
-                <button class="filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterHacks('android')">Android</button>
-            </div>
-        </div>
-
-        <div class="flex items-center gap-4 w-full md:w-auto">
-            <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-blue-400">videogame_asset</span>
-                <span class="font-bold uppercase tracking-wider text-sm hidden sm:inline">Original:</span>
-            </div>
-            <div class="flex gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0" id="original-filter-buttons">
-                <button class="original-filter-btn active bg-blue-900/50 text-blue-300 border border-blue-500 px-4 py-1 text-sm uppercase hover:bg-blue-800 transition-colors whitespace-nowrap" onclick="filterByOriginal('all')">All</button>
-                <button class="original-filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterByOriginal('gb')">GB</button>
-                <button class="original-filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterByOriginal('gba')">GBA</button>
-                <button class="original-filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterByOriginal('snes')">SNES</button>
-                <button class="original-filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterByOriginal('n64')">N64</button>
-                <button class="original-filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-4 py-1 text-sm uppercase hover:border-blue-500 hover:text-blue-300 transition-colors whitespace-nowrap" onclick="filterByOriginal('nds')">NDS</button>
-            </div>
-        </div>
+<div class="mb-8 flex flex-col gap-4 bg-[#1a1a20] p-4 border border-gray-800/50 rounded-lg">
+    <!-- Search Bar -->
+    <div class="relative w-full">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-base">search</span>
+        <input type="text" id="search-input" onkeyup="filterHacks()" placeholder="Search ports..." 
+               class="w-full bg-gray-800/80 text-gray-100 border border-gray-700 hover:border-gray-600 focus:border-blue-500 pl-10 pr-4 py-2 text-sm rounded-lg focus:outline-none font-mono transition-all placeholder-gray-500 shadow-sm">
     </div>
 
-    <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto justify-end">
-        <div class="relative w-full sm:w-auto">
-             <span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm">search</span>
-             <input type="text" id="search-input" onkeyup="filterHacks()" placeholder="Search..." 
-                    class="bg-[#0f0f12] text-gray-300 border border-gray-700 pl-8 pr-3 py-1 text-sm rounded focus:border-blue-500 focus:outline-none font-mono w-full sm:w-40 focus:w-56 transition-all placeholder-gray-600">
+    <!-- Filters Row - Made mobile responsive -->
+    <div class="flex flex-col lg:flex-row lg:items-center gap-4">
+        <!-- Platform Filter -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span class="text-xs uppercase font-bold text-gray-400 whitespace-nowrap">Platform:</span>
+            <div class="flex gap-1 overflow-x-auto pb-2 sm:pb-0 -mx-1 px-1" id="filter-buttons">
+                <button class="filter-btn active bg-blue-900/50 text-blue-300 border border-blue-500 px-3 py-1.5 text-xs uppercase hover:bg-blue-800 transition-colors rounded flex-shrink-0" onclick="filterHacks('all')">All</button>
+                <button class="filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-3 py-1.5 text-xs uppercase hover:border-blue-500 hover:text-blue-300 transition-colors rounded flex-shrink-0" onclick="filterHacks('windows')">Windows</button>
+                <button class="filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-3 py-1.5 text-xs uppercase hover:border-blue-500 hover:text-blue-300 transition-colors rounded flex-shrink-0" onclick="filterHacks('macos')">macOS</button>
+                <button class="filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-3 py-1.5 text-xs uppercase hover:border-blue-500 hover:text-blue-300 transition-colors rounded flex-shrink-0" onclick="filterHacks('android')">Android</button>
+                <button class="filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-3 py-1.5 text-xs uppercase hover:border-blue-500 hover:text-blue-300 transition-colors rounded flex-shrink-0" onclick="filterHacks('linux')">Linux</button>
+            </div>
+            <label class="flex items-center gap-1.5 cursor-pointer sm:ml-2 sm:pl-2 sm:border-l border-gray-700 mt-2 sm:mt-0">
+                <input type="checkbox" id="netplay-checkbox" onchange="filterByNetplay(this.checked)" class="w-4 h-4 bg-gray-800 border border-gray-700 rounded cursor-pointer accent-blue-500">
+                <span class="text-xs text-gray-400 whitespace-nowrap">Online Multiplayer</span>
+            </label>
         </div>
 
-        <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
-            <span class="text-gray-500 text-sm uppercase font-bold whitespace-nowrap">Sort By:</span>
-            <select onchange="sortHacks(this.value)" class="bg-[#0f0f12] text-gray-300 border border-gray-700 px-2 py-1 text-sm rounded focus:border-blue-500 focus:outline-none uppercase font-mono">
-                <option value="name">Name (A-Z)</option>
-                <option value="newest">Newest Release</option>
-                <option value="oldest">Oldest Release</option>
-            </select>
+        <!-- Original Game Filter -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span class="text-xs uppercase font-bold text-gray-400 whitespace-nowrap">Original:</span>
+            <div class="flex gap-1 overflow-x-auto pb-2 sm:pb-0 -mx-1 px-1" id="original-filter-buttons">
+                <button class="original-filter-btn active bg-blue-900/50 text-blue-300 border border-blue-500 px-3 py-1.5 text-xs uppercase hover:bg-blue-800 transition-colors rounded flex-shrink-0" onclick="filterByOriginal('all')">All</button>
+                <button class="original-filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-3 py-1.5 text-xs uppercase hover:border-blue-500 hover:text-blue-300 transition-colors rounded flex-shrink-0" onclick="filterByOriginal('gb')">GB</button>
+                <button class="original-filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-3 py-1.5 text-xs uppercase hover:border-blue-500 hover:text-blue-300 transition-colors rounded flex-shrink-0" onclick="filterByOriginal('gba')">GBA</button>
+                <button class="original-filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-3 py-1.5 text-xs uppercase hover:border-blue-500 hover:text-blue-300 transition-colors rounded flex-shrink-0" onclick="filterByOriginal('snes')">SNES</button>
+                <button class="original-filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-3 py-1.5 text-xs uppercase hover:border-blue-500 hover:text-blue-300 transition-colors rounded flex-shrink-0" onclick="filterByOriginal('n64')">N64</button>
+                <button class="original-filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-3 py-1.5 text-xs uppercase hover:border-blue-500 hover:text-blue-300 transition-colors rounded flex-shrink-0" onclick="filterByOriginal('nds')">NDS</button>
+                <button class="original-filter-btn bg-gray-800 text-gray-400 border border-gray-700 px-3 py-1.5 text-xs uppercase hover:border-blue-500 hover:text-blue-300 transition-colors rounded flex-shrink-0" onclick="filterByOriginal('3ds')">3DS</button>
+            </div>
+        </div>
+
+        <!-- Game Filter and Sort - Stack on mobile -->
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:ml-auto">
+            <!-- Game Filter -->
+            <div class="flex items-center gap-2">
+                <span class="text-xs uppercase font-bold text-gray-400 whitespace-nowrap">Game:</span>
+                <div class="relative flex-1 sm:flex-none">
+                    <select id="game-filter" onchange="filterByGame(this.value)" class="w-full sm:w-auto bg-gray-800/80 text-gray-100 border border-gray-700 hover:border-gray-600 focus:border-blue-500 pl-3 pr-8 py-2 text-xs rounded-lg focus:outline-none font-mono appearance-none transition-all cursor-pointer shadow-sm">
+                        <option value="">All Games</option>
+                    </select>
+                    <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">unfold_more</span>
+                </div>
+            </div>
+
+            <!-- Sort Option -->
+            <div class="flex items-center gap-2">
+                <span class="text-xs uppercase font-bold text-gray-400">Sort:</span>
+                <div class="relative flex-1 sm:flex-none">
+                    <select onchange="sortHacks(this.value)" class="w-full sm:w-auto bg-gray-800/80 text-gray-100 border border-gray-700 hover:border-gray-600 focus:border-blue-500 pl-3 pr-8 py-2 text-xs rounded-lg focus:outline-none uppercase font-mono appearance-none transition-all cursor-pointer shadow-sm">
+                        <option value="name">A-Z</option>
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="downloads">Popular</option>
+                    </select>
+                    <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">unfold_more</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="hacks-grid">
     {% for game in games %}
-    <div class="hack-card bg-[#151518] border border-gray-800 hover:border-blue-500 transition-all group overflow-hidden flex flex-col" data-console="{{ (game.consoles or [game.console]) | join(' ') }}" data-original-platform="{{ game.original_platform or '' }}" data-release-date="{{ game.release_date }}">
-        <a href="{{ url_for('game_page', game_id=game.id) }}" class="block relative h-48 overflow-hidden cursor-pointer">
-            <img src="{{ game.image_url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="{{ game.title }} - {{ (game.consoles or [game.console]) | join('/') }} Port Cover">
+    <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-sky-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-sky-500/10" data-console="{{ (game.consoles or [game.console]) | join(' ') }}" data-original-platform="{{ game.original_platform or '' }}" data-release-date="{{ game.release_date }}" data-base-game="{{ game.base_game or '' }}">
+        <a href="{{ url_for('game_page', game_id=game.id) }}" class="block relative h-48 overflow-hidden cursor-pointer bg-gradient-to-br from-gray-800 to-gray-900">
+            <img src="{{ game.image_url }}" class="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105" alt="{{ game.title }} - {{ (game.consoles or [game.console]) | join('/') }} Port Cover">
             <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
             <div class="absolute bottom-3 left-3">
                 {% for c in (game.consoles or [game.console]) %}
@@ -98,7 +120,7 @@
             <div>
                 <div class="flex justify-between items-center text-xs text-gray-500 mb-2 font-mono">
                     <span><span class="material-symbols-outlined text-[10px] align-middle">person</span> {{ game.author }}</span>
-                    <span>{{ game.release_date }}</span>
+                    <span>{{ game.release_date[:4] if game.release_date else '' }}</span>
                 </div>
                 {% if game.original_platform %}
                 <div class="mb-3 text-[10px]">
@@ -107,7 +129,19 @@
                 {% endif %}
                 <p class="text-gray-400 text-sm line-clamp-3 mb-4">{{ game.description }}</p>
             </div>
-            <a href="{{ url_for('game_page', game_id=game.id) }}" class="w-full border border-gray-600 hover:border-blue-400 hover:text-blue-400 text-gray-300 py-2 text-xs uppercase tracking-widest transition-colors pixel-font text-center block" style="text-decoration:none">
+            <div class="flex items-center justify-between mb-3">
+                <span class="inline-flex items-center gap-2 text-[11px] font-mono text-gray-400 bg-gray-900/50 px-3 py-1 rounded-md border border-gray-700/50">
+                    <span class="material-symbols-outlined text-[13px] text-blue-400">download</span>
+                    {{ game.download_count | default(0) | download_count_label }}
+                </span>
+                {% if game.online_play %}
+                <span class="inline-flex items-center gap-1 text-[11px] font-mono text-green-300 bg-green-900/30 px-3 py-1 rounded-md border border-green-600/50">
+                    <span class="material-symbols-outlined text-[13px]">lan</span>
+                    Online
+                </span>
+                {% endif %}
+            </div>
+            <a href="{{ url_for('game_page', game_id=game.id) }}" class="w-full border border-gray-700/50 hover:border-blue-400/50 hover:text-blue-400 text-gray-300 py-2 px-4 text-xs uppercase tracking-widest transition-all rounded-lg text-center block" style="text-decoration:none">
                 View Details
             </a>
         </div>

@@ -5,60 +5,79 @@
 {% block meta_description %}Patch ROM hacks locally in your browser. Load your clean ROM + patch file (IPS/BPS/UPS/XDELTA) and export the patched ROM—no uploads.{% endblock %}
 {% block meta_keywords %}rom patcher, web patcher, ips patcher, bps patcher, ups patcher, xdelta patcher, patch rom online{% endblock %}
 
+{% block json_ld %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "ROMHACKS.NET Web Patcher",
+    "description": "A free browser-based tool to apply ROM patches (IPS, BPS, UPS, XDELTA) to your game files locally without uploading.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any (Browser-based)",
+    "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+    },
+    "featureList": ["IPS patching", "BPS patching", "UPS patching", "XDELTA patching", "Local ROM caching", "No file uploads"]
+}
+</script>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-6xl mx-auto space-y-16">
+<div class="max-w-6xl mx-auto space-y-10 md:space-y-16">
     
     <section>
-        <h3 class="text-lg font-bold text-white mb-6 pixel-font flex items-center gap-2">
+        <h3 class="text-base md:text-lg font-bold text-white mb-4 md:mb-6 pixel-font flex items-center gap-2">
             <span class="material-symbols-outlined text-blue-500">checklist</span> Instructions
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="step-card p-6 rounded-lg bg-[#151518]">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="material-symbols-outlined text-3xl text-green-500">upload_file</span>
-                    <span class="pixel-font text-2xl text-gray-700 font-bold opacity-30">01</span>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            <div class="step-card p-4 md:p-6 rounded-lg bg-[#151518]">
+                <div class="flex items-center justify-between mb-3 md:mb-4">
+                    <span class="material-symbols-outlined text-2xl md:text-3xl text-green-500">upload_file</span>
+                    <span class="pixel-font text-xl md:text-2xl text-gray-700 font-bold opacity-30">01</span>
                 </div>
-                <h4 class="font-bold text-white mb-2 uppercase tracking-wide">Load ROM</h4>
-                <p class="text-xs text-gray-400 leading-relaxed">Select your clean, legally dumped ROM file (e.g. .gba, .sfc, .z64). Ensure it matches the version required by the hack.</p>
+                <h4 class="font-bold text-white mb-2 uppercase tracking-wide text-sm">Load ROM</h4>
+                <p class="text-xs text-gray-400 leading-relaxed">Select your clean, legally dumped ROM file (e.g. .gba, .sfc, .z64). Your ROM is automatically cached locally for future use—no need to upload again!</p>
             </div>
-            <div class="step-card p-6 rounded-lg bg-[#151518]">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="material-symbols-outlined text-3xl text-green-500">folder_zip</span>
-                    <span class="pixel-font text-2xl text-gray-700 font-bold opacity-30">02</span>
+            <div class="step-card p-4 md:p-6 rounded-lg bg-[#151518]">
+                <div class="flex items-center justify-between mb-3 md:mb-4">
+                    <span class="material-symbols-outlined text-2xl md:text-3xl text-green-500">folder_zip</span>
+                    <span class="pixel-font text-xl md:text-2xl text-gray-700 font-bold opacity-30">02</span>
                 </div>
-                <h4 class="font-bold text-white mb-2 uppercase tracking-wide">Load Patch</h4>
+                <h4 class="font-bold text-white mb-2 uppercase tracking-wide text-sm">Load Patch</h4>
                 <p class="text-xs text-gray-400 leading-relaxed">Select the patch file. We support IPS, BPS, UPS, APS, MOD, PPF, and XDELTA formats.</p>
             </div>
-            <div class="step-card p-6 rounded-lg bg-[#151518]">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="material-symbols-outlined text-3xl text-green-500">download</span>
-                    <span class="pixel-font text-2xl text-gray-700 font-bold opacity-30">03</span>
+            <div class="step-card p-4 md:p-6 rounded-lg bg-[#151518]">
+                <div class="flex items-center justify-between mb-3 md:mb-4">
+                    <span class="material-symbols-outlined text-2xl md:text-3xl text-green-500">download</span>
+                    <span class="pixel-font text-xl md:text-2xl text-gray-700 font-bold opacity-30">03</span>
                 </div>
-                <h4 class="font-bold text-white mb-2 uppercase tracking-wide">Apply & Save</h4>
+                <h4 class="font-bold text-white mb-2 uppercase tracking-wide text-sm">Apply & Save</h4>
                 <p class="text-xs text-gray-400 leading-relaxed">Click 'Apply Patch'. The browser processes the file instantly. Save the patched ROM to your device.</p>
             </div>
         </div>
     </section>
 
     <div class="border border-blue-500/30 bg-[#151518] p-1 relative overflow-hidden group shadow-[0_0_15px_rgba(59,130,246,0.1)]">
-        <div class="absolute top-0 right-0 p-2">
+        <div class="absolute top-0 right-0 p-2 hidden md:block">
             <div class="w-16 h-16 border-t-2 border-r-2 border-blue-500/50 rounded-tr-xl"></div>
         </div>
 
-        <div class="p-6 md:p-10 relative z-10">
-            <div class="flex flex-col md:flex-row md:items-center gap-4 mb-8 border-b border-gray-800 pb-6">
-                <span class="material-symbols-outlined text-4xl text-blue-400 bg-blue-900/20 p-3 rounded w-fit">construction</span>
+        <div class="p-4 md:p-6 lg:p-10 relative z-10">
+            <div class="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 mb-6 md:mb-8 border-b border-gray-800 pb-4 md:pb-6">
+                <span class="material-symbols-outlined text-3xl md:text-4xl text-blue-400 bg-blue-900/20 p-2 md:p-3 rounded w-fit">construction</span>
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-bold pixel-font text-white mb-2">ROM Patcher</h2>
+                    <h2 class="text-xl md:text-2xl lg:text-3xl font-bold pixel-font text-white mb-1 md:mb-2">ROM Patcher</h2>
                     <p class="text-gray-400 text-xs md:text-sm font-mono leading-relaxed">
                         Supports: <strong class="text-blue-400">(IPS/BPS/UPS/APS/MOD/PPF/XDELTA)</strong>
                         <br class="hidden md:block">
-                        Consoles: <span class="text-gray-500">GBA, SNES, NES, N64, NDS, GB, GBC, GEN, WII & more.</span>
+                        <span class="hidden md:inline">Consoles:</span> <span class="text-gray-500">GBA, SNES, NES, N64, NDS, 3DS, GB, GBC, GEN, WII & more.</span>
                     </p>
                 </div>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                 <div class="space-y-6">
                     <div class="flex justify-end">
                         <label class="flex items-center gap-2 text-xs text-gray-500 hover:text-blue-400 cursor-pointer select-none">
@@ -67,39 +86,71 @@
                         </label>
                     </div>
 
-                    <div id="rom-drop-zone" class="drop-zone rounded-lg p-8 text-center bg-[#0f0f12]">
-                        <input id="rom-file" type="file" class="hidden" accept=".gba,.sfc,.z64,.nes,.bin,.md,.smc,.iso,.nds" />
-                        <span class="material-symbols-outlined text-4xl text-gray-500 mb-2">videogame_asset</span>
-                        <h3 class="text-lg font-bold text-gray-300 mb-1">Base ROM File</h3>
-                        <p id="rom-label" class="text-xs text-gray-500 font-mono">Drag & drop or click to select</p>
+                    <!-- Cached ROMs Section -->
+                    <div id="cached-roms-section" class="hidden space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-bold text-blue-300 uppercase tracking-wide">Cached ROMs</h4>
+                            <span id="cache-size" class="text-xs text-gray-500 font-mono">0 MB</span>
+                        </div>
+                        <div id="cached-roms-list" class="space-y-2 max-h-48 overflow-y-auto">
+                        </div>
+                        <button id="clear-cache-btn" class="w-full text-xs bg-red-900/30 hover:bg-red-900/50 text-red-400 border border-red-600/30 py-2 rounded transition">
+                            Clear Cache
+                        </button>
                     </div>
 
-                    <div id="patch-drop-zone" class="drop-zone rounded-lg p-8 text-center bg-[#0f0f12]">
+                    <!-- ROM Cache Info -->
+                    <div class="bg-blue-900/20 border border-blue-600/30 rounded-lg p-4">
+                        <div class="flex gap-3">
+                            <span class="material-symbols-outlined text-blue-400 flex-shrink-0">info</span>
+                            <div class="text-xs text-gray-300 leading-relaxed">
+                                <p class="font-bold text-blue-300 mb-1">💾 Smart ROM Caching</p>
+                                <p>Upload your ROM once and it's saved locally in your browser. Next time you want to patch a different hack, just select it from "Cached ROMs" instead of uploading again—instantly ready to go!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="rom-drop-zone" class="drop-zone rounded-lg p-5 md:p-8 text-center bg-[#0f0f12] cursor-pointer" style="user-select: none;">
+                        <input id="rom-file" type="file" class="hidden" accept=".gba,.sfc,.z64,.nes,.bin,.md,.smc,.iso,.nds,.3ds,.cia" />
+                        <span class="material-symbols-outlined text-3xl md:text-4xl text-gray-500 mb-2 pointer-events-none">videogame_asset</span>
+                        <h3 class="text-base md:text-lg font-bold text-gray-300 mb-1 pointer-events-none">Base ROM File</h3>
+                        <p id="rom-label" class="text-xs text-gray-500 font-mono pointer-events-none">Tap or drag & drop to select</p>
+                    </div>
+
+                    <!-- Privacy Disclaimer -->
+                    <div class="bg-gray-900/50 border border-gray-700 rounded-lg p-3 flex gap-2">
+                        <span class="material-symbols-outlined text-gray-500 flex-shrink-0 text-sm">lock</span>
+                        <p class="text-xs text-gray-400 leading-relaxed">
+                            <strong class="text-gray-300">Privacy Notice:</strong> Your ROM is automatically saved to your browser's local storage for future use. Nothing is ever uploaded to any server.
+                        </p>
+                    </div>
+
+                    <div id="patch-drop-zone" class="drop-zone rounded-lg p-5 md:p-8 text-center bg-[#0f0f12]">
                         <input id="patch-file" type="file" class="hidden" accept=".ips,.bps,.ups,.xdelta,.ppf,.mod" />
-                        <span class="material-symbols-outlined text-4xl text-gray-500 mb-2">medical_services</span>
-                        <h3 class="text-lg font-bold text-gray-300 mb-1">Patch File</h3>
-                        <p id="patch-label" class="text-xs text-gray-500 font-mono">Drag & drop patch file</p>
+                        <span class="material-symbols-outlined text-3xl md:text-4xl text-gray-500 mb-2">medical_services</span>
+                        <h3 class="text-base md:text-lg font-bold text-gray-300 mb-1">Patch File</h3>
+                        <p id="patch-label" class="text-xs text-gray-500 font-mono">Tap or drag & drop patch file</p>
                     </div>
 
-                    <button id="apply-patch-btn" class="w-full bg-gray-700 text-gray-400 font-bold py-4 rounded cursor-not-allowed uppercase pixel-font text-xs tracking-wider transition-all border border-transparent disabled:opacity-50" disabled>
+                    <button id="apply-patch-btn" class="w-full bg-gray-700 text-gray-400 font-bold py-3 md:py-4 rounded cursor-not-allowed uppercase pixel-font text-[10px] md:text-xs tracking-wider transition-all border border-transparent disabled:opacity-50" disabled>
                         Apply Patch
                     </button>
 
-                    <div id="export-rom-btn" class="hidden w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded uppercase pixel-font text-xs tracking-wider flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all cursor-pointer transform active:scale-95">
+                    <div id="export-rom-btn" class="hidden w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 md:py-4 rounded uppercase pixel-font text-[10px] md:text-xs tracking-wider flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all cursor-pointer transform active:scale-95">
                         <span class="material-symbols-outlined">save_alt</span> Save Patched ROM
                     </div>
                 </div>
 
-                <div class="flex flex-col h-full min-h-[400px]">
-                    <div class="bg-black border border-gray-700 rounded-t p-3 flex justify-between items-center">
-                        <span class="text-xs text-gray-500 uppercase font-bold tracking-wider">System Log</span>
-                        <div class="flex gap-2">
-                            <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                            <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                <div class="flex flex-col h-full min-h-[300px] md:min-h-[400px]">
+                    <div class="bg-black border border-gray-700 rounded-t p-2 md:p-3 flex justify-between items-center">
+                        <span class="text-[10px] md:text-xs text-gray-500 uppercase font-bold tracking-wider">System Log</span>
+                        <div class="flex gap-1.5 md:gap-2">
+                            <div class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-red-500"></div>
+                            <div class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-yellow-500"></div>
+                            <div class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500"></div>
                         </div>
                     </div>
-                    <div class="bg-black border-x border-b border-gray-700 rounded-b p-4 font-mono text-xs md:text-sm flex-grow overflow-y-auto shadow-inner relative" id="console-output">
+                    <div class="bg-black border-x border-b border-gray-700 rounded-b p-3 md:p-4 font-mono text-[10px] md:text-sm flex-grow overflow-y-auto shadow-inner relative" id="console-output">
                         <div class="text-green-500 mb-1">> SYSTEM_READY</div>
                         <div class="text-gray-500 mb-1">> Core: PATCHER_MODULE_LOADED</div>
                         <div class="text-gray-500 mb-1">> Waiting for input...</div>
@@ -144,7 +195,7 @@
                     <span class="material-symbols-outlined text-gray-500 group-open:rotate-180 transition-transform">expand_more</span>
                 </summary>
                 <div class="px-4 pb-4 text-xs text-gray-400 leading-relaxed border-t border-gray-800/50 pt-4">
-                    We support the most common patching formats: <strong>IPS, BPS, UPS, APS, MOD, PPF, and XDELTA/VCDIFF</strong>. We support ROMs for GBA, SNES, NES, N64, NDS, Genesis, Wii, GameCube, and more.
+                    We support the most common patching formats: <strong>IPS, BPS, UPS, APS, MOD, PPF, and XDELTA/VCDIFF</strong>. We support ROMs for GBA, SNES, NES, N64, NDS, 3DS, Genesis, Wii, GameCube, and more.
                 </div>
             </details>
 
@@ -175,4 +226,217 @@
         </div>
     </section>
 </div>
+
+<script>
+    let currentROM = null;
+    let currentPatch = null;
+
+    // Initialize cache UI on page load
+    document.addEventListener('DOMContentLoaded', async function() {
+        await updateCachedROMsList();
+    });
+
+    // Update cached ROMs list UI
+    async function updateCachedROMsList() {
+        const roms = await romCache.getAllROMs();
+        const section = document.getElementById('cached-roms-section');
+        const list = document.getElementById('cached-roms-list');
+        const cacheSize = document.getElementById('cache-size');
+        
+        if (roms.length === 0) {
+            section.classList.add('hidden');
+            return;
+        }
+        
+        section.classList.remove('hidden');
+        list.innerHTML = '';
+        
+        const totalSize = await romCache.getTotalSize();
+        cacheSize.textContent = formatBytes(totalSize);
+        
+        roms.sort((a, b) => b.timestamp - a.timestamp).forEach(rom => {
+            const item = document.createElement('div');
+            item.className = 'bg-blue-900/20 border border-blue-600/30 rounded p-3 flex justify-between items-center';
+            item.innerHTML = `
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-mono text-blue-300 truncate">${rom.filename}</p>
+                    <p class="text-xs text-gray-500">${formatBytes(rom.size)} • CRC32: ${rom.crc32.toString(16).toUpperCase().padStart(8, '0')}</p>
+                </div>
+                <div class="flex gap-2 ml-3">
+                    <button class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded transition" 
+                            onclick="selectCachedROM('${rom.id}')">Load</button>
+                    <button class="text-xs bg-red-900/50 hover:bg-red-900 text-red-400 px-3 py-1 rounded transition"
+                            onclick="deleteCachedROM('${rom.id}')">Delete</button>
+                </div>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    async function selectCachedROM(id) {
+        const rom = await romCache.getROM(id);
+        if (rom) {
+            currentROM = new Uint8Array(rom.data);
+            document.getElementById('rom-label').textContent = `✓ ${rom.filename} (${formatBytes(rom.size)})`;
+            document.getElementById('rom-label').className = 'text-xs text-green-400 font-mono';
+            document.getElementById('rom-drop-zone').classList.add('bg-green-900/20', 'border-green-600/30');
+            document.getElementById('rom-drop-zone').classList.remove('bg-[#0f0f12]');
+            updateApplyButtonState();
+            logToConsole(`Loaded cached ROM: ${rom.filename}`);
+        }
+    }
+
+    async function deleteCachedROM(id) {
+        if (confirm('Delete this cached ROM?')) {
+            await romCache.deleteROM(id);
+            await updateCachedROMsList();
+            logToConsole('Cached ROM deleted');
+        }
+    }
+
+    document.getElementById('clear-cache-btn').addEventListener('click', async function() {
+        if (confirm('Clear all cached ROMs? This cannot be undone.')) {
+            await romCache.clearAll();
+            await updateCachedROMsList();
+            logToConsole('Cache cleared');
+        }
+    });
+
+    // Existing ROM file handler - cache the ROM when uploaded
+    const romFileInput = document.getElementById('rom-file');
+    const romDropZone = document.getElementById('rom-drop-zone');
+    
+    // Click to open file picker - only on the zone itself
+    romDropZone.addEventListener('click', (e) => {
+        romFileInput.click();
+    }, { once: false });
+    
+    // Drag over
+    romDropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        romDropZone.style.borderColor = '#3b82f6';
+    });
+    
+    // Drag leave
+    romDropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        romDropZone.style.borderColor = '';
+    });
+    
+    // Drop
+    romDropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        romDropZone.style.borderColor = '';
+        if (e.dataTransfer.files.length) {
+            handleROMFile(e.dataTransfer.files[0]);
+        }
+    });
+
+    // File input change - only process once
+    let isProcessingROM = false;
+    romFileInput.addEventListener('change', (e) => {
+        if (isProcessingROM) return;
+        if (e.target.files.length) {
+            isProcessingROM = true;
+            handleROMFile(e.target.files[0]);
+            romFileInput.value = '';
+            setTimeout(() => { isProcessingROM = false; }, 100);
+        }
+    });
+
+    async function handleROMFile(file) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            currentROM = new Uint8Array(e.target.result);
+            
+            // Auto-save to cache
+            try {
+                await romCache.addROM(file, e.target.result);
+                await updateCachedROMsList();
+                logToConsole(`✓ ROM loaded and saved to browser cache: ${file.name}`);
+            } catch (err) {
+                logToConsole(`Warning: Could not cache ROM - ${err.message}`);
+            }
+            
+            document.getElementById('rom-label').textContent = `✓ ${file.name} (${formatBytes(file.size)})`;
+            document.getElementById('rom-label').className = 'text-xs text-green-400 font-mono';
+            document.getElementById('rom-drop-zone').classList.add('bg-green-900/20', 'border-green-600/30');
+            document.getElementById('rom-drop-zone').classList.remove('bg-[#0f0f12]');
+            
+            updateApplyButtonState();
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    // Patch file handler (keeping existing logic)
+    const patchFileInput = document.getElementById('patch-file');
+    const patchDropZone = document.getElementById('patch-drop-zone');
+    
+    patchDropZone.addEventListener('click', () => patchFileInput.click());
+    patchDropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        patchDropZone.style.borderColor = '#3b82f6';
+    });
+    patchDropZone.addEventListener('dragleave', () => {
+        patchDropZone.style.borderColor = '';
+    });
+    patchDropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        patchDropZone.style.borderColor = '';
+        if (e.dataTransfer.files.length) {
+            const file = e.dataTransfer.files[0];
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                currentPatch = new Uint8Array(event.target.result);
+                document.getElementById('patch-label').textContent = `✓ ${file.name}`;
+                document.getElementById('patch-label').className = 'text-xs text-green-400 font-mono';
+                patchDropZone.classList.add('bg-green-900/20', 'border-green-600/30');
+                patchDropZone.classList.remove('bg-[#0f0f12]');
+                updateApplyButtonState();
+            };
+            reader.readAsArrayBuffer(file);
+        }
+    });
+
+    patchFileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                currentPatch = new Uint8Array(event.target.result);
+                document.getElementById('patch-label').textContent = `✓ ${file.name}`;
+                document.getElementById('patch-label').className = 'text-xs text-green-400 font-mono';
+                patchDropZone.classList.add('bg-green-900/20', 'border-green-600/30');
+                patchDropZone.classList.remove('bg-[#0f0f12]');
+                updateApplyButtonState();
+            };
+            reader.readAsArrayBuffer(file);
+        }
+    });
+
+    function updateApplyButtonState() {
+        const btn = document.getElementById('apply-patch-btn');
+        if (currentROM && currentPatch) {
+            btn.disabled = false;
+            btn.classList.remove('bg-gray-700', 'text-gray-400', 'cursor-not-allowed');
+            btn.classList.add('bg-blue-600', 'hover:bg-blue-500', 'text-white', 'cursor-pointer', 'shadow-[0_0_15px_rgba(59,130,246,0.4)]');
+        } else {
+            btn.disabled = true;
+            btn.classList.add('bg-gray-700', 'text-gray-400', 'cursor-not-allowed');
+            btn.classList.remove('bg-blue-600', 'hover:bg-blue-500', 'text-white', 'cursor-pointer', 'shadow-[0_0_15px_rgba(59,130,246,0.4)]');
+        }
+    }
+
+    function logToConsole(message) {
+        const consoleOutput = document.getElementById('console-output');
+        const line = document.createElement('div');
+        line.className = message.includes('✓') || message.includes('cached') ? 'text-green-500 mb-1' : 'text-gray-400 mb-1';
+        line.textContent = '> ' + message;
+        consoleOutput.appendChild(line);
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
+</script>
 {% endblock %}

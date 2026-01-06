@@ -2,36 +2,87 @@
 
 {% block title %}Contact & Feedback | ROMHACKS.NET{% endblock %}
 
-{% block meta_description %}Report broken links or request corrections for ROM hacks and game ports.{% endblock %}
+{% block meta_description %}Contact us to report broken links, request corrections, or provide feedback about ROM hacks and decompiled ports.{% endblock %}
+{% block meta_keywords %}contact romhacks, report broken link, feedback, rom hack support, request correction{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-12 max-w-2xl">
-    <h1 class="text-4xl font-bold text-white mb-2 pixel-font">Contact & Feedback</h1>
-    <p class="text-gray-400 mb-8">Help us keep the site up to date by reporting broken links or requesting corrections.</p>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-        <!-- Report Broken Link -->
-        <div class="bg-gradient-to-br from-red-900/20 to-gray-900/50 border border-red-500/30 p-6 rounded-lg backdrop-blur-sm">
-            <div class="flex items-center gap-2 mb-4">
-                <span class="material-symbols-outlined text-red-400 text-xl">link_off</span>
-                <h3 class="text-lg font-bold text-red-400">Report Broken Link</h3>
+<div class="max-w-4xl mx-auto mb-12">
+    <div class="mb-12">
+        <h1 class="text-4xl font-bold text-white mb-3 pixel-font">Contact & Feedback</h1>
+        <p class="text-gray-400 text-lg">Found an issue? Have feedback? We'd love to hear from you! Help us keep the community and database accurate.</p>
+    </div>
+
+    <div class="bg-gradient-to-br from-blue-900/20 to-gray-900/20 border border-blue-500/30 p-6 rounded-lg mb-12">
+        <div class="flex gap-3 items-start">
+            <span class="material-symbols-outlined text-blue-400 text-lg mt-1 flex-shrink-0">info</span>
+            <div class="text-sm text-blue-300 leading-relaxed">
+                <p><strong>Response Time:</strong> We typically respond to reports within 24-48 hours during business days. All submissions are reviewed carefully and help us improve the site.</p>
             </div>
-            <p class="text-sm text-gray-400 mb-4">Found a broken download link or dead resource? Let us know so we can fix it.</p>
-            <button class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition" onclick="openFeedbackModal('broken-link')">
-                Report Link
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <!-- Report Broken Link -->
+        <div class="bg-gradient-to-br from-red-900/20 to-gray-900/50 border border-red-500/30 p-6 rounded-lg backdrop-blur-sm hover:border-red-500/50 transition-all">
+            <div class="flex items-start gap-3 mb-4">
+                <span class="material-symbols-outlined text-red-400 text-2xl flex-shrink-0">link_off</span>
+                <div>
+                    <h3 class="text-lg font-bold text-red-400">Broken Link</h3>
+                    <p class="text-xs text-red-300 mt-1">Download or resource dead</p>
+                </div>
+            </div>
+            <p class="text-sm text-gray-400 mb-4 leading-relaxed">Found a broken download link or inaccessible resource? Report it and we'll investigate and fix it as soon as possible.</p>
+            <button class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition text-sm" onclick="openFeedbackModal('broken-link')">
+                <span class="material-symbols-outlined text-sm align-middle mr-1">flag</span> Report
             </button>
         </div>
         
         <!-- Request Correction -->
-        <div class="bg-gradient-to-br from-blue-900/20 to-gray-900/50 border border-blue-500/30 p-6 rounded-lg backdrop-blur-sm">
-            <div class="flex items-center gap-2 mb-4">
-                <span class="material-symbols-outlined text-blue-400 text-xl">edit</span>
-                <h3 class="text-lg font-bold text-blue-400">Request Correction</h3>
+        <div class="bg-gradient-to-br from-blue-900/20 to-gray-900/50 border border-blue-500/30 p-6 rounded-lg backdrop-blur-sm hover:border-blue-500/50 transition-all">
+            <div class="flex items-start gap-3 mb-4">
+                <span class="material-symbols-outlined text-blue-400 text-2xl flex-shrink-0">edit</span>
+                <div>
+                    <h3 class="text-lg font-bold text-blue-400">Correction Request</h3>
+                    <p class="text-xs text-blue-300 mt-1">Inaccurate information</p>
+                </div>
             </div>
-            <p class="text-sm text-gray-400 mb-4">See incorrect information on a game page? Help us improve by suggesting corrections.</p>
-            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition" onclick="openFeedbackModal('correction')">
-                Request Correction
+            <p class="text-sm text-gray-400 mb-4 leading-relaxed">Noticed incorrect game info, wrong author, or bad description? Let us know what needs to be fixed and we'll verify and update it.</p>
+            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition text-sm" onclick="openFeedbackModal('correction')">
+                <span class="material-symbols-outlined text-sm align-middle mr-1">edit_note</span> Request
             </button>
+        </div>
+
+        <!-- General Feedback -->
+        <div class="bg-gradient-to-br from-amber-900/20 to-gray-900/50 border border-amber-500/30 p-6 rounded-lg backdrop-blur-sm hover:border-amber-500/50 transition-all">
+            <div class="flex items-start gap-3 mb-4">
+                <span class="material-symbols-outlined text-amber-400 text-2xl flex-shrink-0">feedback</span>
+                <div>
+                    <h3 class="text-lg font-bold text-amber-400">General Feedback</h3>
+                    <p class="text-xs text-amber-300 mt-1">Suggestions & ideas</p>
+                </div>
+            </div>
+            <p class="text-sm text-gray-400 mb-4 leading-relaxed">Have a suggestion for the site, found a bug, or want to share feedback? We're always looking to improve the community platform.</p>
+            <button class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg transition text-sm" onclick="openFeedbackModal('feedback')">
+                <span class="material-symbols-outlined text-sm align-middle mr-1">lightbulb</span> Share
+            </button>
+        </div>
+    </div>
+
+    <!-- Direct Contact Section -->
+    <div class="bg-[#1a1a20] border border-gray-700/50 rounded-lg p-8 mb-12">
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-blue-400">mail</span>
+            Direct Contact
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <h3 class="text-white font-bold mb-2">Email</h3>
+                <p class="text-gray-400 text-sm mb-2">For urgent issues or detailed reports:</p>
+                <a href="mailto:support@romhacks.net" class="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition font-mono text-sm">
+                    <span class="material-symbols-outlined text-sm">mail</span>
+                    support@romhacks.net
+                </a>
+            </div>
         </div>
     </div>
 </div>
@@ -54,6 +105,7 @@
                     <option value="">Select a type...</option>
                     <option value="broken-link">Broken Link</option>
                     <option value="correction">Correction Request</option>
+                    <option value="feedback">General Feedback</option>
                 </select>
             </div>
             
