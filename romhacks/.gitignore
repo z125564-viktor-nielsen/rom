@@ -1,0 +1,22 @@
+# virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# local secrets / instance data
+.env
+instance/
+
+# sqlite databases (keep runtime data out of git)
+*.db
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
