@@ -149,6 +149,8 @@ def init_db():
         cursor.execute("ALTER TABLE games ADD COLUMN troubleshooting_url TEXT")
     if 'rom_checker_url' not in game_cols:
         cursor.execute("ALTER TABLE games ADD COLUMN rom_checker_url TEXT")
+    if 'wiki_url' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN wiki_url TEXT")
     if 'base_hash' in game_cols:
         # Can't drop columns in SQLite, so we'll leave them but not use them
         pass
@@ -232,6 +234,8 @@ def init_db():
         cursor.execute("ALTER TABLE ports ADD COLUMN troubleshooting_url TEXT")
     if 'rom_checker_url' not in port_cols:
         cursor.execute("ALTER TABLE ports ADD COLUMN rom_checker_url TEXT")
+    if 'wiki_url' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN wiki_url TEXT")
     if 'mod_links' not in port_cols:
         cursor.execute("ALTER TABLE ports ADD COLUMN mod_links TEXT")
     if 'mod_instructions' not in port_cols:
@@ -502,11 +506,11 @@ def insert_game(game_data):
             base_checksum_crc32, base_checksum_md5, base_checksum_sha1,
             patch_format, patch_output_ext, dev_stage, popular, online_play,
             instruction, instruction_text, discord_url, reddit_url,
-            support_forum_url, troubleshooting_url, rom_checker_url,
+            support_forum_url, troubleshooting_url, rom_checker_url, wiki_url,
             instructions_pc, instructions_android, instructions_linux,
             instructions_web, instructions_ios, instructions_mac,
             instructions_switch, instructions_ps4, instructions_xbox
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         game_id,
         game_data.get('title'),
@@ -539,6 +543,7 @@ def insert_game(game_data):
         game_data.get('support_forum_url'),
         game_data.get('troubleshooting_url'),
         game_data.get('rom_checker_url'),
+        game_data.get('wiki_url'),
         game_data.get('instructions_pc'),
         game_data.get('instructions_android'),
         game_data.get('instructions_linux'),
@@ -998,7 +1003,7 @@ def update_game(game_id, data):
         'base_checksum_sha1', 'patch_format', 'patch_output_ext',
         'online_play', 'dev_stage', 'social_links',
         'support_forum_url', 'discord_url', 'reddit_url',
-        'troubleshooting_url', 'rom_checker_url',
+        'troubleshooting_url', 'rom_checker_url', 'wiki_url',
         'instructions_pc', 'instructions_android', 'instructions_linux',
         'instructions_web', 'instructions_ios', 'instructions_mac',
         'instructions_switch', 'instructions_ps4', 'instructions_xbox'
@@ -1052,7 +1057,7 @@ def update_port(port_id, data):
         'base_checksum_sha1', 'patch_format', 'patch_output_ext',
         'online_play', 'social_links',
         'support_forum_url', 'discord_url', 'reddit_url',
-        'troubleshooting_url', 'rom_checker_url',
+        'troubleshooting_url', 'rom_checker_url', 'wiki_url',
         'instructions_pc', 'instructions_android', 'instructions_linux',
         'instructions_web', 'instructions_ios', 'instructions_mac',
         'instructions_switch', 'instructions_ps4', 'instructions_xbox',

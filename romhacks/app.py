@@ -581,6 +581,10 @@ def patcher():
 def contact():
     return render_template('contact.html')
 
+@app.route('/claim')
+def claim():
+    return render_template('claim.html')
+
 @app.route('/privacy-policy')
 def privacy_policy():
     return render_template('privacy_policy.html')
@@ -733,7 +737,7 @@ def submit_feedback_endpoint():
         return jsonify({'success': False, 'message': 'Description is required'}), 400
     
     feedback_type = data.get('type', '').strip()
-    if feedback_type not in ['broken-link', 'correction']:
+    if feedback_type not in ['broken-link', 'correction', 'claim']:
         return jsonify({'success': False, 'message': 'Invalid feedback type'}), 400
     
     # Get client IP

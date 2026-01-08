@@ -122,7 +122,7 @@
     {% for game in games %}
     <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-sky-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-sky-500/10" data-console="{{ (game.consoles or [game.console]) | join(' ') }}" data-original-platform="{{ game.original_platform or '' }}" data-release-date="{{ game.release_date }}" data-base-game="{{ game.base_game or '' }}">
         <a href="{{ url_for('game_page', game_id=game.id) }}" class="block relative h-48 overflow-hidden cursor-pointer bg-gradient-to-br from-gray-800 to-gray-900">
-            <img src="{{ game.image_url }}" loading="lazy" decoding="async" class="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105" alt="{{ game.title }} - {{ (game.consoles or [game.console]) | join('/') }} Port Cover">
+            <img src="{{ game.image_url }}" referrerpolicy="no-referrer" loading="lazy" decoding="async" class="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105" alt="{{ game.title }} - {{ (game.consoles or [game.console]) | join('/') }} Port Cover">
             <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
             <div class="absolute bottom-3 left-3">
                 {% for c in (game.consoles or [game.console]) %}

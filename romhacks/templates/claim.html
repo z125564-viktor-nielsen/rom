@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Claim Project | ROMHACKS.NET{% endblock %}
+
+{% block meta_description %}Project owners can claim their submissions to provide proof of ownership and request updates.{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mb-12">
+    <div class="mb-12">
+        <h1 class="text-4xl font-bold text-white mb-3 pixel-font">Claim Your Project</h1>
+        <p class="text-gray-400 text-lg">Are you the creator of this project? Verify your ownership to manage it.</p>
+    </div>
+
+    <div class="bg-[#1a1a20] border border-gray-800/50 p-8 rounded-xl max-w-2xl mx-auto">
+        <form id="claimForm" class="space-y-6">
+            <input type="hidden" name="type" value="claim">
+            
+            {% if request.args.get('game_id') %}
+            <input type="hidden" name="game_id" value="{{ request.args.get('game_id') }}">
+            {% endif %}
+
+            <!-- Project Info -->
+            <div>
+                <label class="block text-sm font-bold text-gray-300 mb-2">Project Title</label>
+                <input type="text" name="title" value="{{ request.args.get('title', '') }}" 
+                       class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                       placeholder="e.g. Pokemon Unbound" required>
+            </div>
+
+            <!-- Contact Info -->
+            <div>
+                <label class="block text-sm font-bold text-gray-300 mb-2">Your Email</label>
+                <input type="email" name="email" 
+                       class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                       placeholder="name@example.com" required>
+                <p class="text-xs text-gray-500 mt-1">We'll use this to verify your identity.</p>
+            </div>
+
+            <!-- Proof -->
+            <div>
+                <label class="block text-sm font-bold text-gray-300 mb-2">Proof of Ownership</label>
+                <textarea name="proof" rows="3" 
+                          class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                          placeholder="Please provide links to profiles (PokeCommunity, Romero, Discord, etc) that verify you are the creator." required></textarea>
+            </div>
+
+            <!-- Requested Changes -->
+            <div>
+                <label class="block text-sm font-bold text-gray-300 mb-2">Requested Changes / Message</label>
+                <textarea name="description" rows="4" 
+                          class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                          placeholder="Let us know what you'd like to update or change about the listing." required></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">send</span>
+                Submit Claim
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('claimForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+    
+    // Disable button
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Sending...';
+    
+    // Gather data
+    const formData = new FormData(e.target);
+    const data = {
+        type: 'claim',
+        title: formData.get('title'),
+        email: formData.get('email'),
+        // Combine proof and description into the description field for the backend
+        description: `PROOF:\n${formData.get('proof')}\n\nREQUESTED CHANGES:\n${formData.get('description')}`,
+        url: window.location.href // Or maybe the game url if we had it
+    };
+    
+    try {
+        const response = await fetch('/api/feedback', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Claim request submitted successfully! We will review it shortly.');
+            window.location.href = '/';
+        } else {
+            alert('Error: ' + (result.message || 'Failed to submit claim.'));
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    } catch (err) {
+        console.error(err);
+        alert('An error occurred. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+});
+</script>
+{% endblock %}

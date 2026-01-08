@@ -70,7 +70,15 @@
           "configuration": "1. Open Sameboy\n2. File > Open ROM\n3. Load your GBC game\n4. Configure controls as needed"
         }
       ],
-      "android": [],
+      "android": [
+        {
+          "name": "My OldBoy!",
+          "link": "https://play.google.com/store/apps/details?id=com.fastemulator.gbcfree",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#2a2a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#4a4a4a' rx='4'/><rect x='12' y='12' width='40' height='28' fill='#00ff00'/><rect x='16' y='44' width='32' height='8' fill='#333'/><circle cx='20' cy='48' r='2' fill='#666'/><circle cx='28' cy='48' r='2' fill='#666'/><circle cx='36' cy='48' r='2' fill='#666'/><circle cx='44' cy='48' r='2' fill='#666'/></svg>",
+          "installation": "1. Download My OldBoy! Free from Google Play Store\n2. Install the app\n3. Launch the application\n4. Grant necessary storage permissions",
+          "configuration": "1. Navigate to your ROM folder using the built-in file browser\n2. Tap the game file to launch\n3. Supports cheat codes and save states\n4. Customize controls in Settings > Layout"
+        }
+      ],
       "ios": []
     }
   },

@@ -148,7 +148,7 @@
 </style>
 
 <script>
-    function openFeedbackModal(type) {
+    function openFeedbackModal(type, options = { reset: true }) {
         const modal = document.getElementById('feedback-modal');
         const typeSelect = document.getElementById('feedback-type');
         const modalTitle = document.getElementById('modal-title');
@@ -161,14 +161,30 @@
         }
         
         // Reset form
-        document.getElementById('feedback-title').value = '';
-        document.getElementById('feedback-url').value = '';
-        document.getElementById('feedback-description').value = '';
-        document.getElementById('feedback-email').value = '';
-        document.getElementById('status-div').classList.add('hidden');
+        if (options.reset) {
+            document.getElementById('feedback-title').value = '';
+            document.getElementById('feedback-url').value = '';
+            document.getElementById('feedback-description').value = '';
+            document.getElementById('feedback-email').value = '';
+            document.getElementById('status-div').classList.add('hidden');
+        }
+
+        if (options.title) {
+            document.getElementById('feedback-title').value = options.title;
+        }
         
         modal.classList.remove('hidden');
     }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const type = urlParams.get('type');
+        const title = urlParams.get('title');
+
+        if (type) {
+             openFeedbackModal(type, { reset: false, title: title });
+        }
+    });
     
     function closeFeedbackModal() {
         document.getElementById('feedback-modal').classList.add('hidden');
