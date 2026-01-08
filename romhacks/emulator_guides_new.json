@@ -1,0 +1,365 @@
+{
+  "gb": {
+    "console_name": "Game Boy",
+    "guides": {
+      "windows": [
+        {
+          "name": "BGB",
+          "link": "https://bgb.bircd.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#2a2a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#4a4a4a' rx='4'/><rect x='12' y='12' width='40' height='28' fill='#9db500'/><rect x='16' y='44' width='32' height='8' fill='#333'/><circle cx='20' cy='48' r='2' fill='#666'/><circle cx='28' cy='48' r='2' fill='#666'/><circle cx='36' cy='48' r='2' fill='#666'/><circle cx='44' cy='48' r='2' fill='#666'/></svg>",
+          "installation": "1. Download BGB from bgb.bircd.org\n2. Extract the archive to your desired location\n3. Run bgb.exe\n4. No additional installation needed",
+          "configuration": "1. Open BGB\n2. File > Open and select your Game Boy ROM\n3. The emulator supports most GB ROMs out of the box\n4. Configure controls in Settings > Input"
+        }
+      ],
+      "macos": [
+        {
+          "name": "BGB",
+          "link": "https://bgb.bircd.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#2a2a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#4a4a4a' rx='4'/><rect x='12' y='12' width='40' height='28' fill='#9db500'/><rect x='16' y='44' width='32' height='8' fill='#333'/><circle cx='20' cy='48' r='2' fill='#666'/><circle cx='28' cy='48' r='2' fill='#666'/><circle cx='36' cy='48' r='2' fill='#666'/><circle cx='44' cy='48' r='2' fill='#666'/></svg>",
+          "installation": "1. Download BGB for Mac\n2. Extract and place in Applications\n3. Launch BGB from Applications\n4. May need to allow in Security settings",
+          "configuration": "1. Open BGB\n2. File > Open and select your Game Boy ROM\n3. Configure controls in Settings > Input\n4. Full Game Boy support"
+        }
+      ],
+      "linux": [
+        {
+          "name": "Gambatte",
+          "link": "https://github.com/sinamas/gambatte",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#3d3d3d' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#5a5a5a' rx='4'/><rect x='12' y='12' width='40' height='28' fill='#7cb342'/><rect x='16' y='44' width='32' height='8' fill='#2d2d2d'/><rect x='20' y='48' width='4' height='2' fill='#555'/><rect x='28' y='48' width='4' height='2' fill='#555'/><rect x='36' y='48' width='4' height='2' fill='#555'/></svg>",
+          "installation": "1. Install via package manager: sudo apt-get install gambatte-qt\n2. Or compile from source from GitHub\n3. No additional setup required",
+          "configuration": "1. Open Gambatte\n2. File > Open ROM\n3. Select your Game Boy ROM\n4. Configure controls via menu"
+        }
+      ],
+      "android": [],
+      "ios": []
+    }
+  },
+  "gbc": {
+    "console_name": "Game Boy Color",
+    "guides": {
+      "windows": [
+        {
+          "name": "Sameboy",
+          "link": "https://sameboy.github.io/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#2a2a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#4a4a4a' rx='4'/><rect x='12' y='12' width='40' height='28' fill='#00ff00'/><rect x='16' y='44' width='32' height='8' fill='#333'/><circle cx='20' cy='48' r='2' fill='#666'/><circle cx='28' cy='48' r='2' fill='#666'/><circle cx='36' cy='48' r='2' fill='#666'/><circle cx='44' cy='48' r='2' fill='#666'/></svg>",
+          "installation": "1. Download Sameboy from https://sameboy.github.io/\n2. Extract the executable\n3. Run sameboy.exe\n4. No installation needed",
+          "configuration": "1. Open Sameboy\n2. File > Open ROM and select your GBC game\n3. Full color support with accurate emulation\n4. Configure controls in Preferences > Controls"
+        },
+        {
+          "name": "BGB",
+          "link": "https://bgb.bircd.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#2a2a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#4a4a4a' rx='4'/><rect x='12' y='12' width='40' height='28' fill='#00ff00'/><rect x='16' y='44' width='32' height='8' fill='#333'/><circle cx='20' cy='48' r='2' fill='#666'/><circle cx='28' cy='48' r='2' fill='#666'/><circle cx='36' cy='48' r='2' fill='#666'/><circle cx='44' cy='48' r='2' fill='#666'/></svg>",
+          "installation": "1. Download BGB from bgb.bircd.org\n2. Extract the archive\n3. Run bgb.exe\n4. Full GBC support included",
+          "configuration": "1. Open BGB\n2. File > Open and select your GBC ROM\n3. Automatically detects GBC mode\n4. Configure controls in Settings > Input"
+        }
+      ],
+      "macos": [
+        {
+          "name": "Sameboy",
+          "link": "https://sameboy.github.io/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#2a2a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#4a4a4a' rx='4'/><rect x='12' y='12' width='40' height='28' fill='#00ff00'/><rect x='16' y='44' width='32' height='8' fill='#333'/><circle cx='20' cy='48' r='2' fill='#666'/><circle cx='28' cy='48' r='2' fill='#666'/><circle cx='36' cy='48' r='2' fill='#666'/><circle cx='44' cy='48' r='2' fill='#666'/></svg>",
+          "installation": "1. Download Sameboy for macOS from https://sameboy.github.io/\n2. Extract and move to Applications\n3. Launch from Applications\n4. May need to allow in Security settings",
+          "configuration": "1. Open Sameboy\n2. File > Open ROM\n3. Select your Game Boy Color ROM\n4. Enjoy accurate GBC emulation"
+        }
+      ],
+      "linux": [
+        {
+          "name": "Sameboy",
+          "link": "https://sameboy.github.io/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#2a2a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#4a4a4a' rx='4'/><rect x='12' y='12' width='40' height='28' fill='#00ff00'/><rect x='16' y='44' width='32' height='8' fill='#333'/><circle cx='20' cy='48' r='2' fill='#666'/><circle cx='28' cy='48' r='2' fill='#666'/><circle cx='36' cy='48' r='2' fill='#666'/><circle cx='44' cy='48' r='2' fill='#666'/></svg>",
+          "installation": "1. Build from source: git clone https://github.com/LIJI32/SameBoy.git\n2. cd SameBoy && make\n3. Run ./sameboy\n4. Or install via package manager if available",
+          "configuration": "1. Open Sameboy\n2. File > Open ROM\n3. Load your GBC game\n4. Configure controls as needed"
+        }
+      ],
+      "android": [],
+      "ios": []
+    }
+  },
+  "gba": {
+    "console_name": "Game Boy Advance",
+    "guides": {
+      "windows": [
+        {
+          "name": "mGBA",
+          "link": "https://mgba.io/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#4a4a8a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#6a6aaa' rx='4'/><rect x='12' y='12' width='40' height='30' fill='#9090cc'/><rect x='18' y='46' width='28' height='6' fill='#3a3a6a'/></svg>",
+          "installation": "1. Download mGBA from mgba.io\n2. Run the installer or extract the portable version\n3. Launch mGBA\n4. No additional setup needed",
+          "configuration": "1. Open mGBA\n2. File > Load ROM\n3. Select your GBA game\n4. Configure controls in Tools > Settings"
+        }
+      ],
+      "macos": [
+        {
+          "name": "mGBA",
+          "link": "https://mgba.io/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#4a4a8a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#6a6aaa' rx='4'/><rect x='12' y='12' width='40' height='30' fill='#9090cc'/><rect x='18' y='46' width='28' height='6' fill='#3a3a6a'/></svg>",
+          "installation": "1. Install from Homebrew: brew install mgba\n2. Or download DMG from mgba.io\n3. Launch mGBA from Applications\n4. Full GBA support",
+          "configuration": "1. Open mGBA\n2. File > Load ROM\n3. Select your GBA game\n4. Configure controls in Tools > Settings"
+        }
+      ],
+      "linux": [
+        {
+          "name": "mGBA",
+          "link": "https://mgba.io/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#4a4a8a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#6a6aaa' rx='4'/><rect x='12' y='12' width='40' height='30' fill='#9090cc'/><rect x='18' y='46' width='28' height='6' fill='#3a3a6a'/></svg>",
+          "installation": "1. Install via package manager: sudo apt-get install mgba-qt\n2. Or compile from source\n3. Available on most Linux distributions\n4. No additional setup",
+          "configuration": "1. Open mGBA\n2. File > Load ROM\n3. Select your GBA ROM\n4. Configure controls in Tools > Settings"
+        }
+      ],
+      "android": [
+        {
+          "name": "mGBA",
+          "link": "https://mgba.io/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#4a4a8a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#6a6aaa' rx='4'/><rect x='12' y='12' width='40' height='30' fill='#9090cc'/><rect x='18' y='46' width='28' height='6' fill='#3a3a6a'/></svg>",
+          "installation": "1. Download mGBA from Google Play Store\n2. Or download APK from mgba.io\n3. Install the app\n4. Grant storage permissions",
+          "configuration": "1. Open mGBA\n2. Tap the folder icon to browse ROMs\n3. Select your GBA game\n4. Configure controls in app settings"
+        }
+      ],
+      "ios": []
+    }
+  },
+  "snes": {
+    "console_name": "Super Nintendo Entertainment System",
+    "guides": {
+      "windows": [
+        {
+          "name": "Snes9x",
+          "link": "http://www.snes9x.com/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#6a1a1a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#8a3a3a' rx='4'/><rect x='12' y='12' width='40' height='30' fill='#c85a5a'/></svg>",
+          "installation": "1. Download Snes9x from snes9x.com\n2. Run the installer or extract portable version\n3. Launch Snes9x\n4. No additional installation needed",
+          "configuration": "1. Open Snes9x\n2. File > Open ROM\n3. Select your SNES game\n4. Configure joypad in Inputs > Joypad Configuration"
+        }
+      ],
+      "macos": [
+        {
+          "name": "Snes9x",
+          "link": "http://www.snes9x.com/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#6a1a1a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#8a3a3a' rx='4'/><rect x='12' y='12' width='40' height='30' fill='#c85a5a'/></svg>",
+          "installation": "1. Install from Homebrew: brew install snes9x\n2. Or download from snes9x.com\n3. Move to Applications\n4. May need to allow in Security settings",
+          "configuration": "1. Open Snes9x\n2. File > Open ROM\n3. Select your SNES game\n4. Configure controls in Inputs > Joypad Configuration"
+        }
+      ],
+      "linux": [
+        {
+          "name": "Snes9x",
+          "link": "http://www.snes9x.com/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#6a1a1a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#8a3a3a' rx='4'/><rect x='12' y='12' width='40' height='30' fill='#c85a5a'/></svg>",
+          "installation": "1. Install via package manager: sudo apt-get install snes9x-gtk\n2. Or compile from source\n3. Available on most Linux distributions\n4. No additional setup",
+          "configuration": "1. Open Snes9x\n2. File > Open ROM\n3. Select your SNES game\n4. Configure controls via menu"
+        }
+      ],
+      "android": [
+        {
+          "name": "Snes9x EX+",
+          "link": "https://play.google.com/store/apps/details?id=com.explusalabs.snes9xexplus",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#6a1a1a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#8a3a3a' rx='4'/><rect x='12' y='12' width='40' height='30' fill='#c85a5a'/></svg>",
+          "installation": "1. Download from Google Play Store\n2. Or download APK from alternative sources\n3. Install the app\n4. Grant storage permissions",
+          "configuration": "1. Open Snes9x EX+\n2. Tap to browse and select ROM\n3. Load your SNES game\n4. Configure controls in app settings"
+        }
+      ],
+      "ios": []
+    }
+  },
+  "n64": {
+    "console_name": "Nintendo 64",
+    "guides": {
+      "windows": [
+        {
+          "name": "Project64",
+          "link": "https://www.pj64-emu.com/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#8a3a1a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#ba6a3a' rx='4'/><rect x='12' y='12' width='40' height='32' fill='#e8a060'/></svg>",
+          "installation": "1. Download Project64 from pj64-emu.com\n2. Run the installer\n3. Select installation folder\n4. Install complete",
+          "configuration": "1. Launch Project64\n2. File > Open ROM\n3. Select your N64 game\n4. Configure controller in Options > Configure Controller"
+        }
+      ],
+      "macos": [
+        {
+          "name": "Mupen64Plus",
+          "link": "https://mupen64plus.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#5a3a1a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#8a5a2a' rx='4'/><rect x='12' y='12' width='40' height='32' fill='#c8906a'/></svg>",
+          "installation": "1. Install from Homebrew: brew install mupen64plus\n2. Or build from source\n3. May require additional plugins\n4. Configure emulator paths",
+          "configuration": "1. Open Mupen64Plus\n2. File > Open ROM\n3. Select your N64 game\n4. Configure input in Settings > Input Devices"
+        }
+      ],
+      "linux": [
+        {
+          "name": "Mupen64Plus",
+          "link": "https://mupen64plus.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#5a3a1a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#8a5a2a' rx='4'/><rect x='12' y='12' width='40' height='32' fill='#c8906a'/></svg>",
+          "installation": "1. Install via package manager: sudo apt-get install mupen64plus\n2. Install GUI: sudo apt-get install mupen64plus-ui-console\n3. May require additional video/audio plugins\n4. No additional setup",
+          "configuration": "1. Open Mupen64Plus\n2. File > Open ROM\n3. Select your N64 game\n4. Configure controls in Settings > Input Devices"
+        }
+      ],
+      "android": [],
+      "ios": []
+    }
+  },
+  "nds": {
+    "console_name": "Nintendo DS",
+    "guides": {
+      "windows": [
+        {
+          "name": "DeSmuME",
+          "link": "https://desmume.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#3a3a3a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#5a5a5a' rx='4'/><rect x='12' y='12' width='40' height='22' fill='#7ab3e0'/><rect x='12' y='38' width='40' height='14' fill='#9db500'/></svg>",
+          "installation": "1. Download DeSmuME from desmume.org\n2. Extract or run installer\n3. Launch the application\n4. No additional setup needed",
+          "configuration": "1. Open DeSmuME\n2. File > Open ROM\n3. Select your DS game\n4. Configure controls in Config > Emulation Settings"
+        }
+      ],
+      "macos": [
+        {
+          "name": "DeSmuME",
+          "link": "https://desmume.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#3a3a3a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#5a5a5a' rx='4'/><rect x='12' y='12' width='40' height='22' fill='#7ab3e0'/><rect x='12' y='38' width='40' height='14' fill='#9db500'/></svg>",
+          "installation": "1. Download DeSmuME from desmume.org\n2. Extract and move to Applications\n3. Launch from Applications\n4. May need to allow in Security settings",
+          "configuration": "1. Open DeSmuME\n2. File > Open ROM\n3. Select your DS game\n4. Configure controls in Config > Emulation Settings"
+        }
+      ],
+      "linux": [
+        {
+          "name": "DeSmuME",
+          "link": "https://desmume.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#3a3a3a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#5a5a5a' rx='4'/><rect x='12' y='12' width='40' height='22' fill='#7ab3e0'/><rect x='12' y='38' width='40' height='14' fill='#9db500'/></svg>",
+          "installation": "1. Install via package manager: sudo apt-get install desmume\n2. Or build from source\n3. Available on most Linux distributions\n4. No additional setup",
+          "configuration": "1. Open DeSmuME\n2. File > Open ROM\n3. Select your DS game\n4. Configure controls in Config > Emulation Settings"
+        }
+      ],
+      "android": [],
+      "ios": []
+    }
+  },
+  "3ds": {
+    "console_name": "Nintendo 3DS",
+    "guides": {
+      "windows": [
+        {
+          "name": "Citra",
+          "link": "https://citra-emu.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#2a2a6a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#4a4a9a' rx='4'/><rect x='12' y='12' width='40' height='22' fill='#6a6aca'/><rect x='12' y='38' width='40' height='14' fill='#2a8a8a'/></svg>",
+          "installation": "1. Download Citra from citra-emu.org\n2. Extract the files\n3. Run citra.exe\n4. No installation needed",
+          "configuration": "1. Open Citra\n2. File > Load File\n3. Select your 3DS game\n4. Configure controls in Settings > Controls"
+        }
+      ],
+      "macos": [
+        {
+          "name": "Citra",
+          "link": "https://citra-emu.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#2a2a6a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#4a4a9a' rx='4'/><rect x='12' y='12' width='40' height='22' fill='#6a6aca'/><rect x='12' y='38' width='40' height='14' fill='#2a8a8a'/></svg>",
+          "installation": "1. Download Citra for macOS from citra-emu.org\n2. Extract and move to Applications\n3. Launch Citra\n4. May need to allow in Security settings",
+          "configuration": "1. Open Citra\n2. File > Load File\n3. Select your 3DS game\n4. Configure controls in Settings > Controls"
+        }
+      ],
+      "linux": [
+        {
+          "name": "Citra",
+          "link": "https://citra-emu.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#2a2a6a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#4a4a9a' rx='4'/><rect x='12' y='12' width='40' height='22' fill='#6a6aca'/><rect x='12' y='38' width='40' height='14' fill='#2a8a8a'/></svg>",
+          "installation": "1. Build from source: git clone https://github.com/citra-emu/citra.git\n2. Follow build instructions on GitHub\n3. Or download precompiled binaries\n4. No additional setup",
+          "configuration": "1. Open Citra\n2. File > Load File\n3. Select your 3DS game\n4. Configure controls in Settings > Controls"
+        }
+      ],
+      "android": [],
+      "ios": []
+    }
+  },
+  "wii": {
+    "console_name": "Nintendo Wii",
+    "guides": {
+      "windows": [
+        {
+          "name": "Dolphin",
+          "link": "https://dolphin-emu.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#1a4a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#2a7a4a' rx='4'/><rect x='12' y='12' width='40' height='35' fill='#5abaaa'/></svg>",
+          "installation": "1. Download Dolphin from dolphin-emu.org\n2. Run installer or extract portable version\n3. Launch Dolphin\n4. No additional setup needed",
+          "configuration": "1. Open Dolphin\n2. Open > Browse for ISOs\n3. Select your Wii game disc\n4. Configure controls in Options > Controller Settings"
+        }
+      ],
+      "macos": [
+        {
+          "name": "Dolphin",
+          "link": "https://dolphin-emu.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#1a4a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#2a7a4a' rx='4'/><rect x='12' y='12' width='40' height='35' fill='#5abaaa'/></svg>",
+          "installation": "1. Download Dolphin from dolphin-emu.org\n2. Extract and move to Applications\n3. Launch Dolphin\n4. May need to allow in Security settings",
+          "configuration": "1. Open Dolphin\n2. Open > Browse for ISOs\n3. Select your Wii game\n4. Configure controls in Options > Controller Settings"
+        }
+      ],
+      "linux": [
+        {
+          "name": "Dolphin",
+          "link": "https://dolphin-emu.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#1a4a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#2a7a4a' rx='4'/><rect x='12' y='12' width='40' height='35' fill='#5abaaa'/></svg>",
+          "installation": "1. Install via package manager: sudo apt-get install dolphin-emu\n2. Or build from source\n3. Available on most Linux distributions\n4. No additional setup",
+          "configuration": "1. Open Dolphin\n2. Open > Browse for ISOs\n3. Select your Wii game\n4. Configure controls in Options > Controller Settings"
+        }
+      ],
+      "android": [],
+      "ios": []
+    }
+  },
+  "gcn": {
+    "console_name": "Nintendo GameCube",
+    "guides": {
+      "windows": [
+        {
+          "name": "Dolphin",
+          "link": "https://dolphin-emu.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#4a1a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#7a3a5a' rx='4'/><rect x='12' y='12' width='40' height='35' fill='#ba6aaa'/></svg>",
+          "installation": "1. Download Dolphin from dolphin-emu.org\n2. Run installer or extract portable version\n3. Launch Dolphin\n4. No additional setup needed",
+          "configuration": "1. Open Dolphin\n2. Open > Browse for ISOs\n3. Select your GameCube game disc\n4. Configure controls in Options > Controller Settings"
+        }
+      ],
+      "macos": [
+        {
+          "name": "Dolphin",
+          "link": "https://dolphin-emu.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#4a1a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#7a3a5a' rx='4'/><rect x='12' y='12' width='40' height='35' fill='#ba6aaa'/></svg>",
+          "installation": "1. Download Dolphin from dolphin-emu.org\n2. Extract and move to Applications\n3. Launch Dolphin\n4. May need to allow in Security settings",
+          "configuration": "1. Open Dolphin\n2. Open > Browse for ISOs\n3. Select your GameCube game\n4. Configure controls in Options > Controller Settings"
+        }
+      ],
+      "linux": [
+        {
+          "name": "Dolphin",
+          "link": "https://dolphin-emu.org/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#4a1a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#7a3a5a' rx='4'/><rect x='12' y='12' width='40' height='35' fill='#ba6aaa'/></svg>",
+          "installation": "1. Install via package manager: sudo apt-get install dolphin-emu\n2. Or build from source\n3. Available on most Linux distributions\n4. No additional setup",
+          "configuration": "1. Open Dolphin\n2. Open > Browse for ISOs\n3. Select your GameCube game\n4. Configure controls in Options > Controller Settings"
+        }
+      ],
+      "android": [],
+      "ios": []
+    }
+  },
+  "ps1": {
+    "console_name": "PlayStation 1",
+    "guides": {
+      "windows": [
+        {
+          "name": "DuckStation",
+          "link": "https://stenzek.github.io/duckstation/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#1a4a8a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#2a6aba' rx='4'/><rect x='12' y='12' width='40' height='36' fill='#5a9aca'/></svg>",
+          "installation": "1. Download DuckStation from stenzek.github.io/duckstation\n2. Extract the files\n3. Run duckstation.exe\n4. No additional setup needed",
+          "configuration": "1. Open DuckStation\n2. Add game directory in Settings\n3. Your PSX games will appear in the list\n4. Configure controls in Settings > Input\n5. Excellent PS1 compatibility"
+        }
+      ],
+      "macos": [
+        {
+          "name": "DuckStation",
+          "link": "https://stenzek.github.io/duckstation/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#1a4a8a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#2a6aba' rx='4'/><rect x='12' y='12' width='40' height='36' fill='#5a9aca'/></svg>",
+          "installation": "1. Download DuckStation for macOS from website\n2. Extract and move to Applications\n3. Launch DuckStation\n4. May need to allow in Security settings",
+          "configuration": "1. Open DuckStation\n2. Add game directory in Settings\n3. Your PSX games will appear\n4. Configure controls in Settings > Input"
+        }
+      ],
+      "linux": [
+        {
+          "name": "DuckStation",
+          "link": "https://stenzek.github.io/duckstation/",
+          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#1a4a8a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#2a6aba' rx='4'/><rect x='12' y='12' width='40' height='36' fill='#5a9aca'/></svg>",
+          "installation": "1. Download DuckStation from website or build from source\n2. Extract and run the application\n3. Available as AppImage on most Linux distributions\n4. No additional setup required",
+          "configuration": "1. Open DuckStation\n2. Add game directory in Settings\n3. Select your PSX game\n4. Configure controls in Settings > Input"
+        }
+      ],
+      "android": [],
+      "ios": []
+    }
+  }
+}

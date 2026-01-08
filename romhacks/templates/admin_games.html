@@ -17,10 +17,16 @@
                 ← Back to Dashboard
             </a>
             {% if item_type == 'port' %}
+            <a href="{{ url_for('admin_add_port') }}" class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white border border-green-400 rounded-lg transition-colors text-sm font-bold">
+                <span class="material-symbols-outlined align-middle" style="display: inline; font-size: 18px;">add_circle</span> Add Port
+            </a>
             <a href="{{ url_for('admin_games') }}" class="px-4 py-2 bg-purple-900/50 hover:bg-purple-900 text-purple-300 border border-purple-600 rounded-lg transition-colors text-sm font-bold">
                 Manage ROM Hacks
             </a>
             {% else %}
+            <a href="{{ url_for('admin_add_game') }}" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white border border-purple-400 rounded-lg transition-colors text-sm font-bold">
+                <span class="material-symbols-outlined align-middle" style="display: inline; font-size: 18px;">add_circle</span> Add ROM Hack
+            </a>
             <a href="{{ url_for('admin_ports') }}" class="px-4 py-2 bg-green-900/50 hover:bg-green-900 text-green-300 border border-green-600 rounded-lg transition-colors text-sm font-bold">
                 Manage Ports
             </a>

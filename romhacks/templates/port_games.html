@@ -1,53 +1,66 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ game.title }} | ROMHACKS.NET{% endblock %}
+{% block title %}{{ game.title }} — {{ game.base_game or 'Decompiled Port' }} for {{ (game.consoles or [game.console]) | join(', ') }} | ROMHACKS.NET{% endblock %}
 {% block og_type %}article{% endblock %}
 {% block meta_image %}{{ game.image_url }}{% endblock %}
-{% block meta_description %}{{ (game.description or '') | truncate(155, True, '…') }}{% endblock %}
-{% block meta_keywords %}{{ game.title }}, decompiled port, {{ (game.consoles or [game.console]) | join(', ') }}, windows port, android port, download{% endblock %}
+{% block meta_description %}{{ (game.title ~ ' decompiled port of ' ~ (game.base_game or 'the original') ~ ' with downloads for ' ~ ((game.consoles or [game.console]) | join(', ')) ~ '. ' ~ (game.description or 'Includes install steps, patch links, and notes from the team.')) | truncate(155, True, '…') }}{% endblock %}
+{% block meta_keywords %}{{ game.title }}, {{ game.base_game }}, {{ (game.consoles or [game.console]) | join(', ') }}, decompiled port, download, how to install{% endblock %}
 
 {% block json_ld %}
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
-    "@type": "CreativeWork",
+    "@type": "VideoGame",
     "name": {{ (game.title or '') | tojson }},
     "description": {{ (game.description or '') | tojson }},
     "url": {{ url_for('port_page', port_id=game.id, _external=True) | tojson }},
     "image": {{ (game.image_url or '') | tojson }},
-    "author": {{ (game.author or '') | tojson }},
+    "creator": {
+        "@type": "Person",
+        "name": {{ (game.author or 'ROMHACKS.NET Team') | tojson }}
+    },
     "datePublished": {{ (game.release_date or '') | tojson }},
-    "Latest version": {{ (game.version or '') | tojson }},
-    "isBasedOn": {{ (game.base_game or '') | tojson }}
+    "softwareVersion": {{ (game.version or '') | tojson }},
+    "applicationPlatform": {{ ((game.consoles or [game.console]) | join('/')) | tojson }},
+    "isBasedOn": {{ (game.base_game or '') | tojson }},
+    "offers": {
+        "@type": "Offer",
+        "url": {{ (game.download_link or url_for('port_page', port_id=game.id, _external=True)) | tojson }},
+        "availability": "https://schema.org/InStock",
+        "price": "0",
+        "priceCurrency": "USD"
+    }
 }
 </script>
 {% endblock %}
 
 {% block content %}
 <div class="flex flex-col gap-6 max-w-6xl mx-auto">
-    <div class="relative h-[380px] rounded-2xl overflow-visible border border-gray-700/50 shadow-2xl bg-gradient-to-br from-gray-800 to-gray-900">
-        <img src="{{ game.image_url }}" class="w-full h-full object-contain object-center opacity-40" alt="{{ game.title }} - {{ game.console }} Port Cover Art">
+    <div class="relative min-h-[280px] md:h-[380px] rounded-2xl overflow-hidden border border-gray-700/50 shadow-2xl bg-gradient-to-br from-gray-800 to-gray-900">
+        <img src="{{ game.image_url }}" loading="lazy" decoding="async" class="w-full h-full object-contain object-center opacity-40" alt="{{ game.title }} - {{ game.console }} Port Cover Art">
         <div class="absolute inset-0 bg-gradient-to-t from-[#050507] to-transparent"></div>
-        <div class="absolute bottom-0 left-0 p-8 w-full">
-            <div class="flex items-center gap-4 mb-4">
-                {% for c in (game.consoles or [game.console]) %}
-                <span class="{{ styles.get(c, styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[10px] font-bold px-3 py-1 rounded border uppercase bg-opacity-80">{{ c }}</span>
-                {% endfor %}
-                <span class="text-xs font-mono text-gray-400 border border-gray-700 px-2 py-1 bg-black/50">Released: {{ game.release_date[:4] if game.release_date else '' }}</span>
-            </div>
-            <h1 class="text-3xl md:text-5xl font-bold text-white pixel-font mb-6">{{ game.title }}</h1>
+        <div class="absolute bottom-0 left-0 right-0 p-4 md:p-8">
             <div class="flex items-end justify-between">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                    <div class="border-l-2 border-blue-400 pl-3">
-                        <div class="text-xs text-gray-400 uppercase font-bold tracking-wider">By {{ game.author }}</div>
+                <div>
+                    <div class="flex flex-wrap items-center gap-1.5 md:gap-4 mb-3 md:mb-4">
+                        {% for c in (game.consoles or [game.console]) %}
+                        <span class="{{ styles.get(c, styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[10px] font-bold px-3 py-1 rounded border uppercase bg-opacity-80">{{ c }}</span>
+                        {% endfor %}
+                        <span class="text-xs font-mono text-gray-400 border border-gray-700 px-2 py-1 bg-black/50">Released: {{ game.release_date[:4] if game.release_date else '' }}</span>
                     </div>
-                    <div class="border-l-2 border-blue-400 pl-3">
-                        <div class="text-xs text-gray-400 uppercase font-bold tracking-wider">Latest Version</div>
-                        <div class="text-lg text-white font-mono font-semibold">{{ game.version }}</div>
+                    <h1 class="text-3xl md:text-5xl font-bold text-white pixel-font mb-6">{{ game.title }}</h1>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                        <div class="border-l-2 border-blue-400 pl-3">
+                            <div class="text-xs text-gray-400 uppercase font-bold tracking-wider">By {{ game.author }}</div>
+                        </div>
+                        <div class="border-l-2 border-blue-400 pl-3">
+                            <div class="text-xs text-gray-400 uppercase font-bold tracking-wider">Latest Version</div>
+                            <div class="text-lg text-white font-mono font-semibold">{{ game.version }}</div>
+                        </div>
                     </div>
                 </div>
                 {% if social_links %}
-                <div class="flex gap-3">
+                <div class="flex flex-col gap-2">
                     {% for link in social_links %}
                     <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gray-800/50 border border-gray-700/50 hover:border-blue-400/50 hover:bg-gray-800 transition-all group" title="{{ link.type|replace('_', ' ')|title }}">
                         {% if link.type == 'twitter' %}
@@ -59,7 +72,7 @@
                         {% elif link.type == 'website' %}
                         <span class="material-symbols-outlined text-lg text-gray-400 group-hover:text-blue-400 transition-colors">language</span>
                         {% else %}
-                        <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14c1.1 0 2-.9 2-2v-7h-2v7z"/></svg>
+                        <span class="material-symbols-outlined text-lg text-gray-400 group-hover:text-blue-400 transition-colors">language</span>
                         {% endif %}
                     </a>
                     {% endfor %}
@@ -78,18 +91,21 @@
                 <span class="material-symbols-outlined text-blue-500">photo_library</span> Screenshots
             </h3>
             <!-- Main Screenshot Display -->
-            <div class="relative rounded-xl overflow-hidden border border-gray-800 bg-black/20 shadow-lg aspect-video group">
-                <img id="main-screenshot" src="{{ game.screenshots[0] }}" class="w-full h-full object-contain" alt="{{ game.title }} Screenshot">
+            <div class="relative rounded-xl overflow-hidden border border-gray-800 bg-black/20 shadow-lg aspect-video group cursor-pointer" onclick="openScreenshotModal(currentScreenshotIndex)">
+                <img id="main-screenshot" src="{{ game.screenshots[0] }}" loading="lazy" decoding="async" class="w-full h-full object-contain" alt="{{ game.title }} Screenshot">
                 
                 <!-- Navigation Arrows Overlay -->
                 {% if game.screenshots|length > 1 %}
-                <button onclick="selectScreenshot(currentScreenshotIndex - 1)" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all opacity-0 group-hover:opacity-100 p-2" id="prev-arrow">
+                <button onclick="selectScreenshot(currentScreenshotIndex - 1); event.stopPropagation();" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all opacity-0 group-hover:opacity-100 p-2" id="prev-arrow">
                     <span class="material-symbols-outlined text-4xl">chevron_left</span>
                 </button>
-                <button onclick="selectScreenshot(currentScreenshotIndex + 1)" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all opacity-0 group-hover:opacity-100 p-2" id="next-arrow">
+                <button onclick="selectScreenshot(currentScreenshotIndex + 1); event.stopPropagation();" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all opacity-0 group-hover:opacity-100 p-2" id="next-arrow">
                     <span class="material-symbols-outlined text-4xl">chevron_right</span>
                 </button>
                 {% endif %}
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <span class="material-symbols-outlined text-white text-5xl">zoom_in</span>
+                </div>
             </div>
             
             <!-- Thumbnail Navigation -->
@@ -213,13 +229,94 @@
                 </div>
             </section>
             {% endif %}
+
+            <!-- Modding Instructions Section -->
+            {% set has_mods = false %}
+            {% for feature in key_features %}
+                {% if feature.title and feature.title|lower == 'mods' %}
+                    {% set has_mods = true %}
+                {% endif %}
+            {% endfor %}
+            {% if has_mods and (game.mod_links or game.mod_instructions) %}
+            <section>
+                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-purple-400">build</span>
+                    Modding Instructions
+                </h3>
+                <div class="border border-purple-700/50 rounded-lg overflow-hidden bg-gray-900/30">
+                    <!-- Mod Links -->
+                    {% if game.mod_links %}
+                    <div class="px-6 py-4 border-b border-purple-700/30">
+                        <h4 class="text-sm font-bold text-purple-300 mb-3 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">link</span>
+                            Mod Resources
+                        </h4>
+                        <div class="flex flex-wrap gap-3">
+                            {% set mod_links_parsed = game.mod_links %}
+                            {% if mod_links_parsed is string %}
+                                {% set mod_links_parsed = mod_links_parsed | tojson | safe %}
+                            {% endif %}
+                            {% for link in mod_links_parsed if mod_links_parsed is iterable and mod_links_parsed is not string %}
+                            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" 
+                               class="inline-flex items-center gap-2 px-4 py-2 bg-purple-900/50 hover:bg-purple-800/50 border border-purple-600/50 rounded-lg text-purple-200 text-sm font-medium transition-all hover:border-purple-400/50">
+                                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                                {{ link.name }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Mod Instructions -->
+                    {% if game.mod_instructions %}
+                    <div class="px-6 py-4">
+                        <h4 class="text-sm font-bold text-purple-300 mb-3 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">menu_book</span>
+                            How to Install Mods
+                        </h4>
+                        <div class="text-xs text-gray-400 leading-relaxed whitespace-pre-line bg-[#151518] p-4 rounded-lg border border-gray-700/50">{{ game.mod_instructions|replace('\\n', '\n') }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+            {% endif %}
         </div>
 
         <div class="md:col-span-1">
         </div>
     </div>
 
+    <div class="flex justify-center mt-8 mb-4">
+        <a href="{{ url_for('contact') }}" class="inline-flex items-center gap-2 text-gray-500 hover:text-blue-400 text-sm transition-all">
+            <span class="material-symbols-outlined text-base">report</span>
+            Incorrect info?
+        </a>
+    </div>
 
+</div>
+
+<!-- Screenshot Modal Lightbox -->
+<div id="screenshot-modal" class="fixed inset-0 bg-black/90 hidden z-50 flex items-center justify-center p-4" onclick="closeScreenshotModal(event)">
+    <button onclick="closeScreenshotModal()" class="absolute top-4 right-4 text-white/70 hover:text-white transition-all">
+        <span class="material-symbols-outlined text-4xl">close</span>
+    </button>
+    
+    <div class="relative w-full h-full flex items-center justify-center" onclick="event.stopPropagation()">
+        <img id="modal-screenshot" src="" loading="lazy" decoding="async" class="max-w-full max-h-full object-contain" alt="Enlarged screenshot">
+        
+        <!-- Modal Navigation -->
+        <button onclick="modalPrevScreenshot()" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all p-3" id="modal-prev-arrow">
+            <span class="material-symbols-outlined text-5xl">chevron_left</span>
+        </button>
+        <button onclick="modalNextScreenshot()" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all p-3" id="modal-next-arrow">
+            <span class="material-symbols-outlined text-5xl">chevron_right</span>
+        </button>
+        
+        <!-- Screenshot Counter -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 px-4 py-2 rounded-lg text-white/70 text-sm font-mono">
+            <span id="modal-counter">1</span> / <span id="modal-total">1</span>
+        </div>
+    </div>
 </div>
 
 <!-- Screenshot Navigation Scripts -->
@@ -295,6 +392,89 @@ document.addEventListener('keydown', (e) => {
 // Update arrow states on load and resize
 window.addEventListener('load', updateArrowState);
 window.addEventListener('resize', updateArrowState);
+
+// Screenshot Modal Functions
+function openScreenshotModal(index) {
+    const modal = document.getElementById('screenshot-modal');
+    const modalImg = document.getElementById('modal-screenshot');
+    const counter = document.getElementById('modal-counter');
+    const total = document.getElementById('modal-total');
+    
+    if (modal && modalImg && allScreenshots.length > 0) {
+        currentScreenshotIndex = Math.max(0, Math.min(index, allScreenshots.length - 1));
+        modalImg.src = allScreenshots[currentScreenshotIndex];
+        counter.textContent = currentScreenshotIndex + 1;
+        total.textContent = allScreenshots.length;
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        updateModalArrowState();
+    }
+}
+
+function closeScreenshotModal(event) {
+    // Only close if clicking the background, not the image
+    if (event && event.target.id !== 'screenshot-modal') return;
+    
+    const modal = document.getElementById('screenshot-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+
+function modalNextScreenshot() {
+    if (currentScreenshotIndex < allScreenshots.length - 1) {
+        currentScreenshotIndex++;
+        updateModalImage();
+    }
+}
+
+function modalPrevScreenshot() {
+    if (currentScreenshotIndex > 0) {
+        currentScreenshotIndex--;
+        updateModalImage();
+    }
+}
+
+function updateModalImage() {
+    const modalImg = document.getElementById('modal-screenshot');
+    const counter = document.getElementById('modal-counter');
+    
+    if (modalImg && allScreenshots.length > 0) {
+        modalImg.src = allScreenshots[currentScreenshotIndex];
+        counter.textContent = currentScreenshotIndex + 1;
+        updateModalArrowState();
+    }
+}
+
+function updateModalArrowState() {
+    const prevArrow = document.getElementById('modal-prev-arrow');
+    const nextArrow = document.getElementById('modal-next-arrow');
+    
+    if (prevArrow) {
+        prevArrow.style.opacity = currentScreenshotIndex === 0 ? '0.2' : '1';
+        prevArrow.style.pointerEvents = currentScreenshotIndex === 0 ? 'none' : 'auto';
+    }
+    
+    if (nextArrow) {
+        nextArrow.style.opacity = currentScreenshotIndex >= allScreenshots.length - 1 ? '0.2' : '1';
+        nextArrow.style.pointerEvents = currentScreenshotIndex >= allScreenshots.length - 1 ? 'none' : 'auto';
+    }
+}
+
+// Modal keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    const modal = document.getElementById('screenshot-modal');
+    if (modal && !modal.classList.contains('hidden')) {
+        if (e.key === 'ArrowLeft') {
+            modalPrevScreenshot();
+        } else if (e.key === 'ArrowRight') {
+            modalNextScreenshot();
+        } else if (e.key === 'Escape') {
+            closeScreenshotModal();
+        }
+    }
+});
 
 // Instructions Accordion
 function toggleInstructions(platform) {

@@ -23,6 +23,8 @@ from database import (
     update_port,
     delete_game,
     delete_port,
+    insert_game,
+    insert_port,
 )
 import json
 import os
@@ -35,7 +37,7 @@ app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')  # 
 limiter = Limiter(
     app=app,
     key_func=get_remote_address,
-    default_limits=["200 per day", "50 per hour"],
+    default_limits=["1000000 per day", "100000 per hour"],
     storage_uri="memory://"
 )
 
@@ -83,7 +85,17 @@ def admin_dashboard():
     status = request.args.get('status', 'new')
     submissions = get_submissions(status)
     
-    return render_template('admin_dashboard.html', submissions=submissions, active_status=status)
+    # Get counts for each status using simple queries
+    pending_count = len(get_submissions('new'))
+    approved_count = len(get_submissions('approved'))
+    rejected_count = len(get_submissions('rejected'))
+    
+    return render_template('admin_dashboard.html', 
+                          submissions=submissions, 
+                          active_status=status,
+                          pending_count=pending_count,
+                          approved_count=approved_count,
+                          rejected_count=rejected_count)
 
 @app.route('/admin/submission/<int:submission_id>')
 @login_required
@@ -166,8 +178,8 @@ def admin_edit_game(game_id):
                       'patch_format', 'patch_output_ext', 'dev_stage', 'instruction_text',
                       'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
                       'rom_checker_url', 'instructions_pc', 'instructions_android',
-                      'instructions_linux', 'instructions_web', 'instructions_ios',
-                      'instructions_mac', 'instructions_switch', 'instructions_ps4', 'instructions_xbox']:
+                      'instructions_linux', 'instructions_ios',
+                      'instructions_mac', 'instructions_switch']:
             if field in request.form:
                 data[field] = request.form.get(field, '').strip()
         
@@ -200,16 +212,15 @@ def admin_edit_port(port_id):
     
     if request.method == 'POST':
         data = {}
-        # Extract form data
+        # Extract form data (exclude ROM/patch-specific fields for ports)
         for field in ['title', 'console', 'version', 'release_date', 'author',
                       'description', 'base_game', 'original_platform', 'download_link',
-                      'image_url', 'base_region', 'base_revision', 'base_header',
-                      'base_checksum_crc32', 'base_checksum_md5', 'base_checksum_sha1',
-                      'patch_format', 'patch_output_ext', 'instruction_text',
+                      'image_url', 'instruction_text',
                       'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
                       'rom_checker_url', 'instructions_pc', 'instructions_android',
-                      'instructions_linux', 'instructions_web', 'instructions_ios',
-                      'instructions_mac', 'instructions_switch', 'instructions_ps4', 'instructions_xbox']:
+                      'instructions_linux', 'instructions_ios',
+                      'instructions_mac', 'instructions_switch',
+                      'mod_links', 'mod_instructions']:
             if field in request.form:
                 data[field] = request.form.get(field, '').strip()
         
@@ -230,6 +241,180 @@ def admin_edit_port(port_id):
         return redirect(url_for('admin_ports'))
     
     return render_template('admin_edit_game.html', item=port, item_type='port')
+
+
+@app.route('/admin/game/add', methods=['GET', 'POST'])
+@login_required
+def admin_add_game():
+    """Add a new game (romhack)"""
+    if request.method == 'POST':
+        data = {}
+        # Extract form data
+        for field in ['title', 'console', 'version', 'release_date', 'author',
+                      'description', 'base_game', 'version_region', 'download_link',
+                      'image_url', 'base_region', 'base_revision', 'base_header',
+                      'base_checksum_crc32', 'base_checksum_md5', 'base_checksum_sha1',
+                      'patch_format', 'patch_output_ext', 'dev_stage', 'instruction_text',
+                      'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
+                      'rom_checker_url', 'instructions_pc', 'instructions_android',
+                      'instructions_linux', 'instructions_ios',
+                      'instructions_mac', 'instructions_switch']:
+            if field in request.form:
+                data[field] = request.form.get(field, '').strip()
+        
+        # Generate ID from title
+        title = data.get('title', '')
+        data['id'] = request.form.get('id', '').strip() or title.lower().replace(' ', '_').replace("'", '')
+        
+        # Handle features as comma-separated list
+        features_str = request.form.get('features', '')
+        data['features'] = [f.strip() for f in features_str.split(',') if f.strip()]
+        
+        # Handle screenshots as newline-separated list
+        screenshots_str = request.form.get('screenshots', '')
+        data['screenshots'] = [s.strip() for s in screenshots_str.split('\n') if s.strip()]
+        
+        # Boolean fields
+        data['popular'] = 'popular' in request.form
+        data['online_play'] = 'online_play' in request.form
+        data['instruction'] = 'instruction' in request.form
+        
+        insert_game(data)
+        return redirect(url_for('admin_games'))
+    
+    # Empty item for the form
+    empty_item = {
+        'id': '', 'title': '', 'console': '', 'version': '', 'release_date': '',
+        'author': '', 'description': '', 'base_game': '', 'version_region': '',
+        'features': [], 'screenshots': [], 'image_url': '', 'download_link': '',
+        'base_region': '', 'base_revision': '', 'base_header': '',
+        'base_checksum_crc32': '', 'base_checksum_md5': '', 'base_checksum_sha1': '',
+        'patch_format': '', 'patch_output_ext': '', 'dev_stage': '',
+        'popular': False, 'online_play': False, 'instruction': False, 'instruction_text': '',
+        'discord_url': '', 'reddit_url': '', 'support_forum_url': '', 'troubleshooting_url': '',
+        'rom_checker_url': '', 'instructions_pc': '', 'instructions_android': '',
+        'instructions_linux': '', 'instructions_ios': '',
+        'instructions_mac': '', 'instructions_switch': ''
+    }
+    return render_template('admin_edit_game.html', item=empty_item, item_type='game', is_new=True)
+
+
+@app.route('/admin/port/add', methods=['GET', 'POST'])
+@login_required
+def admin_add_port():
+    """Add a new port"""
+    if request.method == 'POST':
+        data = {}
+        # Extract form data (exclude ROM/patch-specific fields for ports)
+        for field in ['title', 'console', 'version', 'release_date', 'author',
+                      'description', 'base_game', 'original_platform', 'download_link',
+                      'image_url', 'instruction_text',
+                      'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
+                      'rom_checker_url', 'instructions_pc', 'instructions_android',
+                      'instructions_linux', 'instructions_web', 'instructions_ios',
+                      'instructions_mac', 'instructions_switch', 'instructions_ps4', 'instructions_xbox']:
+            if field in request.form:
+                data[field] = request.form.get(field, '').strip()
+        
+        # Generate ID from title
+        title = data.get('title', '')
+        data['id'] = request.form.get('id', '').strip() or title.lower().replace(' ', '_').replace("'", '')
+        
+        # Handle features as comma-separated list
+        features_str = request.form.get('features', '')
+        data['features'] = [f.strip() for f in features_str.split(',') if f.strip()]
+        
+        # Handle screenshots as newline-separated list
+        screenshots_str = request.form.get('screenshots', '')
+        data['screenshots'] = [s.strip() for s in screenshots_str.split('\n') if s.strip()]
+        
+        # Boolean fields
+        data['popular'] = 'popular' in request.form
+        data['online_play'] = 'online_play' in request.form
+        data['instruction'] = 'instruction' in request.form
+        
+        insert_port(data)
+        return redirect(url_for('admin_ports'))
+    
+    # Empty item for the form
+    empty_item = {
+        'id': '', 'title': '', 'console': '', 'version': '', 'release_date': '',
+        'author': '', 'description': '', 'base_game': '', 'original_platform': '',
+        'features': [], 'screenshots': [], 'image_url': '', 'download_link': '',
+        'popular': False, 'online_play': False, 'instruction': False, 'instruction_text': '',
+        'discord_url': '', 'reddit_url': '', 'support_forum_url': '', 'troubleshooting_url': '',
+        'rom_checker_url': '', 'instructions_pc': '', 'instructions_android': '',
+        'instructions_linux': '', 'instructions_ios': '',
+        'instructions_mac': '', 'instructions_switch': ''
+    }
+    return render_template('admin_edit_game.html', item=empty_item, item_type='port', is_new=True)
+
+
+@app.route('/admin/import-json', methods=['GET', 'POST'])
+@login_required
+def admin_import_json():
+    """Import games or ports from JSON"""
+    if request.method == 'POST':
+        json_data = None
+        item_type = 'game'
+        
+        # Handle both JSON POST and form data
+        if request.is_json:
+            # JSON POST request
+            data = request.get_json() or {}
+            json_data = json.dumps(data)
+            item_type = data.get('item_type', 'game') if isinstance(data, dict) and 'item_type' in data else 'game'
+        else:
+            # Form POST request
+            json_data = request.form.get('json_data', '')
+            item_type = request.form.get('item_type', 'game')
+        
+        if not json_data or not json_data.strip():
+            if request.is_json:
+                return jsonify({'success': False, 'error': 'No JSON data provided'}), 400
+            else:
+                return render_template('admin_import_json.html', 
+                                       json_error='No JSON data provided')
+        
+        try:
+            items = json.loads(json_data)
+            if not isinstance(items, list):
+                items = [items]
+            
+            success_count = 0
+            errors = []
+            
+            for item in items:
+                try:
+                    if item_type == 'port':
+                        insert_port(item)
+                    else:
+                        insert_game(item)
+                    success_count += 1
+                except Exception as e:
+                    errors.append(f"Error importing {item.get('title', 'unknown')}: {str(e)}")
+            
+            if request.is_json:
+                return jsonify({
+                    'success': True,
+                    'message': f'Successfully imported {success_count} of {len(items)} items',
+                    'success_count': success_count,
+                    'total': len(items),
+                    'errors': errors
+                })
+            else:
+                return render_template('admin_import_json.html', 
+                                       success_count=success_count, 
+                                       errors=errors,
+                                       total=len(items))
+        except json.JSONDecodeError as e:
+            if request.is_json:
+                return jsonify({'success': False, 'error': f'Invalid JSON: {str(e)}'}), 400
+            else:
+                return render_template('admin_import_json.html', 
+                                       json_error=f"Invalid JSON: {str(e)}")
+    
+    return render_template('admin_import_json.html')
 
 
 @app.route('/api/admin/game/<game_id>/delete', methods=['POST'])
@@ -264,7 +449,7 @@ def get_platform_instructions(game):
     instructions = {}
     
     # Check each platform column
-    for platform in ['pc', 'android', 'linux', 'web', 'ios', 'mac', 'switch', 'ps4', 'xbox']:
+    for platform in ['pc', 'android', 'linux', 'ios', 'mac', 'switch']:
         col_name = f'instructions_{platform}'
         if col_name in game and game[col_name]:
             instructions[platform] = game[col_name]
@@ -283,6 +468,23 @@ def get_social_links(game):
             links = []
     
     return links
+
+
+def get_emulator_guides():
+    """Load emulator guides for all consoles from JSON file."""
+    try:
+        guides_path = os.path.join(os.path.dirname(__file__), 'emulator_guides.json')
+        with open(guides_path, 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def get_console_emulator_guide(console):
+    """Get the emulator guide for a specific console."""
+    guides = get_emulator_guides()
+    console_key = console.lower().replace(' ', '').replace('-', '')
+    return guides.get(console_key, None)
 
 
 def format_download_count(count):
@@ -475,11 +677,28 @@ def game_page(game_id):
     # Use appropriate color styles based on whether it's a port or game
     styles = PLATFORM_STYLE if is_port else CONSOLE_STYLES
     download_count = get_download_count(game_id)
+    # Parse platform-specific instructions (legacy, kept for backward compatibility)
+    instructions = get_platform_instructions(game)
+    # Parse social links
+    social_links = get_social_links(game)
+    # Get emulator guide for the console
+    console = game.get('console', '')
+    emulator_guide = get_console_emulator_guide(console) if not is_port else None
+    return render_template('game.html', game=game, styles=styles, is_port=is_port, download_count=download_count, instructions=instructions, social_links=social_links, emulator_guide=emulator_guide)
+
+@app.route('/port/<port_id>')
+def port_page(port_id):
+    game = get_port_by_id(port_id)
+    if game is None:
+        abort(404)
+    # Use platform styles for ports
+    styles = PLATFORM_STYLE
+    download_count = get_download_count(port_id)
     # Parse platform-specific instructions
     instructions = get_platform_instructions(game)
     # Parse social links
     social_links = get_social_links(game)
-    return render_template('game.html', game=game, styles=styles, is_port=is_port, download_count=download_count, instructions=instructions, social_links=social_links)
+    return render_template('port_games.html', game=game, styles=styles, is_port=True, download_count=download_count, instructions=instructions, social_links=social_links)
 
 @app.route('/api/track-download/<game_id>', methods=['POST'])
 @limiter.limit("30 per hour")

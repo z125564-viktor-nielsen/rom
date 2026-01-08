@@ -113,7 +113,7 @@
                     <span>Online Play</span>
                 </label>
                 <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
-                    <input type="checkbox" name="instruction" {% if item.instruction %}checked{% endif %}
+                    <input type="checkbox" name="instruction" id="instructionCheckbox" {% if item.instruction %}checked{% endif %}
                            class="w-4 h-4 rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500">
                     <span>Has Special Instructions</span>
                 </label>
@@ -148,7 +148,8 @@
             </div>
         </div>
 
-        <!-- ROM/Patch Information -->
+        <!-- ROM/Patch Information (ROM Hacks Only) -->
+        {% if item_type != 'port' %}
         <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
             <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <span class="material-symbols-outlined">memory</span>
@@ -204,6 +205,7 @@
                 </div>
             </div>
         </div>
+        {% endif %}
 
         <!-- Platform Instructions -->
         <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
@@ -217,7 +219,7 @@
                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">{{ item.instruction_text or '' }}</textarea>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {% for platform in ['pc', 'android', 'linux', 'web', 'ios', 'mac', 'switch', 'ps4', 'xbox'] %}
+                {% for platform in ['pc', 'android', 'linux', 'ios', 'mac', 'switch'] %}
                 <div>
                     <label class="block text-sm font-bold text-gray-300 mb-2">{{ platform|upper }} Instructions</label>
                     <textarea name="instructions_{{ platform }}" rows="2"
@@ -226,6 +228,33 @@
                 {% endfor %}
             </div>
         </div>
+
+        <!-- Modding Section (for Ports only) -->
+        {% if item_type == 'port' %}
+        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">build</span>
+                Modding Support
+            </h2>
+            <p class="text-sm text-gray-400 mb-4">This section only displays on port pages when "Mods" is added as a Key Feature title above.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Mod Links (JSON array)</label>
+                    <p class="text-xs text-gray-500 mb-2">Format: [{"name": "Mod Name", "url": "https://..."}]</p>
+                    <textarea name="mod_links" rows="3"
+                              class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 font-mono text-sm"
+                              placeholder='[{"name": "GameBanana Mods", "url": "https://gamebanana.com/..."}]'>{{ item.mod_links or '' }}</textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Modding Instructions</label>
+                    <p class="text-xs text-gray-500 mb-2">Explain how to install mods for this port</p>
+                    <textarea name="mod_instructions" rows="5"
+                              class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 text-sm"
+                              placeholder="1. Download the mod files...&#10;2. Extract to the game folder...&#10;3. ...">{{ item.mod_instructions or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+        {% endif %}
 
         <!-- Community Links -->
         <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
@@ -286,4 +315,31 @@
         font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
 </style>
+
+<script>
+    // Handle "Has Special Instructions" checkbox
+    const instructionCheckbox = document.getElementById('instructionCheckbox');
+    const instructionTextarea = document.querySelector('textarea[name="instruction_text"]');
+    const instructionLabel = instructionTextarea.parentElement.querySelector('label');
+    
+    function updateInstructionFieldState() {
+        if (instructionCheckbox.checked) {
+            // When checked, disable the general instruction text field
+            instructionTextarea.disabled = true;
+            instructionLabel.classList.add('opacity-50');
+            instructionTextarea.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+            // When unchecked, enable the general instruction text field
+            instructionTextarea.disabled = false;
+            instructionLabel.classList.remove('opacity-50');
+            instructionTextarea.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    }
+    
+    // Initialize state on page load
+    updateInstructionFieldState();
+    
+    // Listen for checkbox changes
+    instructionCheckbox.addEventListener('change', updateInstructionFieldState);
+</script>
 {% endblock %}

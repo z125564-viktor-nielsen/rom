@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}Import JSON | Admin | ROMHACKS.NET{% endblock %}
+{% block meta_description %}Import games or ports from JSON data.{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mb-12">
+    <div class="mb-8">
+        <a href="{{ url_for('admin_dashboard') }}" class="text-blue-400 hover:text-blue-300 text-sm">
+            <span class="material-symbols-outlined align-middle" style="font-size: 16px;">arrow_back</span>
+            Back to Dashboard
+        </a>
+        <h1 class="text-4xl font-bold text-white pixel-font mt-4 mb-2">Import JSON</h1>
+        <p class="text-gray-400">Bulk import games or ports from JSON data</p>
+    </div>
+
+    {% if success_count is defined %}
+    <div class="mb-6 p-4 bg-green-900/30 border border-green-600 rounded-lg">
+        <p class="text-green-300 font-bold">
+            <span class="material-symbols-outlined align-middle mr-2">check_circle</span>
+            Successfully imported {{ success_count }} of {{ total }} items
+        </p>
+        {% if errors %}
+        <div class="mt-4 text-red-300">
+            <p class="font-bold mb-2">Errors:</p>
+            <ul class="list-disc list-inside text-sm">
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if json_error %}
+    <div class="mb-6 p-4 bg-red-900/30 border border-red-600 rounded-lg">
+        <p class="text-red-300 font-bold">
+            <span class="material-symbols-outlined align-middle mr-2">error</span>
+            {{ json_error }}
+        </p>
+    </div>
+    {% endif %}
+
+    <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+        <form id="import-form" method="POST" action="{{ url_for('admin_import_json') }}">
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-300 mb-2">Item Type</label>
+                <select id="item_type" name="item_type" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500">
+                    <option value="game">ROM Hack</option>
+                    <option value="port">Port</option>
+                </select>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-gray-300 mb-2">JSON Data</label>
+                <textarea id="json_data" name="json_data" rows="15" 
+                    class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-blue-500"
+                    placeholder='[{"id": "my-hack", "title": "My ROM Hack", ...}]'></textarea>
+            </div>
+
+            <button type="button" onclick="submitJSON()" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors">
+                <span class="material-symbols-outlined align-middle mr-2">upload</span>
+                Import JSON
+            </button>
+        </form>
+    </div>
+
+    <script>
+    function submitJSON() {
+        const jsonText = document.getElementById('json_data').value.trim();
+        const itemType = document.getElementById('item_type').value;
+        
+        if (!jsonText) {
+            alert('Please enter JSON data');
+            return;
+        }
+        
+        try {
+            // Parse JSON to validate it
+            const data = JSON.parse(jsonText);
+            console.log('Parsed JSON:', data);
+            
+            // Ensure it's an array
+            const items = Array.isArray(data) ? data : [data];
+            
+            console.log('Sending items:', JSON.stringify(items));
+            
+            // Submit form directly with form data to maintain compatibility
+            const formData = new FormData();
+            formData.append('json_data', jsonText);
+            formData.append('item_type', itemType);
+            
+            fetch('{{ url_for('admin_import_json') }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(text => {
+                // Reload to show results from template rendering
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            });
+        } catch (error) {
+            alert('Invalid JSON: ' + error.message);
+        }
+    }
+    </script>
+
+    <!-- JSON Format Reference -->
+    <div class="mt-8 bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
+        <h2 class="text-xl font-bold text-white mb-4">
+            <span class="material-symbols-outlined align-middle mr-2">info</span>
+            JSON Format Reference
+        </h2>
+        
+        <div class="mb-6">
+            <h3 class="text-lg font-bold text-purple-400 mb-3">ROM Hack Format (Complete)</h3>
+            <pre class="bg-gray-900 border border-gray-700 rounded-lg p-4 text-xs text-gray-300 overflow-x-auto"><code>{
+  "id": "unique-id",
+  "title": "ROM Hack Title",
+  "console": "gba",
+  "version": "1.0",
+  "release_date": "2024-01-01",
+  "author": "Author Name",
+  "description": "Description of the hack",
+  "base_game": "Original Game Name",
+  "version_region": "USA",
+  "dev_stage": "alpha|beta|release|complete",
+  "features": ["Feature 1", "Feature 2"],
+  "image_url": "https://example.com/cover.png",
+  "screenshots": ["https://example.com/ss1.png", "https://example.com/ss2.png"],
+  "download_link": "https://example.com/patch.zip",
+  
+  "base_region": "USA",
+  "base_revision": "Rev 1",
+  "base_header": "Headered",
+  "base_checksum_crc32": "ABCD1234",
+  "base_checksum_md5": "...",
+  "base_checksum_sha1": "...",
+  "patch_format": "ips",
+  "patch_output_ext": ".gba",
+  
+  "popular": false,
+  "online_play": false,
+  "instruction": true,
+  "instruction_text": "General patching instructions",
+  
+  "instructions_pc": "PC-specific setup",
+  "instructions_android": "Android-specific setup",
+  "instructions_linux": "Linux-specific setup",
+  "instructions_web": "Web-specific setup",
+  "instructions_ios": "iOS-specific setup",
+  "instructions_mac": "Mac-specific setup",
+  "instructions_switch": "Switch-specific setup",
+  "instructions_ps4": "PS4-specific setup",
+  "instructions_xbox": "Xbox-specific setup",
+  
+  "discord_url": "https://discord.gg/...",
+  "reddit_url": "https://reddit.com/r/...",
+  "support_forum_url": "https://forums.example.com/...",
+  "troubleshooting_url": "https://example.com/troubleshooting",
+  "rom_checker_url": "https://example.com/checker"
+}</code></pre>
+        </div>
+
+        <div class="mb-6">
+            <h3 class="text-lg font-bold text-green-400 mb-3">Port Format (Complete)</h3>
+            <pre class="bg-gray-900 border border-gray-700 rounded-lg p-4 text-xs text-gray-300 overflow-x-auto"><code>{
+  "id": "unique-port-id",
+  "title": "Port Title",
+  "console": "android",
+  "original_platform": "pc",
+  "version": "1.0",
+  "release_date": "2024-01-01",
+  "author": "Author Name",
+  "description": "Description of the port",
+  "base_game": "Original Game Name",
+  
+  "features": ["Feature 1", "Feature 2"],
+  "image_url": "https://example.com/cover.png",
+  "screenshots": ["https://example.com/ss1.png", "https://example.com/ss2.png"],
+  "download_link": "https://example.com/port.apk",
+  
+  "popular": false,
+  "online_play": false,
+  "instruction": true,
+  "instruction_text": "General setup instructions",
+  
+  "instructions_pc": "PC installation",
+  "instructions_android": "Android installation",
+  "instructions_linux": "Linux installation",
+  "instructions_web": "Web access",
+  "instructions_ios": "iOS installation",
+  "instructions_mac": "Mac installation",
+  "instructions_switch": "Switch setup",
+  "instructions_ps4": "PS4 setup",
+  "instructions_xbox": "Xbox setup",
+  
+  "discord_url": "https://discord.gg/...",
+  "reddit_url": "https://reddit.com/r/...",
+  "support_forum_url": "https://forums.example.com/...",
+  "troubleshooting_url": "https://example.com/troubleshooting",
+  "rom_checker_url": "https://example.com/checker"
+}</code></pre>
+        </div>
+
+        <div class="mt-4 p-4 bg-blue-900/20 border border-blue-600/50 rounded-lg">
+            <p class="text-blue-300 text-sm">
+                <span class="material-symbols-outlined align-middle mr-1" style="font-size: 16px;">lightbulb</span>
+                <strong>Tip:</strong> You can import a single object or an array of objects. Only <code>id</code> and <code>title</code> are required fields. All other fields are optional.
+            </p>
+        </div>
+        
+        <div class="mt-4 p-4 bg-green-900/20 border border-green-600/50 rounded-lg">
+            <p class="text-green-300 text-sm">
+                <span class="material-symbols-outlined align-middle mr-1" style="font-size: 16px;">done</span>
+                <strong>Note:</strong> Arrays like <code>features</code> and <code>screenshots</code> should be provided as JSON arrays. Boolean fields (<code>popular</code>, <code>online_play</code>, <code>instruction</code>) should be <code>true</code> or <code>false</code>.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script data-goatcounter="https://natto.goatcounter.com/count"
+        async src="https://gc.zgo.at/count.js"></script>
+    <noscript>
+        <img src="https://natto.goatcounter.com/count?p=/noscript" alt="">
+    </noscript>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <link rel="icon" type="image/svg+xml" href="/logo/favicon.svg">
@@ -142,8 +147,9 @@
                 </a>
                 
                 <a href="{{ url_for('submit') }}" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-lg text-sm flex items-center gap-2 transition-all">
-                    <span class="material-symbols-outlined text-[16px]">add</span>
-                    <span class="hidden sm:inline">Submit</span>
+                    <span class="material-symbols-outlined text-[16px] hidden sm:inline">add</span>
+                    <span class="sm:hidden">Submit</span>
+                    <span class="hidden sm:inline">Submit Game</span>
                 </a>
                 
                 <!-- Mobile Menu Button -->
@@ -232,49 +238,6 @@
                         <span class="material-symbols-outlined text-xs">mail</span>
                         support@romhacks.net
                     </a>
-                </div>
-            </div>
-
-            {# Legal Info Section #}
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8 py-6 md:py-8 border-t border-b border-gray-800">
-                <div class="bg-gradient-to-br from-blue-900/20 to-gray-900/50 border border-blue-500/30 p-5 rounded-lg backdrop-blur-sm">
-                    <div class="flex items-start gap-3">
-                        <span class="material-symbols-outlined text-blue-400 text-lg mt-0.5 flex-shrink-0">info</span>
-                        <div>
-                            <h4 class="text-sm font-bold text-blue-300 uppercase tracking-wider mb-2">Educational Fair Use</h4>
-                            <p class="text-xs text-gray-400 leading-relaxed">This site hosts educational information about ROM hacks and decompiled game projects. We do not provide or distribute copyrighted ROM files. Users must legally own the original games. All content is provided for educational purposes under fair use guidelines.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-gradient-to-br from-amber-900/20 to-gray-900/50 border border-amber-500/30 p-5 rounded-lg backdrop-blur-sm">
-                    <div class="flex items-start gap-3">
-                        <span class="material-symbols-outlined text-amber-400 text-lg mt-0.5 flex-shrink-0">image_not_supported</span>
-                        <div>
-                            <h4 class="text-sm font-bold text-amber-300 uppercase tracking-wider mb-2">Image & Media Rights</h4>
-                            <p class="text-xs text-gray-400 leading-relaxed">All game screenshots, artwork, logos, and promotional images are property of their respective copyright holders. These are displayed for identification and review purposes only under fair use guidelines.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-gradient-to-br from-red-900/20 to-gray-900/50 border border-red-500/30 p-5 rounded-lg backdrop-blur-sm">
-                    <div class="flex items-start gap-3">
-                        <span class="material-symbols-outlined text-red-400 text-lg mt-0.5 flex-shrink-0">gavel</span>
-                        <div>
-                            <h4 class="text-sm font-bold text-red-300 uppercase tracking-wider mb-2">Liability Disclaimer</h4>
-                            <p class="text-xs text-gray-400 leading-relaxed">We are not responsible for the legality, accuracy, or safety of third-party content. Use of tools and materials is at your own risk. Always respect intellectual property rights and comply with applicable laws in your jurisdiction.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-gradient-to-br from-green-900/20 to-gray-900/50 border border-green-500/30 p-5 rounded-lg backdrop-blur-sm">
-                    <div class="flex items-start gap-3">
-                        <span class="material-symbols-outlined text-green-400 text-lg mt-0.5 flex-shrink-0">verified_user</span>
-                        <div>
-                            <h4 class="text-sm font-bold text-green-300 uppercase tracking-wider mb-2">DMCA & Copyright</h4>
-                            <p class="text-xs text-gray-400 leading-relaxed">If you believe your copyright has been violated, please contact us immediately at legal@romhacks.net. We respect intellectual property rights and will investigate all valid claims.</p>
-                        </div>
-                    </div>
                 </div>
             </div>
 

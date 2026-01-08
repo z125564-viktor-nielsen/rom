@@ -232,6 +232,10 @@ def init_db():
         cursor.execute("ALTER TABLE ports ADD COLUMN troubleshooting_url TEXT")
     if 'rom_checker_url' not in port_cols:
         cursor.execute("ALTER TABLE ports ADD COLUMN rom_checker_url TEXT")
+    if 'mod_links' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN mod_links TEXT")
+    if 'mod_instructions' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN mod_instructions TEXT")
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS requests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -483,12 +487,79 @@ def load_ports_from_json():
     conn.commit()
     conn.close()
 
+def insert_game(game_data):
+    """Insert a game (romhack) directly into the games table"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    game_id = game_data.get('id', game_data.get('title', 'game').lower().replace(' ', '_').replace("'", ''))
+    
+    cursor.execute('''
+        INSERT OR REPLACE INTO games (
+            id, title, console, version, release_date, author,
+            description, features, image_url, screenshots, download_link,
+            base_game, version_region, base_region, base_revision, base_header,
+            base_checksum_crc32, base_checksum_md5, base_checksum_sha1,
+            patch_format, patch_output_ext, dev_stage, popular, online_play,
+            instruction, instruction_text, discord_url, reddit_url,
+            support_forum_url, troubleshooting_url, rom_checker_url,
+            instructions_pc, instructions_android, instructions_linux,
+            instructions_web, instructions_ios, instructions_mac,
+            instructions_switch, instructions_ps4, instructions_xbox
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        game_id,
+        game_data.get('title'),
+        game_data.get('console', ''),
+        game_data.get('version'),
+        game_data.get('release_date'),
+        game_data.get('author'),
+        game_data.get('description'),
+        json.dumps(game_data.get('features', [])),
+        game_data.get('image_url'),
+        json.dumps(game_data.get('screenshots', [])),
+        game_data.get('download_link'),
+        game_data.get('base_game'),
+        game_data.get('version_region'),
+        game_data.get('base_region'),
+        game_data.get('base_revision'),
+        game_data.get('base_header'),
+        game_data.get('base_checksum_crc32'),
+        game_data.get('base_checksum_md5'),
+        game_data.get('base_checksum_sha1'),
+        game_data.get('patch_format'),
+        game_data.get('patch_output_ext'),
+        game_data.get('dev_stage'),
+        1 if game_data.get('popular', False) else 0,
+        1 if game_data.get('online_play', False) else 0,
+        1 if game_data.get('instruction', False) else 0,
+        game_data.get('instruction_text'),
+        game_data.get('discord_url'),
+        game_data.get('reddit_url'),
+        game_data.get('support_forum_url'),
+        game_data.get('troubleshooting_url'),
+        game_data.get('rom_checker_url'),
+        game_data.get('instructions_pc'),
+        game_data.get('instructions_android'),
+        game_data.get('instructions_linux'),
+        game_data.get('instructions_web'),
+        game_data.get('instructions_ios'),
+        game_data.get('instructions_mac'),
+        game_data.get('instructions_switch'),
+        game_data.get('instructions_ps4'),
+        game_data.get('instructions_xbox'),
+    ))
+    
+    conn.commit()
+    conn.close()
+    return game_id
+
 def insert_port(port_data):
     """Insert a port directly into the ports table"""
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    port_id = port_data.get('id', port_data.get('title', 'port').lower().replace(' ', '_'))
+    port_id = port_data.get('id', port_data.get('title', 'port').lower().replace(' ', '_').replace("'", ''))
     
     cursor.execute('''
         INSERT OR REPLACE INTO ports (
@@ -515,6 +586,7 @@ def insert_port(port_data):
     
     conn.commit()
     conn.close()
+    return port_id
 
 def get_games():
     """Get all games from database"""
@@ -852,6 +924,29 @@ def get_submissions(status=None):
     
     return [dict(row) for row in rows]
 
+
+def get_submission_counts():
+    """Get count of submissions by status"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT COALESCE(status, 'new') as status, COUNT(*) as count FROM requests GROUP BY COALESCE(status, 'new')")
+        rows = cursor.fetchall()
+        
+        counts = {'new': 0, 'approved': 0, 'rejected': 0}
+        for row in rows:
+            status = row['status'] if row['status'] else 'new'
+            if status in counts:
+                counts[status] = row['count']
+        
+        conn.close()
+        return counts
+    except Exception as e:
+        conn.close()
+        # Return defaults if query fails
+        return {'new': 0, 'approved': 0, 'rejected': 0}
+
 def get_submission_by_id(submission_id):
     """Get a specific submission by ID"""
     conn = get_db_connection()
@@ -960,7 +1055,8 @@ def update_port(port_id, data):
         'troubleshooting_url', 'rom_checker_url',
         'instructions_pc', 'instructions_android', 'instructions_linux',
         'instructions_web', 'instructions_ios', 'instructions_mac',
-        'instructions_switch', 'instructions_ps4', 'instructions_xbox'
+        'instructions_switch', 'instructions_ps4', 'instructions_xbox',
+        'mod_links', 'mod_instructions'
     ]
     
     update_parts = []

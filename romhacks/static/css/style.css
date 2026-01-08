@@ -414,6 +414,17 @@ html, body {
         height: auto;
         min-height: 280px;
     }
+    
+    /* Keep tags inside banner on mobile */
+    .rounded-2xl.overflow-hidden .flex-wrap {
+        max-width: 100%;
+    }
+    
+    /* Smaller tags on mobile */
+    .rounded-2xl.overflow-hidden span[class*="text-[10px]"] {
+        font-size: 8px;
+        padding: 2px 6px;
+    }
 }
 
 /* Improve social links touch targets */
@@ -436,5 +447,12 @@ html, body {
     .text-xs {
         font-size: 0.8rem;
         line-height: 1.5;
+    }
+}
+
+/* Fix search input icon overlap on mobile */
+@media (max-width: 767px) {
+    #search-input {
+        padding-left: 2.75rem !important;
     }
 }
