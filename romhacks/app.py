@@ -175,13 +175,19 @@ def admin_edit_game(game_id):
                       'description', 'base_game', 'version_region', 'download_link',
                       'image_url', 'base_region', 'base_revision', 'base_header',
                       'base_checksum_crc32', 'base_checksum_md5', 'base_checksum_sha1',
-                      'patch_format', 'patch_output_ext', 'dev_stage', 'instruction_text',
+                      'patch_format', 'patch_output_ext', 'dev_stage',
                       'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
                       'rom_checker_url', 'instructions_pc', 'instructions_android',
                       'instructions_linux', 'instructions_ios',
                       'instructions_mac', 'instructions_switch']:
             if field in request.form:
                 data[field] = request.form.get(field, '').strip()
+        
+        # Handle instruction_text only if special instructions checkbox is checked
+        if 'instruction' in request.form:
+            data['instruction_text'] = request.form.get('instruction_text', '').strip()
+        else:
+            data['instruction_text'] = ''
         
         # Handle features as comma-separated list
         features_str = request.form.get('features', '')
@@ -215,7 +221,7 @@ def admin_edit_port(port_id):
         # Extract form data (exclude ROM/patch-specific fields for ports)
         for field in ['title', 'console', 'version', 'release_date', 'author',
                       'description', 'base_game', 'original_platform', 'download_link',
-                      'image_url', 'instruction_text',
+                      'image_url',
                       'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
                       'rom_checker_url', 'instructions_pc', 'instructions_android',
                       'instructions_linux', 'instructions_ios',
@@ -223,6 +229,12 @@ def admin_edit_port(port_id):
                       'mod_links', 'mod_instructions']:
             if field in request.form:
                 data[field] = request.form.get(field, '').strip()
+        
+        # Handle instruction_text only if special instructions checkbox is checked
+        if 'instruction' in request.form:
+            data['instruction_text'] = request.form.get('instruction_text', '').strip()
+        else:
+            data['instruction_text'] = ''
         
         # Handle features as comma-separated list
         features_str = request.form.get('features', '')
@@ -780,4 +792,4 @@ def submit_game_endpoint():
         }), 400
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=False)

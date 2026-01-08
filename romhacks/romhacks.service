@@ -1,0 +1,13 @@
+[Unit]
+Description=RomHacks Flask Application
+After=network.target
+
+[Service]
+User=www-data
+WorkingDirectory=/var/www/romhacks
+ExecStart=/usr/bin/gunicorn --workers 4 --bind 127.0.0.1:5000 app:app
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
