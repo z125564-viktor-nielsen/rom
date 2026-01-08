@@ -178,7 +178,7 @@
                                     {% for emulator in emulators %}
                                     <div class="border border-blue-500/20 rounded-lg p-4 bg-gray-800/30">
                                         <!-- Emulator Header with Logo and Link -->
-                                        <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center justify-between mb-4">
                                             <div class="flex items-center gap-3">
                                                 <!-- Emulator Logo -->
                                                 {% if emulator.logo_svg %}
@@ -187,18 +187,19 @@
                                                 </div>
                                                 {% endif %}
                                                 <div>
-                                                    <div class="font-bold text-blue-300">{{ emulator.name }}</div>
+                                                    <div class="font-bold text-blue-300 text-lg">{{ emulator.name }}</div>
                                                 </div>
                                             </div>
+                                            
+                                            <!-- Link to emulator website -->
+                                            {% if emulator.link %}
+                                            <a href="{{ emulator.link }}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-400/40 hover:scale-105 transform duration-200 group flex-shrink-0">
+                                                <span class="material-symbols-outlined text-sm text-white">language</span>
+                                                <span class="text-sm font-semibold text-white">Website</span>
+                                                <span class="material-symbols-outlined text-sm text-white group-hover:translate-x-1 transition-transform">arrow_outward</span>
+                                            </a>
+                                            {% endif %}
                                         </div>
-                                        
-                                        <!-- Link to emulator website -->
-                                        {% if emulator.link %}
-                                        <a href="{{ emulator.link }}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 px-4 py-3 mt-4 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 transition-all border border-blue-500/40 hover:border-blue-400/60 group">
-                                            <span class="material-symbols-outlined text-blue-300 group-hover:text-blue-100 transition-colors">language</span>
-                                            <span class="text-sm font-semibold text-blue-200 group-hover:text-white transition-colors">Emulator Website</span>
-                                        </a>
-                                        {% endif %}
                                         
                                         <!-- Installation -->
                                         <div class="mb-3">
@@ -397,6 +398,16 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Claim It Section -->
+    <div class="mt-16 mb-12 bg-[#1a1a20] border border-gray-800/50 rounded-xl p-8 text-center max-w-6xl mx-auto">
+        <h3 class="text-xl font-bold pixel-font text-white mb-2">Is this your project?</h3>
+        <p class="text-gray-400 text-sm mb-4">Help us keep the database accurate and complete.</p>
+        <a href="{{ url_for('contact') }}" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-semibold transition-all">
+            <span class="material-symbols-outlined text-base">verified_user</span>
+            Claim it!
+        </a>
     </div>
 
 </div>
