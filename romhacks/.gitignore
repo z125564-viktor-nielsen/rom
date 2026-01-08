@@ -20,3 +20,8 @@ instance/
 .DS_Store
 Thumbs.db
 .vscode/
+
+*.db
+instance/
+.env
+.venv/
