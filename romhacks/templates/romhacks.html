@@ -177,17 +177,11 @@
                 </div>
                 <p class="text-gray-400 text-sm line-clamp-2 mb-4">{{ game.description }}</p>
             </div>
-            <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <div class="flex items-center justify-between mb-3">
                 <span class="inline-flex items-center gap-2 text-[11px] font-mono text-gray-400 bg-gray-900/50 px-3 py-1 rounded-md border border-gray-700/50">
                     <span class="material-symbols-outlined text-[13px] text-blue-400">download</span>
                     {{ game.download_count | default(0) | download_count_label }}
                 </span>
-                {% if game.features %}
-                <span class="inline-flex items-center gap-1 text-[11px] font-mono text-purple-300 bg-purple-900/30 px-3 py-1 rounded-md border border-purple-600/50">
-                    <span class="material-symbols-outlined text-[13px]">star</span>
-                    {{ game.features | length }} Features
-                </span>
-                {% endif %}
                 {% if game.online_play %}
                 <span class="inline-flex items-center gap-1 text-[11px] font-mono text-green-300 bg-green-900/30 px-3 py-1 rounded-md border border-green-600/50">
                     <span class="material-symbols-outlined text-[13px]">lan</span>

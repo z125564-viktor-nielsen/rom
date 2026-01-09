@@ -260,18 +260,22 @@
 
     <script>
     function trackDownload(gameId) {
+        console.log('trackDownload called with:', gameId);
         fetch(`/api/track-download/${gameId}`, {
             method: 'POST'
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response received:', response.status);
+            return response.json();
+        })
         .then(data => {
-            if (data.success) {
-                // Optionally update the counter on the page
-                const countElement = document.getElementById('download-count');
-                if (countElement) {
-                    let currentCount = parseInt(countElement.textContent) || 0;
-                    countElement.textContent = currentCount + 1;
-                }
+            console.log('Data received:', data);
+            // Update the counter on the page with the new count from the server
+            const countElement = document.getElementById('download-count');
+            console.log('Count element found:', countElement);
+            if (countElement && data.new_count !== undefined) {
+                countElement.textContent = data.new_count;
+                console.log('Counter updated to:', data.new_count);
             }
         })
         .catch(error => console.error('Error tracking download:', error));

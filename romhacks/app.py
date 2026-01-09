@@ -676,8 +676,8 @@ def index():
     attach_monthly_download_counts(ports_data)
     
     # Sort by monthly downloads (most popular this month) and take top 12
-    games.sort(key=lambda g: g.get('monthly_download_count', 0), reverse=True)
-    ports_data.sort(key=lambda p: p.get('monthly_download_count', 0), reverse=True)
+    games.sort(key=lambda g: (g.get('monthly_download_count', 0), g.get('download_count', 0)), reverse=True)
+    ports_data.sort(key=lambda p: (p.get('monthly_download_count', 0), p.get('download_count', 0)), reverse=True)
     
     popular_games = games[:12]
     popular_ports = ports_data[:12]
@@ -957,7 +957,9 @@ def track_download_endpoint(game_id):
         client_ip = request.headers.get('X-Forwarded-For').split(',')[0].strip()
     
     result = track_download(game_id, client_ip)
-    return jsonify({'success': result})
+    # Get the updated count and return formatted
+    new_count = get_download_count(game_id)
+    return jsonify({'success': result, 'new_count': format_download_count(new_count)})
 
 @app.route('/api/feedback', methods=['POST'])
 @limiter.limit("10 per hour")
@@ -1028,4 +1030,5 @@ def submit_game_endpoint():
         }), 400
 
 if __name__ == '__main__':
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.run(host='0.0.0.0', port=5000, debug=False)

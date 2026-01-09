@@ -750,7 +750,13 @@ def get_ports():
         port['consoles'] = _normalize_consoles(port.get('console'))
         port['features'] = json.loads(port['features'])
         port['screenshots'] = json.loads(port['screenshots'])
+        if port.get('mod_links'):
+            try:
+                port['mod_links'] = json.loads(port['mod_links'])
+            except:
+                port['mod_links'] = []
         port['popular'] = bool(port['popular'])
+        port['online_play'] = bool(port.get('online_play'))
         
         # Apply filter configurations with auto-detection
         for filter_name in FILTER_CONFIGS:

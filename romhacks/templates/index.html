@@ -186,17 +186,25 @@
                         </div>
                         <p class="text-gray-400 text-sm line-clamp-3 mb-4">{{ port.description }}</p>
                     </div>
-                    <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-start justify-between mb-3 gap-3">
                         <span class="inline-flex items-center gap-2 text-[11px] font-mono text-gray-400 bg-gray-900/50 px-3 py-1 rounded-md border border-gray-700/50">
                             <span class="material-symbols-outlined text-[13px] text-sky-400">download</span>
                             {{ port.download_count | default(0) | download_count_label }}
                         </span>
-                        {% if port.online_play %}
-                        <span class="inline-flex items-center gap-1 text-[11px] font-mono text-green-300 bg-green-900/30 px-3 py-1 rounded-md border border-green-600/50">
-                            <span class="material-symbols-outlined text-[13px]">lan</span>
-                            Online
-                        </span>
-                        {% endif %}
+                        <div class="flex flex-col gap-1 items-end">
+                            {% if port.online_play %}
+                            <span class="inline-flex items-center gap-1 text-[11px] font-mono text-green-300 bg-green-900/30 px-3 py-1 rounded-md border border-green-600/50">
+                                <span class="material-symbols-outlined text-[13px]">lan</span>
+                                Online
+                            </span>
+                            {% endif %}
+                            {% if port.mod_links or port.mod_instructions %}
+                            <span class="inline-flex items-center gap-1 text-[11px] font-mono text-purple-300 bg-purple-900/30 px-3 py-1 rounded-md border border-purple-600/50">
+                                <span class="material-symbols-outlined text-[13px]">extension</span>
+                                Mods
+                            </span>
+                            {% endif %}
+                        </div>
                     </div>
                     <a href="{{ url_for('port_page', port_id=port.id) }}" class="w-full border border-gray-700/50 hover:border-sky-400/50 hover:text-sky-400 text-gray-300 py-2 px-4 text-xs uppercase tracking-widest transition-all rounded-lg text-center block" style="text-decoration:none">
                         View Details

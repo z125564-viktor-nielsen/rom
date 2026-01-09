@@ -271,7 +271,7 @@
                 <div class="flex items-center justify-between px-2 py-2 mb-4">
                     <span class="inline-flex items-center gap-2 text-[12px] font-mono text-gray-300">
                         <span class="material-symbols-outlined text-[14px] text-blue-400">download</span>
-                        {{ download_count | default(0) | download_count_label }} downloads
+                        <span id="download-count">{{ download_count | default(0) | download_count_label }}</span> downloads
                     </span>
                 </div>
 
