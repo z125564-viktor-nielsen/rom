@@ -156,8 +156,12 @@
         typeSelect.value = type;
         if (type === 'broken-link') {
             modalTitle.textContent = 'Report Broken Link';
-        } else {
+        } else if (type === 'correction') {
             modalTitle.textContent = 'Request Correction';
+        } else if (type === 'feedback') {
+            modalTitle.textContent = 'Share Feedback';
+        } else {
+            modalTitle.textContent = 'Report Issue';
         }
         
         // Reset form
