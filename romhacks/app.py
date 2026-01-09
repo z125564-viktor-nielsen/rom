@@ -693,6 +693,7 @@ def index():
 def ports():
     ports_data = get_ports()
     attach_download_counts(ports_data)
+    attach_monthly_download_counts(ports_data)
     ports_data.sort(key=lambda p: p.get('download_count', 0), reverse=True)
     ports_data = ports_data[:12]
     return render_template('ports.html', games=ports_data, styles=PLATFORM_STYLE)
@@ -701,6 +702,7 @@ def ports():
 def romhacks():
     games = get_games()
     attach_download_counts(games)
+    attach_monthly_download_counts(games)
     games.sort(key=lambda g: g.get('download_count', 0), reverse=True)
     games = games[:12]
     return render_template('romhacks.html', games=games, styles=CONSOLE_STYLES)

@@ -357,6 +357,10 @@ function sortHacks(criteria) {
             const downloadsA = parseInt(a.querySelector('[class*="download"]')?.innerText.replace(/[^0-9.k]/g, '') || '0');
             const downloadsB = parseInt(b.querySelector('[class*="download"]')?.innerText.replace(/[^0-9.k]/g, '') || '0');
             return downloadsB - downloadsA;
+        } else if(criteria === 'monthly_downloads') {
+            const monthlyA = parseInt(a.dataset.monthlyDownloads || '0');
+            const monthlyB = parseInt(b.dataset.monthlyDownloads || '0');
+            return monthlyB - monthlyA;
         }
         return 0;
     });

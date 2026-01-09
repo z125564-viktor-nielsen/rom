@@ -128,6 +128,7 @@
                     <option value="newest">Newest First</option>
                     <option value="oldest">Oldest First</option>
                     <option value="downloads">Most Popular</option>
+                    <option value="monthly_downloads">Monthly Most Downloaded</option>
                 </select>
                 <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">unfold_more</span>
             </div>
@@ -149,7 +150,7 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="hacks-grid">
     {% for game in games %}
-    <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-sky-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-sky-500/10" data-console="{{ (game.consoles or [game.console]) | join(' ') }}" data-original-platform="{{ game.original_platform or '' }}" data-release-date="{{ game.release_date }}" data-base-game="{{ game.base_game or '' }}" data-game-series="{{ game.game_series or '' }}">
+    <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-sky-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-sky-500/10" data-console="{{ (game.consoles or [game.console]) | join(' ') }}" data-original-platform="{{ game.original_platform or '' }}" data-release-date="{{ game.release_date }}" data-base-game="{{ game.base_game or '' }}" data-game-series="{{ game.game_series or '' }}" data-monthly-downloads="{{ game.monthly_download_count or 0 }}">
         <a href="{{ url_for('port_page', port_id=game.id) }}" class="block relative h-48 overflow-hidden cursor-pointer bg-gradient-to-br from-gray-800 to-gray-900">
             <img src="{{ game.image_url }}" referrerpolicy="no-referrer" loading="lazy" decoding="async" class="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105" alt="{{ game.title }} - {{ (game.consoles or [game.console]) | join('/') }} Port Cover">
             <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
@@ -173,17 +174,25 @@
                 {% endif %}
                 <p class="text-gray-400 text-sm line-clamp-3 mb-4">{{ game.description }}</p>
             </div>
-            <div class="flex items-center justify-between mb-3">
+            <div class="flex items-start justify-between mb-3 gap-3">
                 <span class="inline-flex items-center gap-2 text-[11px] font-mono text-gray-400 bg-gray-900/50 px-3 py-1 rounded-md border border-gray-700/50">
                     <span class="material-symbols-outlined text-[13px] text-blue-400">download</span>
                     {{ game.download_count | default(0) | download_count_label }}
                 </span>
-                {% if game.online_play %}
-                <span class="inline-flex items-center gap-1 text-[11px] font-mono text-green-300 bg-green-900/30 px-3 py-1 rounded-md border border-green-600/50">
-                    <span class="material-symbols-outlined text-[13px]">lan</span>
-                    Online
-                </span>
-                {% endif %}
+                <div class="flex flex-col gap-1">
+                    {% if game.online_play %}
+                    <span class="inline-flex items-center gap-1 text-[11px] font-mono text-green-300 bg-green-900/30 px-3 py-1 rounded-md border border-green-600/50">
+                        <span class="material-symbols-outlined text-[13px]">lan</span>
+                        Online
+                    </span>
+                    {% endif %}
+                    {% if game.mod_links or game.mod_instructions %}
+                    <span class="inline-flex items-center gap-1 text-[11px] font-mono text-purple-300 bg-purple-900/30 px-3 py-1 rounded-md border border-purple-600/50">
+                        <span class="material-symbols-outlined text-[13px]">extension</span>
+                        Mods
+                    </span>
+                    {% endif %}
+                </div>
             </div>
             <a href="{{ url_for('port_page', port_id=game.id) }}" class="w-full border border-gray-700/50 hover:border-blue-400/50 hover:text-blue-400 text-gray-300 py-2 px-4 text-xs uppercase tracking-widest transition-all rounded-lg text-center block" style="text-decoration:none">
                 View Details
