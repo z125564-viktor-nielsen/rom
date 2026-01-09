@@ -40,7 +40,7 @@
         {
           "name": "Sameboy",
           "link": "https://sameboy.github.io/",
-          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#2a2a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#4a4a4a' rx='4'/><rect x='12' y='12' width='40' height='28' fill='#00ff00'/><rect x='16' y='44' width='32' height='8' fill='#333'/><circle cx='20' cy='48' r='2' fill='#666'/><circle cx='28' cy='48' r='2' fill='#666'/><circle cx='36' cy='48' r='2' fill='#666'/><circle cx='44' cy='48' r='2' fill='#666'/></svg>",
+          "logo_svg": "<img src='https://ubuntuhandbook.org/wp-content/uploads/2020/03/sameboy-icon.png' alt='Sameboy Logo' class='w-full h-full object-contain' />",
           "installation": "1. Download Sameboy from https://sameboy.github.io/\n2. Extract the executable\n3. Run sameboy.exe\n4. No installation needed",
           "configuration": "1. Open Sameboy\n2. File > Open ROM and select your GBC game\n3. Full color support with accurate emulation\n4. Configure controls in Preferences > Controls"
         },
@@ -56,7 +56,7 @@
         {
           "name": "Sameboy",
           "link": "https://sameboy.github.io/",
-          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#2a2a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#4a4a4a' rx='4'/><rect x='12' y='12' width='40' height='28' fill='#00ff00'/><rect x='16' y='44' width='32' height='8' fill='#333'/><circle cx='20' cy='48' r='2' fill='#666'/><circle cx='28' cy='48' r='2' fill='#666'/><circle cx='36' cy='48' r='2' fill='#666'/><circle cx='44' cy='48' r='2' fill='#666'/></svg>",
+          "logo_svg": "<img src='https://ubuntuhandbook.org/wp-content/uploads/2020/03/sameboy-icon.png' alt='Sameboy Logo' class='w-full h-full object-contain' />",
           "installation": "1. Download Sameboy for macOS from https://sameboy.github.io/\n2. Extract and move to Applications\n3. Launch from Applications\n4. May need to allow in Security settings",
           "configuration": "1. Open Sameboy\n2. File > Open ROM\n3. Select your Game Boy Color ROM\n4. Enjoy accurate GBC emulation"
         }
@@ -65,7 +65,7 @@
         {
           "name": "Sameboy",
           "link": "https://sameboy.github.io/",
-          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#2a2a2a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#4a4a4a' rx='4'/><rect x='12' y='12' width='40' height='28' fill='#00ff00'/><rect x='16' y='44' width='32' height='8' fill='#333'/><circle cx='20' cy='48' r='2' fill='#666'/><circle cx='28' cy='48' r='2' fill='#666'/><circle cx='36' cy='48' r='2' fill='#666'/><circle cx='44' cy='48' r='2' fill='#666'/></svg>",
+          "logo_svg": "<img src='https://ubuntuhandbook.org/wp-content/uploads/2020/03/sameboy-icon.png' alt='Sameboy Logo' class='w-full h-full object-contain' />",
           "installation": "1. Build from source: git clone https://github.com/LIJI32/SameBoy.git\n2. cd SameBoy && make\n3. Run ./sameboy\n4. Or install via package manager if available",
           "configuration": "1. Open Sameboy\n2. File > Open ROM\n3. Load your GBC game\n4. Configure controls as needed"
         }
@@ -89,7 +89,7 @@
         {
           "name": "mGBA",
           "link": "https://mgba.io/",
-          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#4a4a8a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#6a6aaa' rx='4'/><rect x='12' y='12' width='40' height='30' fill='#9090cc'/><rect x='18' y='46' width='28' height='6' fill='#3a3a6a'/></svg>",
+          "logo_svg": "<img src='https://avatars.githubusercontent.com/u/10085927?s=280&v=4' alt='mGBA Logo' class='w-full h-full object-contain' />",
           "installation": "1. Download mGBA from mgba.io\n2. Run the installer or extract the portable version\n3. Launch mGBA\n4. No additional setup needed",
           "configuration": "1. Open mGBA\n2. File > Load ROM\n3. Select your GBA game\n4. Configure controls in Tools > Settings"
         }
@@ -98,7 +98,7 @@
         {
           "name": "mGBA",
           "link": "https://mgba.io/",
-          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#4a4a8a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#6a6aaa' rx='4'/><rect x='12' y='12' width='40' height='30' fill='#9090cc'/><rect x='18' y='46' width='28' height='6' fill='#3a3a6a'/></svg>",
+          "logo_svg": "<img src='https://avatars.githubusercontent.com/u/10085927?s=280&v=4' alt='mGBA Logo' class='w-full h-full object-contain' />",
           "installation": "1. Install from Homebrew: brew install mgba\n2. Or download DMG from mgba.io\n3. Launch mGBA from Applications\n4. Full GBA support",
           "configuration": "1. Open mGBA\n2. File > Load ROM\n3. Select your GBA game\n4. Configure controls in Tools > Settings"
         }
@@ -107,7 +107,7 @@
         {
           "name": "mGBA",
           "link": "https://mgba.io/",
-          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#4a4a8a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#6a6aaa' rx='4'/><rect x='12' y='12' width='40' height='30' fill='#9090cc'/><rect x='18' y='46' width='28' height='6' fill='#3a3a6a'/></svg>",
+          "logo_svg": "<img src='https://avatars.githubusercontent.com/u/10085927?s=280&v=4' alt='mGBA Logo' class='w-full h-full object-contain' />",
           "installation": "1. Install via package manager: sudo apt-get install mgba-qt\n2. Or compile from source\n3. Available on most Linux distributions\n4. No additional setup",
           "configuration": "1. Open mGBA\n2. File > Load ROM\n3. Select your GBA ROM\n4. Configure controls in Tools > Settings"
         }
@@ -116,7 +116,7 @@
         {
           "name": "mGBA",
           "link": "https://mgba.io/",
-          "logo_svg": "<svg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'><rect width='64' height='64' fill='#4a4a8a' rx='8'/><rect x='8' y='8' width='48' height='48' fill='#6a6aaa' rx='4'/><rect x='12' y='12' width='40' height='30' fill='#9090cc'/><rect x='18' y='46' width='28' height='6' fill='#3a3a6a'/></svg>",
+          "logo_svg": "<img src='https://avatars.githubusercontent.com/u/10085927?s=280&v=4' alt='mGBA Logo' class='w-full h-full object-contain' />",
           "installation": "1. Download mGBA from Google Play Store\n2. Or download APK from mgba.io\n3. Install the app\n4. Grant storage permissions",
           "configuration": "1. Open mGBA\n2. Tap the folder icon to browse ROMs\n3. Select your GBA game\n4. Configure controls in app settings"
         }

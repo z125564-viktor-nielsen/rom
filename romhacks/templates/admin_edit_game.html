@@ -96,10 +96,10 @@
                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">{{ item.description or '' }}</textarea>
             </div>
             <div class="mt-4">
-                <label class="block text-sm font-bold text-gray-300 mb-2">Features (comma-separated)</label>
-                <input type="text" name="features" value="{{ item.features|join(', ') if item.features else '' }}"
-                       class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
-                       placeholder="Feature 1, Feature 2, Feature 3">
+                <label class="block text-sm font-bold text-gray-300 mb-2">Features (one per line)</label>
+                <textarea name="features" rows="5"
+                          class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 font-mono text-sm"
+                          placeholder="Feature 1&#10;Feature 2&#10;Feature 3">{{ item.features|join('\n') if item.features else '' }}</textarea>
             </div>
             <div class="mt-4 flex flex-wrap gap-6">
                 <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
@@ -112,13 +112,11 @@
                            class="w-4 h-4 rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500">
                     <span>Online Play</span>
                 </label>
-                {% if item_type != 'port' %}
                 <label class="flex items-center gap-2 text-gray-300 cursor-pointer">
                     <input type="checkbox" name="instruction" id="instructionCheckbox" {% if item.instruction %}checked{% endif %}
                            class="w-4 h-4 rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500">
                     <span>Has Special Instructions</span>
                 </label>
-                {% endif %}
             </div>
         </div>
 
@@ -209,8 +207,7 @@
         </div>
         {% endif %}
 
-        <!-- Special Instructions (Hidden until checkbox is checked) - ROM Hacks Only -->
-        {% if item_type != 'port' %}
+        <!-- Special Instructions (Hidden until checkbox is checked) -->
         <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6" id="specialInstructionsSection" style="display: none;">
             <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <span class="material-symbols-outlined">warning</span>
@@ -223,38 +220,36 @@
                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">{{ item.instruction_text or '' }}</textarea>
             </div>
         </div>
-        {% endif %}
 
-        <!-- Platform Instructions -->
-        <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
-            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <span class="material-symbols-outlined">description</span>
-                Platform Instructions
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {% for platform in ['pc', 'android', 'linux', 'ios', 'mac', 'switch'] %}
-                <div>
-                    <label class="block text-sm font-bold text-gray-300 mb-2">{{ platform|upper }} Instructions</label>
-                    <textarea name="instructions_{{ platform }}" rows="2"
-                              class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 text-sm">{{ item['instructions_' + platform] or '' }}</textarea>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
         {% if item_type == 'port' %}
         <div class="bg-[#1a1a20] border border-gray-800 rounded-lg p-6">
             <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <span class="material-symbols-outlined">build</span>
                 Modding Support
             </h2>
-            <p class="text-sm text-gray-400 mb-4">This section only displays on port pages when "Mods" is added as a Key Feature title above.</p>
+            <p class="text-sm text-gray-400 mb-4">Add a link to where mods are hosted and instructions on how to install them.</p>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-bold text-gray-300 mb-2">Mod Links (JSON array)</label>
-                    <p class="text-xs text-gray-500 mb-2">Format: [{"name": "Mod Name", "url": "https://..."}]</p>
-                    <textarea name="mod_links" rows="3"
-                              class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 font-mono text-sm"
-                              placeholder='[{"name": "GameBanana Mods", "url": "https://gamebanana.com/..."}]'>{{ item.mod_links or '' }}</textarea>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Mod Repository</label>
+                    <p class="text-xs text-gray-500 mb-2">Primary link to where mods are hosted for this port</p>
+                    
+                    <!-- Hidden field to store the JSON for backend compatibility -->
+                    <input type="hidden" name="mod_links" id="mod_links_hidden" value="{{ item.mod_links | tojson if item.mod_links is iterable and item.mod_links is not string else item.mod_links or '' }}">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-1">Repository Name</label>
+                            <input type="text" id="mod_repo_name" 
+                                   class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 text-sm"
+                                   placeholder="e.g. GameBanana Mods">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 mb-1">Repository URL</label>
+                            <input type="url" id="mod_repo_url" 
+                                   class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 text-sm"
+                                   placeholder="https://...">
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-300 mb-2">Modding Instructions</label>
@@ -352,5 +347,43 @@
     
     // Listen for checkbox changes
     instructionCheckbox.addEventListener('change', updateInstructionFieldState);
+
+    // Handle Mod Repository Inputs
+    const hiddenInput = document.getElementById('mod_links_hidden');
+    if (hiddenInput) {
+        const nameInput = document.getElementById('mod_repo_name');
+        const urlInput = document.getElementById('mod_repo_url');
+
+        // Parse initial value
+        try {
+            if (hiddenInput.value) {
+                const data = JSON.parse(hiddenInput.value);
+                if (Array.isArray(data) && data.length > 0) {
+                    nameInput.value = data[0].name || '';
+                    urlInput.value = data[0].url || '';
+                }
+            }
+        } catch (e) {
+            console.error('Error parsing mod links', e);
+        }
+
+        function updateJson() {
+            const name = nameInput.value.trim();
+            const url = urlInput.value.trim();
+            
+            if (name || url) {
+                const data = [{
+                    name: name,
+                    url: url
+                }];
+                hiddenInput.value = JSON.stringify(data);
+            } else {
+                hiddenInput.value = '';
+            }
+        }
+
+        nameInput.addEventListener('input', updateJson);
+        urlInput.addEventListener('input', updateJson);
+    }
 </script>
 {% endblock %}

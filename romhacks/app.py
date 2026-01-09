@@ -12,6 +12,9 @@ from database import (
     get_download_count,
     get_download_counts_for_ids,
     submit_feedback,
+    get_feedback,
+    update_feedback_status,
+    delete_feedback,
     submit_game,
     hash_string,
     get_submissions,
@@ -25,10 +28,15 @@ from database import (
     delete_port,
     insert_game,
     insert_port,
+    get_monthly_download_counts_for_ids,
+    check_and_archive_previous_month,
+    get_all_archived_months,
+    get_monthly_popular_history,
 )
 import json
 import os
 from functools import wraps
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')  # Change this!
@@ -43,6 +51,50 @@ limiter = Limiter(
 
 # Initialize database on startup
 init_db()
+
+# Check and archive previous month's data if needed
+check_and_archive_previous_month()
+
+@app.context_processor
+def inject_globals():
+    return {
+        'current_year': datetime.now().year,
+        'site_name': 'ROMHACKS.NET'
+    }
+
+# --- Performance & SEO Middleware ---
+@app.after_request
+def add_cache_headers(response):
+    """Add cache headers for performance optimization"""
+    # Cache static assets for 30 days
+    if request.path.startswith('/static/'):
+        response.cache_control.max_age = 2592000  # 30 days
+        response.cache_control.public = True
+    # Cache sitemaps and robots.txt for 7 days
+    elif request.path in ['/sitemap.xml', '/robots.txt']:
+        response.cache_control.max_age = 604800  # 7 days
+        response.cache_control.public = True
+    # Cache game pages for 24 hours
+    elif request.path.startswith('/game/') or request.path.endswith('-rom-hacks'):
+        response.cache_control.max_age = 86400  # 24 hours
+        response.cache_control.public = True
+    # Cache category pages for 12 hours
+    elif request.path in ['/romhacks', '/ports']:
+        response.cache_control.max_age = 43200  # 12 hours
+        response.cache_control.public = True
+    # No cache for dynamic pages (admin, API, etc)
+    elif '/admin/' in request.path or '/api/' in request.path:
+        response.cache_control.no_cache = True
+        response.cache_control.no_store = True
+        response.cache_control.private = True
+    
+    # Add security headers
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    
+    return response
 
 # Admin authentication
 def login_required(f):
@@ -81,21 +133,34 @@ def admin_logout():
 @app.route('/admin')
 @login_required
 def admin_dashboard():
-    """Admin dashboard"""
+    """Admin dashboard with submissions and feedback"""
+    view = request.args.get('view', 'submissions')
     status = request.args.get('status', 'new')
-    submissions = get_submissions(status)
     
-    # Get counts for each status using simple queries
+    # Always get counts for all statuses (needed for badges/tabs)
     pending_count = len(get_submissions('new'))
     approved_count = len(get_submissions('approved'))
     rejected_count = len(get_submissions('rejected'))
     
+    feedback_new_count = len(get_feedback(status='new'))
+    feedback_resolved_count = len(get_feedback(status='resolved'))
+    feedback_ignored_count = len(get_feedback(status='ignored'))
+    
+    # Get data for the active view only
+    submissions = get_submissions(status) if view == 'submissions' else []
+    feedback_list = get_feedback(status=status) if view == 'feedback' else []
+    
     return render_template('admin_dashboard.html', 
+                          active_view=view,
                           submissions=submissions, 
                           active_status=status,
                           pending_count=pending_count,
                           approved_count=approved_count,
-                          rejected_count=rejected_count)
+                          rejected_count=rejected_count,
+                          feedback_list=feedback_list,
+                          feedback_new_count=feedback_new_count,
+                          feedback_resolved_count=feedback_resolved_count,
+                          feedback_ignored_count=feedback_ignored_count)
 
 @app.route('/admin/submission/<int:submission_id>')
 @login_required
@@ -136,6 +201,54 @@ def api_submission_status(submission_id):
         'status': submission['status'],
         'admin_notes': submission['admin_notes']
     })
+
+@app.route('/admin/feedback/<int:feedback_id>')
+@login_required
+def admin_feedback_detail(feedback_id):
+    """View feedback details"""
+    feedback_list = get_feedback()
+    feedback = next((f for f in feedback_list if f['id'] == feedback_id), None)
+    if not feedback:
+        abort(404)
+    
+    return render_template('admin_feedback_detail.html', feedback=feedback)
+
+@app.route('/api/admin/feedback/<int:feedback_id>/status', methods=['POST'])
+@login_required
+def api_update_feedback_status(feedback_id):
+    """API to update feedback status"""
+    data = request.get_json() or {}
+    new_status = data.get('status', '')
+    
+    if new_status not in ['new', 'resolved', 'ignored']:
+        return jsonify({'success': False, 'message': 'Invalid status'}), 400
+    
+    success = update_feedback_status(feedback_id, new_status)
+    return jsonify({'success': success})
+
+@app.route('/api/admin/feedback/<int:feedback_id>/notes', methods=['POST'])
+@login_required
+def api_update_feedback_notes(feedback_id):
+    """API to update feedback admin notes"""
+    data = request.get_json() or {}
+    admin_notes = data.get('admin_notes', '')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('UPDATE feedback SET admin_notes = ? WHERE id = ?', (admin_notes, feedback_id))
+    conn.commit()
+    success = cursor.rowcount > 0
+    conn.close()
+    
+    return jsonify({'success': success})
+
+@app.route('/api/admin/feedback/<int:feedback_id>/delete', methods=['POST'])
+@login_required
+def api_delete_feedback(feedback_id):
+    """API to delete feedback"""
+    success = delete_feedback(feedback_id)
+    return jsonify({'success': success})
+
 
 
 # --- Admin Game/Port Management Routes ---
@@ -189,9 +302,9 @@ def admin_edit_game(game_id):
         else:
             data['instruction_text'] = ''
         
-        # Handle features as comma-separated list
+        # Handle features as newline-separated list
         features_str = request.form.get('features', '')
-        data['features'] = [f.strip() for f in features_str.split(',') if f.strip()]
+        data['features'] = [f.strip() for f in features_str.replace('\r\n', '\n').split('\n') if f.strip()]
         
         # Handle screenshots as newline-separated list
         screenshots_str = request.form.get('screenshots', '')
@@ -236,9 +349,9 @@ def admin_edit_port(port_id):
         else:
             data['instruction_text'] = ''
         
-        # Handle features as comma-separated list
+        # Handle features as newline-separated list
         features_str = request.form.get('features', '')
-        data['features'] = [f.strip() for f in features_str.split(',') if f.strip()]
+        data['features'] = [f.strip() for f in features_str.replace('\r\n', '\n').split('\n') if f.strip()]
         
         # Handle screenshots as newline-separated list
         screenshots_str = request.form.get('screenshots', '')
@@ -540,22 +653,41 @@ PLATFORM_STYLE = {
     'mac': 'bg-gray-700/70 text-gray-200 border-gray-500/50'
 }
 
+def attach_monthly_download_counts(items):
+    """Attach monthly download counts to a list of game/port dicts"""
+    if not items:
+        return
+    ids = [item['id'] for item in items]
+    counts = get_monthly_download_counts_for_ids(ids)
+    for item in items:
+        item['monthly_download_count'] = counts.get(item['id'], 0)
+
 @app.route('/')
 def index():
     games = get_games()
     ports_data = get_ports()
-    # Attach download counts to all items
+    
+    # Attach total download counts for display
     attach_download_counts(games)
     attach_download_counts(ports_data)
     
-    # Sort by downloads and take top 12
-    games.sort(key=lambda g: g.get('download_count', 0), reverse=True)
-    ports_data.sort(key=lambda p: p.get('download_count', 0), reverse=True)
+    # Attach monthly download counts for sorting
+    attach_monthly_download_counts(games)
+    attach_monthly_download_counts(ports_data)
+    
+    # Sort by monthly downloads (most popular this month) and take top 12
+    games.sort(key=lambda g: g.get('monthly_download_count', 0), reverse=True)
+    ports_data.sort(key=lambda p: p.get('monthly_download_count', 0), reverse=True)
     
     popular_games = games[:12]
     popular_ports = ports_data[:12]
+    
+    # Get current month name for display
+    current_month = datetime.now().strftime('%B %Y')
 
-    return render_template('index.html', games=popular_games, ports=popular_ports, styles=CONSOLE_STYLES, platform_styles=PLATFORM_STYLE)
+    return render_template('index.html', games=popular_games, ports=popular_ports, 
+                          styles=CONSOLE_STYLES, platform_styles=PLATFORM_STYLE,
+                          current_month=current_month)
 
 @app.route('/ports')
 def ports():
@@ -602,6 +734,74 @@ def logo_file(filename):
     return send_from_directory('logo', filename)
 
 
+# --- Base Game Hub Pages (Programmatic SEO) ---
+@app.route('/<base_game>-rom-hacks')
+@app.route('/<base_game>-hacks')
+def base_game_hub(base_game):
+    """Generate dynamic hub pages for specific base games (e.g., /pokemon-emerald-rom-hacks)"""
+    # Normalize base_game parameter for search
+    base_game_normalized = base_game.lower().replace('-', ' ')
+    
+    # Get all games
+    all_games = get_games()
+    
+    # Special handling for major franchises to aggregate all related games
+    if base_game_normalized == 'pokemon' or base_game_normalized == 'pokémon':
+        matching_games = [
+            game for game in all_games 
+            if 'pokemon' in game.get('base_game', '').lower() or 'pokémon' in game.get('base_game', '').lower()
+        ]
+        base_game_display = "Pokémon"
+    elif base_game_normalized == 'mario':
+        matching_games = [
+            game for game in all_games 
+            if 'mario' in game.get('base_game', '').lower()
+        ]
+        base_game_display = "Mario"
+    elif base_game_normalized == 'zelda':
+        matching_games = [
+            game for game in all_games 
+            if 'zelda' in game.get('base_game', '').lower()
+        ]
+        base_game_display = "Zelda"
+    elif base_game_normalized == 'super mario world':
+        matching_games = [
+            game for game in all_games 
+            if 'super mario world' in game.get('base_game', '').lower()
+        ]
+        base_game_display = "Super Mario World"
+    elif base_game_normalized == 'fire emblem':
+        matching_games = [
+            game for game in all_games 
+            if 'fire emblem' in game.get('base_game', '').lower()
+        ]
+        base_game_display = "Fire Emblem"
+    else:
+        # Filter games that match this base game identically (handling é/e mismatch)
+        matching_games = [
+            game for game in all_games 
+            if game.get('base_game', '').lower().replace('é', 'e') == base_game_normalized.replace('é', 'e')
+        ]
+        # Get formatted base game name for display
+        base_game_display = ' '.join(word.capitalize() for word in base_game_normalized.split())
+    
+    if not matching_games:
+        abort(404)
+    
+    # Sort by download count
+    attach_download_counts(matching_games)
+    matching_games.sort(key=lambda g: g.get('download_count', 0), reverse=True)
+    
+    return render_template(
+        'base_game_hub.html',
+        base_game=base_game_display,
+        base_game_slug=base_game,
+        games=matching_games,
+        styles=CONSOLE_STYLES,
+        game_count=len(matching_games)
+    )
+
+
 @app.route('/sitemap.xml')
 def sitemap():
     """Generate dynamic sitemap.xml for SEO"""
@@ -637,6 +837,21 @@ def sitemap():
     <priority>{priority}</priority>
   </url>''')
     
+    # Add major franchise hubs (manual override for high SEO value)
+    franchise_hubs = [
+        ('pokemon', 'daily', '0.95'),
+        ('mario', 'daily', '0.92'),
+        ('zelda', 'daily', '0.92'),
+        ('fire-emblem', 'weekly', '0.88'),
+        ('super-mario-world', 'weekly', '0.88')
+    ]
+    for franchise, changefreq, priority in franchise_hubs:
+         xml_parts.append(f'''  <url>
+    <loc>{base_url}/{franchise}-rom-hacks</loc>
+    <changefreq>{changefreq}</changefreq>
+    <priority>{priority}</priority>
+  </url>''')
+
     # Add game pages
     for game in games:
         xml_parts.append(f'''  <url>
@@ -651,6 +866,21 @@ def sitemap():
     <loc>{base_url}/game/{port['id']}</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+  </url>''')
+    
+    # Add base game hub pages (programmatic SEO)
+    unique_base_games = set()
+    for game in games:
+        base_game = game.get('base_game', '')
+        if base_game:
+            unique_base_games.add(base_game)
+    
+    for base_game in sorted(unique_base_games):
+        base_game_slug = base_game.lower().replace(' ', '-')
+        xml_parts.append(f'''  <url>
+    <loc>{base_url}/{base_game_slug}-rom-hacks</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>''')
     
     xml_parts.append('</urlset>')
@@ -685,10 +915,10 @@ def game_page(game_id):
     game = get_game_by_id(game_id)
     is_port = False
     if game is None:
-        # Try ports as well
-        game = get_port_by_id(game_id)
-        is_port = True
-    if game is None:
+        # If it's actually a port ID, send them to the port page (game.html has no modding section)
+        port = get_port_by_id(game_id)
+        if port:
+            return redirect(url_for('port_page', port_id=game_id))
         abort(404)
     # Use appropriate color styles based on whether it's a port or game
     styles = PLATFORM_STYLE if is_port else CONSOLE_STYLES
@@ -737,7 +967,7 @@ def submit_feedback_endpoint():
         return jsonify({'success': False, 'message': 'Description is required'}), 400
     
     feedback_type = data.get('type', '').strip()
-    if feedback_type not in ['broken-link', 'correction', 'claim']:
+    if feedback_type not in ['broken-link', 'correction', 'claim', 'feedback']:
         return jsonify({'success': False, 'message': 'Invalid feedback type'}), 400
     
     # Get client IP

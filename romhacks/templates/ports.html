@@ -1,25 +1,40 @@
 {% extends 'base.html' %}
 
-{% block title %}Decompiled Ports Database | ROMHACKS.NET{% endblock %}
+{% block title %}Decompiled Ports Database — Download PC, Android, macOS, Linux Game Ports | ROMHACKS.NET{% endblock %}
 
-{% block meta_description %}Browse decompiled game ports for Windows, macOS, Android, and Linux. Find project details, release info, features, and official download links.{% endblock %}
-{% block meta_keywords %}decompiled ports, decompilation, windows ports, macos ports, android ports, linux ports, reverse engineered games, game ports{% endblock %}
+{% block meta_description %}Browse native game ports for Windows PC, macOS, Android, and Linux. Find reverse-engineered Zelda, Mario, Pokemon, and Sonic ports. Download from official sources. No emulation needed.{% endblock %}
+{% block meta_keywords %}decompiled ports, decompilation, windows ports, macos ports, android ports, linux ports, reverse engineered games, game ports, native ports, emulation-free{% endblock %}
 
 {% block json_ld %}
 <script type="application/ld+json">
 {
     "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "Decompiled Ports",
-    "itemListElement": [
-        {% for game in games %}
+    "@graph": [
         {
-            "@type": "ListItem",
-            "position": {{ loop.index }},
-            "url": {{ url_for('game_page', game_id=game.id, _external=True) | tojson }},
-            "name": {{ (game.title or '') | tojson }}
-        }{{ "," if not loop.last else "" }}
-        {% endfor %}
+            "@type": "CollectionPage",
+            "name": "Decompiled Ports Database",
+            "description": "Native decompiled game ports for modern platforms",
+            "url": {{ url_for('ports', _external=True) | tojson }},
+            "isPartOf": {
+                "@type": "WebSite",
+                "name": "ROMHACKS.NET"
+            }
+        },
+        {
+            "@type": "ItemList",
+            "name": "Decompiled Ports",
+            "itemListElement": [
+                {% for game in games %}
+                {
+                    "@type": "ListItem",
+                    "position": {{ loop.index }},
+                    "url": {{ url_for('port_page', port_id=game.id, _external=True) | tojson }},
+                    "name": {{ (game.title or '') | tojson }},
+                    "image": {{ (game.image_url or '') | tojson }}
+                }{{ "," if not loop.last else "" }}
+                {% endfor %}
+            ]
+        }
     ]
 }
 </script>
@@ -79,6 +94,17 @@
             </div>
         </div>
 
+        <!-- Game Series Filter -->
+        <div class="space-y-2">
+            <span class="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Series</span>
+            <div class="relative">
+                <select id="series-filter" onchange="filterBySeries(this.value)" class="w-full bg-gray-800/50 text-gray-100 border border-gray-700/50 hover:border-gray-600 focus:border-sky-500 pl-3 pr-8 py-2 text-xs rounded-lg focus:outline-none font-mono appearance-none transition-all cursor-pointer">
+                    <option value="">All Series</option>
+                </select>
+                <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">unfold_more</span>
+            </div>
+        </div>
+
         <!-- Game Filter -->
         <div class="space-y-2">
             <span class="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Game</span>
@@ -89,7 +115,10 @@
                 <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none">unfold_more</span>
             </div>
         </div>
+    </div>
 
+    <!-- Second Row of Filters -->
+    <div class="p-4 pt-0 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         <!-- Sort -->
         <div class="space-y-2">
             <span class="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Sort By</span>
@@ -120,8 +149,8 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="hacks-grid">
     {% for game in games %}
-    <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-sky-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-sky-500/10" data-console="{{ (game.consoles or [game.console]) | join(' ') }}" data-original-platform="{{ game.original_platform or '' }}" data-release-date="{{ game.release_date }}" data-base-game="{{ game.base_game or '' }}">
-        <a href="{{ url_for('game_page', game_id=game.id) }}" class="block relative h-48 overflow-hidden cursor-pointer bg-gradient-to-br from-gray-800 to-gray-900">
+    <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-sky-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-sky-500/10" data-console="{{ (game.consoles or [game.console]) | join(' ') }}" data-original-platform="{{ game.original_platform or '' }}" data-release-date="{{ game.release_date }}" data-base-game="{{ game.base_game or '' }}" data-game-series="{{ game.game_series or '' }}">
+        <a href="{{ url_for('port_page', port_id=game.id) }}" class="block relative h-48 overflow-hidden cursor-pointer bg-gradient-to-br from-gray-800 to-gray-900">
             <img src="{{ game.image_url }}" referrerpolicy="no-referrer" loading="lazy" decoding="async" class="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105" alt="{{ game.title }} - {{ (game.consoles or [game.console]) | join('/') }} Port Cover">
             <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
             <div class="absolute bottom-3 left-3">
@@ -156,7 +185,7 @@
                 </span>
                 {% endif %}
             </div>
-            <a href="{{ url_for('game_page', game_id=game.id) }}" class="w-full border border-gray-700/50 hover:border-blue-400/50 hover:text-blue-400 text-gray-300 py-2 px-4 text-xs uppercase tracking-widest transition-all rounded-lg text-center block" style="text-decoration:none">
+            <a href="{{ url_for('port_page', port_id=game.id) }}" class="w-full border border-gray-700/50 hover:border-blue-400/50 hover:text-blue-400 text-gray-300 py-2 px-4 text-xs uppercase tracking-widest transition-all rounded-lg text-center block" style="text-decoration:none">
                 View Details
             </a>
         </div>

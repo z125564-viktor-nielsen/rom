@@ -1,87 +1,191 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ hub_title }} | ROMHACKS.NET{% endblock %}
-{% block meta_description %}{{ hub_description }}{% endblock %}
-{% block meta_keywords %}{{ hub_title }}, {{ base_game }}, {{ hub_label }}, patch download, how to install{% endblock %}
+{% block title %}Best {{ base_game }} ROM Hacks ({{ current_year }}) — Download Patches | ROMHACKS.NET{% endblock %}
+
+{% block meta_description %}The best collection of {{ base_game }} ROM hacks and mods. Download verified patches, play {{ base_game }} with new features, stories, and graphics. Includes {{ game_count }} top-rated hacks.{% endblock %}
+{% block meta_keywords %}{{ base_game }} rom hacks, best {{ base_game }} hacks, {{ base_game }} patches, download {{ base_game }} rom hacks, play {{ base_game }} mods, {{ base_game }} fan games{% endblock %}
+
+{% block og_type %}website{% endblock %}
 
 {% block json_ld %}
 <script type="application/ld+json">
-{{ structured_data | safe }}
+{
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "CollectionPage",
+            "name": "{{ base_game }} ROM Hacks",
+            "description": "Collection of fan-made {{ base_game }} ROM hacks and patches",
+            "url": {{ request.url | tojson }},
+            "isPartOf": {
+                "@type": "WebSite",
+                "name": "ROMHACKS.NET",
+                "url": {{ url_for('index', _external=True) | tojson }}
+            }
+        },
+        {
+            "@type": "ItemList",
+            "name": "{{ base_game }} ROM Hacks",
+            "description": "{{ game_count }} fan-made modifications and hacks for {{ base_game }}",
+            "itemListElement": [
+                {% for game in games[:10] %}
+                {
+                    "@type": "ListItem",
+                    "position": {{ loop.index }},
+                    "name": {{ (game.title or '') | tojson }},
+                    "description": {{ (game.description or '') | tojson }},
+                    "url": {{ url_for('game_page', game_id=game.id, _external=True) | tojson }},
+                    "image": {{ (game.image_url or '') | tojson }}
+                }{{ "," if not loop.last else "" }}
+                {% endfor %}
+            ]
+        },
+        {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": {{ url_for('index', _external=True) | tojson }}
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "ROM Hacks",
+                    "item": {{ url_for('romhacks', _external=True) | tojson }}
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": "{{ base_game }} ROM Hacks",
+                    "item": {{ request.url | tojson }}
+                }
+            ]
+        }
+    ]
+}
 </script>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto space-y-8">
-    <header class="space-y-4">
-        <div class="flex flex-wrap items-end justify-between gap-3">
+<div class="max-w-6xl mx-auto space-y-10 md:space-y-12">
+    <!-- Header Section -->
+    <header class="space-y-6">
+        <div class="flex flex-col gap-4">
+            <nav class="flex items-center gap-2 text-xs text-gray-500">
+                <a href="/" class="hover:text-gray-400 transition">Home</a>
+                <span>/</span>
+                <a href="/romhacks" class="hover:text-gray-400 transition">ROM Hacks</a>
+                <span>/</span>
+                <span class="text-gray-400">{{ base_game }}</span>
+            </nav>
             <div>
-                <p class="text-xs uppercase text-gray-500 tracking-wider">{{ hub_label }}</p>
-                <h1 class="text-4xl md:text-5xl font-bold text-white">{{ hub_title }}</h1>
-                <p class="text-gray-400">{{ base_game }} downloads, patch links, and install guidance on ROMHACKS.NET.</p>
+                <p class="text-xs uppercase text-blue-400 tracking-wider font-semibold mb-2">ROM Hack Collections</p>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white pixel-font mb-3">{{ base_game }} ROM Hacks</h1>
+                <p class="text-base md:text-lg text-gray-300 max-w-3xl leading-relaxed">
+                    Browse {{ game_count }} fan-made {{ base_game }} modifications and ROM hacks. Download patch files, read detailed features, and learn how to install each mod. Use our web-based patcher to apply patches directly in your browser — no complex tools required.
+                </p>
             </div>
-            <div class="text-xs text-gray-400 font-mono">Showing {{ result_count }} {{ hub_label.lower() }}</div>
-        </div>
-        <div class="space-y-3 text-sm text-gray-300">
-            {% for paragraph in intro_paragraphs %}
-            <p>{{ paragraph }}</p>
-            {% endfor %}
         </div>
     </header>
 
-    <section class="bg-[#111118] border border-gray-800 rounded-2xl p-5 space-y-6">
-        <div class="flex items-center justify-between">
-            <h2 class="text-sm uppercase tracking-wider text-gray-500">Filters</h2>
-            {% if has_filters %}
-            <a href="{{ filter_clear_url }}" class="text-xs text-blue-400 hover:text-white font-semibold">Clear filters</a>
-            {% endif %}
+    <!-- Quick Info Section -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div class="rounded-xl border border-gray-700/50 bg-gray-900/30 p-4 text-center">
+            <div class="text-2xl md:text-3xl font-bold text-white">{{ game_count }}</div>
+            <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider">ROM Hacks</div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {% for filter_key, options in filter_data.items() %}
-            <div class="space-y-2">
-                <div class="text-[10px] uppercase tracking-wider text-gray-500">{{ filter_key|title }}</div>
-                <div class="flex flex-wrap gap-2">
-                    {% for option in options %}
-                    <a href="{{ option.url }}" class="px-3 py-1 rounded-full border text-[11px] font-medium transition {% if option.active %}bg-blue-500/80 border-blue-400 text-white{% else %}bg-gray-900/60 border-gray-700 text-gray-300 hover:border-blue-500 hover:text-white{% endif %}">
-                        {{ option.label }}
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endfor %}
-            {% if platform_filters %}
-            <div class="space-y-2">
-                <div class="text-[10px] uppercase tracking-wider text-gray-500">Platform</div>
-                <div class="flex flex-wrap gap-2">
-                    {% for platform in platform_filters %}
-                    <a href="{{ platform.url }}" class="px-3 py-1 rounded-full border text-[11px] font-medium transition {% if platform.active %}bg-blue-500/80 border-blue-400 text-white{% else %}bg-gray-900/60 border-gray-700 text-gray-300 hover:border-blue-500 hover:text-white{% endif %}">
-                        {{ platform.label }}
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
+        <div class="rounded-xl border border-gray-700/50 bg-gray-900/30 p-4 text-center">
+            <div class="text-2xl md:text-3xl font-bold text-blue-400">Free</div>
+            <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider">No Cost</div>
         </div>
-    </section>
+        <div class="rounded-xl border border-gray-700/50 bg-gray-900/30 p-4 text-center">
+            <div class="text-2xl md:text-3xl font-bold text-green-400">✓</div>
+            <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider">Verified</div>
+        </div>
+        <div class="rounded-xl border border-gray-700/50 bg-gray-900/30 p-4 text-center">
+            <div class="text-2xl md:text-3xl font-bold text-purple-400">Web</div>
+            <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider">Patcher</div>
+        </div>
+    </div>
 
-    {% if featured_entries %}
-    <section class="space-y-4">
-        <div class="flex items-center justify-between">
-            <h2 class="text-lg font-bold text-white">{{ hub_label }} Picks</h2>
-            <a href="{{ url_for('romhacks') if not is_port else url_for('ports') }}" class="text-xs text-gray-400 hover:text-white">View all</a>
+    <!-- Information Boxes -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="rounded-xl border border-blue-500/30 bg-blue-950/20 p-6 backdrop-blur-sm">
+            <h2 class="text-lg font-bold text-blue-300 mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined">help</span>
+                How to Use These Hacks
+            </h2>
+            <ol class="space-y-2 text-sm text-gray-300">
+                <li><span class="font-semibold text-blue-400">1. Choose a hack:</span> Browse the collection below and find one that interests you.</li>
+                <li><span class="font-semibold text-blue-400">2. Download patch:</span> Get the patch file from the hack's detail page.</li>
+                <li><span class="font-semibold text-blue-400">3. Own the original:</span> Have a legal copy of the original {{ base_game }} ROM.</li>
+                <li><span class="font-semibold text-blue-400">4. Use web patcher:</span> Visit our <a href="/patcher" class="text-blue-400 hover:text-blue-300">web patcher</a> tool to apply the patch locally.</li>
+                <li><span class="font-semibold text-blue-400">5. Play!</span> Your patched ROM is ready to play on your device or emulator.</li>
+            </ol>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {% for item in featured_entries %}
-            <a href="{{ url_for('game_page', game_id=item.id) }}" class="block group overflow-hidden rounded-2xl border border-gray-800 bg-[#111118] hover:border-blue-500/60 transition">
-                <div class="relative h-48 overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800">
-                    <img src="{{ item.image_url }}" loading="lazy" decoding="async" class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105" alt="{{ item.title }} cover">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                    <div class="absolute bottom-3 left-3 text-white">
-                        <span class="{{ styles.get(item.console, styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[10px] font-bold px-2 py-1 rounded uppercase">{{ item.console }}</span>
-                        <h3 class="text-2xl font-bold">{{ item.title }}</h3>
+
+        <div class="rounded-xl border border-green-500/30 bg-green-950/20 p-6 backdrop-blur-sm">
+            <h2 class="text-lg font-bold text-green-300 mb-3 flex items-center gap-2">
+                <span class="material-symbols-outlined">verified</span>
+                Why ROMHACKS.NET?
+            </h2>
+            <ul class="space-y-2 text-sm text-gray-300">
+                <li class="flex items-start gap-2">
+                    <span class="text-green-400 mt-0.5">✓</span>
+                    <span><span class="font-semibold">Curated collection:</span> Hand-verified {{ base_game }} hacks from trusted creators.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-green-400 mt-0.5">✓</span>
+                    <span><span class="font-semibold">Web patcher:</span> Patch files locally in your browser — no downloads or installation needed.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-green-400 mt-0.5">✓</span>
+                    <span><span class="font-semibold">Always free:</span> No ads, no paywalls, no hidden costs.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-green-400 mt-0.5">✓</span>
+                    <span><span class="font-semibold">Community-driven:</span> Discover hacks built by passionate fans.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Featured/Popular Hacks -->
+    {% if games[:3] %}
+    <section class="space-y-4">
+        <h2 class="text-xl md:text-2xl font-bold text-white pixel-font flex items-center gap-2">
+            <span class="material-symbols-outlined text-yellow-500">star</span>
+            Popular {{ base_game }} Hacks
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for game in games[:3] %}
+            <a href="/game/{{ game.id }}" class="group block rounded-xl border border-gray-700/50 bg-gradient-to-b from-gray-900/50 to-gray-950 overflow-hidden hover:border-blue-500/50 transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-blue-500/10">
+                <div class="relative h-40 overflow-hidden bg-black">
+                    <img src="{{ game.image_url }}" loading="lazy" decoding="async" class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105 opacity-50" alt="{{ game.title }} cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                    <div class="absolute top-3 right-3">
+                        <span class="{{ styles.get(game.console, styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[9px] font-bold px-2 py-1 rounded border uppercase">{{ game.console }}</span>
+                    </div>
+                    <div class="absolute bottom-3 left-3">
+                        <h3 class="text-lg font-bold text-white">{{ game.title }}</h3>
+                        <p class="text-xs text-gray-300 mt-1">by {{ game.author }}</p>
                     </div>
                 </div>
-                <div class="p-4">
-                    <p class="text-sm text-gray-400 line-clamp-3">{{ item.description }}</p>
+                <div class="p-4 space-y-3">
+                    <p class="text-sm text-gray-400 line-clamp-2">{{ game.description }}</p>
+                    {% if game.features %}
+                    <div class="flex flex-wrap gap-1.5">
+                        {% for feature in game.features[:2] %}
+                        <span class="text-[10px] font-semibold text-blue-300 bg-blue-900/40 px-2 py-1 rounded border border-blue-500/30">{{ feature }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div class="flex items-center justify-between pt-2 border-t border-gray-700/50 text-xs text-gray-500">
+                        <span>v{{ game.version }}</span>
+                        <span>Download patch</span>
+                    </div>
                 </div>
             </a>
             {% endfor %}
@@ -89,44 +193,76 @@
     </section>
     {% endif %}
 
+    <!-- All Hacks List -->
     <section class="space-y-4">
         <div class="flex items-center justify-between">
-            <h2 class="text-lg font-bold text-white">{{ hub_label }} ({{ result_count }})</h2>
+            <h2 class="text-xl md:text-2xl font-bold text-white pixel-font">All {{ base_game }} ROM Hacks ({{ game_count }})</h2>
             <span class="text-xs text-gray-500 uppercase tracking-wider">Updated weekly</span>
         </div>
+        
         {% if not games %}
-        <div class="rounded-2xl border border-dashed border-gray-700 bg-[#0f0f13]/60 px-6 py-8 text-center text-gray-400">
-            No entries match those filters. Adjust the filters or try again later.
+        <div class="rounded-xl border border-dashed border-gray-700 bg-gray-900/30 px-6 py-12 text-center">
+            <p class="text-gray-400">No {{ base_game }} ROM hacks available yet. Check back soon!</p>
         </div>
         {% else %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="space-y-3">
             {% for game in games %}
-            <div class="flex flex-col rounded-2xl border border-gray-800 bg-[#101017] overflow-hidden shadow-xl shadow-blue-500/5">
-                <a href="{{ url_for('game_page', game_id=game.id) }}" class="h-40 overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 relative">
-                    <img src="{{ game.image_url }}" loading="lazy" decoding="async" class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105" alt="{{ game.title }} cover">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <div class="absolute bottom-3 left-3 text-white">
-                        <span class="{{ styles.get(game.console, styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[10px] font-bold px-2 py-1 rounded uppercase">{{ game.console }}</span>
-                        <h3 class="text-xl font-bold">{{ game.title }}</h3>
+            <a href="/game/{{ game.id }}" class="group flex flex-col sm:flex-row gap-4 p-4 rounded-xl border border-gray-700/50 bg-gray-900/20 hover:bg-gray-900/40 hover:border-blue-500/50 transition-all duration-200">
+                <!-- Image Thumbnail -->
+                <div class="sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-gray-800 flex-shrink-0">
+                    <img src="{{ game.image_url }}" loading="lazy" decoding="async" class="w-full h-full object-cover" alt="{{ game.title }} thumbnail">
+                </div>
+                
+                <!-- Content -->
+                <div class="flex-grow min-w-0">
+                    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                        <div>
+                            <h3 class="text-base font-bold text-white group-hover:text-blue-400 transition">{{ game.title }}</h3>
+                            <p class="text-xs text-gray-400">by {{ game.author }} • v{{ game.version }}</p>
+                        </div>
+                        <span class="{{ styles.get(game.console, styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[9px] font-bold px-2 py-1 rounded border uppercase flex-shrink-0">{{ game.console }}</span>
                     </div>
-                </a>
-                <div class="p-4 flex-grow flex flex-col justify-between space-y-3">
-                    <p class="text-sm text-gray-400 line-clamp-3">{{ game.description }}</p>
-                    <div class="flex items-center justify-between text-[11px] font-mono text-gray-500">
-                        <span><span class="material-symbols-outlined text-xs text-blue-400">download</span> {{ game.download_count | default(0) | download_count_label }} downloads</span>
-                        {% if game.online_play %}
-                        <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-green-300 px-2 py-1 rounded-full bg-green-900/20 border border-green-600/60">
-                            <span class="material-symbols-outlined text-xs">lan</span>
-                            Online
+                    
+                    <p class="text-sm text-gray-400 line-clamp-2 mb-3">{{ game.description }}</p>
+                    
+                    <!-- Tags & Meta -->
+                    <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                        {% if game.release_date %}
+                        <span class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-xs">calendar_today</span>
+                            {{ game.release_date[:4] }}
                         </span>
                         {% endif %}
+                        {% if game.download_count %}
+                        <span class="flex items-center gap-1">
+                            <span class="material-symbols-outlined text-xs">download</span>
+                            {{ game.download_count | download_count_label }} downloads
+                        </span>
+                        {% endif %}
+                        {% if game.online_play %}
+                        <span class="inline-flex items-center gap-1 text-green-400">
+                            <span class="material-symbols-outlined text-xs">lan</span>
+                            Online Play
+                        </span>
+                        {% endif %}
+                        {% if game.features %}
+                        <span class="text-blue-400 font-semibold">{{ game.features|length }} features</span>
+                        {% endif %}
                     </div>
-                    <a href="{{ url_for('game_page', game_id=game.id) }}" class="text-xs text-blue-400 uppercase tracking-widest">View details</a>
                 </div>
-            </div>
+            </a>
             {% endfor %}
         </div>
         {% endif %}
+    </section>
+
+    <!-- CTA Section -->
+    <section class="rounded-2xl border border-blue-500/30 bg-gradient-to-r from-blue-950/30 to-purple-950/30 p-8 text-center backdrop-blur-sm">
+        <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
+        <p class="text-gray-300 mb-6 max-w-2xl mx-auto">Use our web-based patcher to apply any ROM hack locally in your browser. No complex tools, no command line — just upload your ROM, download the patch, and play!</p>
+        <a href="/patcher" class="inline-block bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-lg border-2 border-blue-400 shadow-[4px_4px_0px_0px_rgba(59,130,246,0.5)] hover:shadow-[2px_2px_0px_0px_rgba(59,130,246,0.5)] active:translate-x-1 active:translate-y-1 transition-all uppercase tracking-wide text-sm">
+            Launch Web Patcher
+        </a>
     </section>
 </div>
 {% endblock %}

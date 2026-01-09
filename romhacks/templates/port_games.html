@@ -83,54 +83,147 @@
     </div>
 
     <!-- Screenshots and Info Section -->
-    {% if game.screenshots %}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-crt-filter">
-        <!-- Screenshots on Left -->
-        <div class="lg:col-span-2 space-y-4">
-            <h3 class="text-xl font-bold text-white pixel-font flex items-center gap-2">
-                <span class="material-symbols-outlined text-blue-500">photo_library</span> Screenshots
-            </h3>
-            <!-- Main Screenshot Display -->
-            <div class="relative rounded-xl overflow-hidden border border-gray-800 bg-black/20 shadow-lg aspect-video group cursor-pointer" onclick="openScreenshotModal(currentScreenshotIndex)">
-                <img id="main-screenshot" src="{{ game.screenshots[0] }}" loading="lazy" decoding="async" class="w-full h-full object-contain" alt="{{ game.title }} Screenshot">
-                
-                <!-- Navigation Arrows Overlay -->
-                {% if game.screenshots|length > 1 %}
-                <button onclick="selectScreenshot(currentScreenshotIndex - 1); event.stopPropagation();" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all opacity-0 group-hover:opacity-100 p-2" id="prev-arrow">
-                    <span class="material-symbols-outlined text-4xl">chevron_left</span>
-                </button>
-                <button onclick="selectScreenshot(currentScreenshotIndex + 1); event.stopPropagation();" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all opacity-0 group-hover:opacity-100 p-2" id="next-arrow">
-                    <span class="material-symbols-outlined text-4xl">chevron_right</span>
-                </button>
-                {% endif %}
-                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                    <span class="material-symbols-outlined text-white text-5xl">zoom_in</span>
-                </div>
-            </div>
-            
-            <!-- Thumbnail Navigation -->
-            {% if game.screenshots|length > 1 %}
-            <div class="flex justify-center">
-                <div class="overflow-hidden">
-                    <div id="thumbnail-container" class="flex gap-2 transition-transform duration-300">
-                        {% for shot in game.screenshots %}
-                        <button 
-                            class="flex-shrink-0 w-20 h-20 rounded border-2 transition-all cursor-pointer hover:border-blue-400 {% if loop.first %}border-blue-400{% else %}border-gray-700/50{% endif %} overflow-hidden"
-                            onclick="selectScreenshot({{ loop.index0 }})"
-                            title="Screenshot {{ loop.index }}">
-                            <img src="{{ shot }}" class="w-full h-full object-cover" alt="Screenshot {{ loop.index }}">
-                        </button>
-                        {% endfor %}
+        <!-- Main Content Column -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Screenshots Section -->
+            {% if game.screenshots %}
+            <div class="space-y-4">
+                <h3 class="text-xl font-bold text-white pixel-font flex items-center gap-2">
+                    <span class="material-symbols-outlined text-blue-500">photo_library</span> Screenshots
+                </h3>
+                <!-- Main Screenshot Display -->
+                <div class="relative rounded-xl overflow-hidden border border-gray-800 bg-black/20 shadow-lg aspect-video group cursor-pointer" onclick="openScreenshotModal(currentScreenshotIndex)">
+                    <img id="main-screenshot" src="{{ game.screenshots[0] }}" loading="lazy" decoding="async" class="w-full h-full object-contain" alt="{{ game.title }} Screenshot">
+                    
+                    <!-- Navigation Arrows Overlay -->
+                    {% if game.screenshots|length > 1 %}
+                    <button onclick="selectScreenshot(currentScreenshotIndex - 1); event.stopPropagation();" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all opacity-0 group-hover:opacity-100 p-2" id="prev-arrow">
+                        <span class="material-symbols-outlined text-4xl">chevron_left</span>
+                    </button>
+                    <button onclick="selectScreenshot(currentScreenshotIndex + 1); event.stopPropagation();" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all opacity-0 group-hover:opacity-100 p-2" id="next-arrow">
+                        <span class="material-symbols-outlined text-4xl">chevron_right</span>
+                    </button>
+                    {% endif %}
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <span class="material-symbols-outlined text-white text-5xl">zoom_in</span>
                     </div>
                 </div>
+                
+                <!-- Thumbnail Navigation -->
+                {% if game.screenshots|length > 1 %}
+                <div class="flex justify-center">
+                    <div class="overflow-hidden">
+                        <div id="thumbnail-container" class="flex gap-2 transition-transform duration-300">
+                            {% for shot in game.screenshots %}
+                            <button 
+                                class="flex-shrink-0 w-20 h-20 rounded border-2 transition-all cursor-pointer hover:border-blue-400 {% if loop.first %}border-blue-400{% else %}border-gray-700/50{% endif %} overflow-hidden"
+                                onclick="selectScreenshot({{ loop.index0 }})"
+                                title="Screenshot {{ loop.index }}">
+                                <img src="{{ shot }}" class="w-full h-full object-cover" alt="Screenshot {{ loop.index }}">
+                            </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
+            {% endif %}
+
+            <!-- Platform Instructions -->
+            {% if instructions %}
+            <section>
+                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-700/50 pb-2 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-blue-500">info</span>
+                    Platform Instructions
+                </h3>
+                <div class="space-y-3">
+                    {% for platform, steps in instructions.items() %}
+                    {% set pid = platform|replace(' ', '-')|lower %}
+                    <div class="border border-gray-700/50 rounded-lg overflow-hidden">
+                        <button onclick="toggleInstructions('{{ pid }}')" class="w-full px-6 py-4 bg-gray-900/50 hover:bg-gray-800/50 transition-all flex items-center justify-between group">
+                            <div class="flex items-center gap-3">
+                                <!-- Platform Icon -->
+                                {% if 'pc' in platform|lower or 'windows' in platform|lower %}
+                                <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M3,12V6.75L9,5.43V11.91L3,12M20,3V11.75L10,11.9V5.21L20,3M3,13L9,13.09V19.9L3,18.75V13M20,13.25V22L10,20.09V13.1L20,13.25Z"/></svg>
+                                {% elif 'android' in platform|lower %}
+                                <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.68-.04-.84.27l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.16-.31-.55-.42-.84-.27-.3.16-.42.54-.26.85L7.4 9.48c-3.5 2.55-5.4 6.2-5.4 10.52h17.98c0-4.32-1.9-7.97-5.38-10.52zM8 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm8 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+                                {% elif 'linux' in platform|lower %}
+                                <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 00-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139zm.529 3.405h.013c.213 0 .396.062.584.198.19.135.33.332.438.533.105.259.158.459.166.724 0-.02.006-.04.006-.06v.105a.086.086 0 01-.004-.021l-.004-.024a1.807 1.807 0 01-.15.706.953.953 0 01-.213.335.71.71 0 00-.088-.042c-.104-.045-.198-.064-.284-.133a1.312 1.312 0 00-.22-.066c.05-.06.146-.133.183-.198.053-.128.082-.264.088-.402v-.02a.53.53 0 00-.043-.182.35.35 0 00-.12-.149.27.27 0 00-.166-.045c-.066 0-.13.023-.166.045a.35.35 0 00-.12.149.53.53 0 00-.043.182v.02c.006.138.035.274.088.402.037.065.133.138.183.198a1.572 1.572 0 00-.22.066c-.086.069-.18.088-.284.133a.71.71 0 00-.088.042.953.953 0 01-.213-.335 1.807 1.807 0 01-.15-.706l-.004.024a.086.086 0 01-.004.021v-.105c0 .02.006.04.006.06.008-.265.061-.465.166-.724.108-.2.248-.398.438-.533.188-.136.371-.198.584-.198zm-4.31.702c.266 0 .469.06.636.181.166.178.312.332.418.598.106.201.143.467.172.666-.006.146-.038.284-.092.418-.058.135-.143.259-.223.339a.69.69 0 01-.25.158c-.09.06-.166.09-.242.09-.021 0-.045.003-.06.003l-.003-.003a.382.382 0 01-.117-.03.44.44 0 00-.127-.045.113.113 0 00-.046-.003c-.038 0-.075.01-.114.024a.61.61 0 00-.132.087c-.053.046-.098.092-.132.135a.55.55 0 00-.076.135c-.003.045-.003.09-.003.135.003.045.006.09.003.135-.006.135-.033.201-.06.27a.61.61 0 01-.087.158c-.064.07-.137.129-.192.166a.488.488 0 01-.18.09c-.066.024-.135.045-.2.059-.13.022-.262.024-.393.006-.132-.03-.262-.075-.384-.135-.184-.105-.35-.254-.488-.408a1.18 1.18 0 01-.27-.465c-.06-.18-.09-.381-.09-.582 0-.201.03-.402.09-.582.06-.179.15-.345.27-.466.138-.153.304-.302.488-.407.122-.06.252-.106.384-.135a.86.86 0 01.393.006c.065.014.134.035.2.059a.49.49 0 01.18.09c.055.037.128.096.192.166a.61.61 0 01.087.158c.027.069.054.135.06.27.003.045 0 .09-.003.135 0 .045 0 .09.003.135a.55.55 0 00.076.135c.034.043.079.09.132.135a.61.61 0 00.132.087c.039.014.076.024.114.024a.113.113 0 00.046-.003.44.44 0 00.127-.045.382.382 0 01.117-.03l.003-.003c.015 0 .039.003.06.003.076 0 .152-.03.242-.09a.69.69 0 00.25-.158c.08-.08.165-.204.223-.339.054-.134.086-.272.092-.418-.029-.199-.066-.465-.172-.666-.106-.266-.252-.42-.418-.598-.167-.121-.37-.181-.636-.181z"/></svg>
+                                {% elif 'mac' in platform|lower or 'macos' in platform|lower %}
+                                <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                                {% elif 'ios' in platform|lower or 'iphone' in platform|lower or 'ipad' in platform|lower %}
+                                <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-5 18c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm5.5-3H6V4h11v13z"/></svg>
+                                {% elif 'switch' in platform|lower or 'nintendo' in platform|lower %}
+                                <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 24 24"><path d="M14.176 24h3.674c3.376 0 6.15-2.774 6.15-6.15V6.15C24 2.775 21.226 0 17.85 0H14.1c-.074 0-.15.074-.15.15v23.7c-.001.076.075.15.226.15zm4.574-13.199c1.351 0 2.399 1.125 2.399 2.398 0 1.352-1.125 2.4-2.399 2.4-1.35 0-2.4-1.049-2.4-2.4-.075-1.349 1.05-2.398 2.4-2.398zM11.4 0H6.15C2.775 0 0 2.775 0 6.15v11.7C0 21.226 2.775 24 6.15 24h5.25c.074 0 .15-.074.15-.149V.15c0-.076-.076-.15-.15-.15zM6.602 8.799c1.35 0 2.398 1.05 2.398 2.4s-1.049 2.398-2.398 2.398c-1.352 0-2.4-1.049-2.4-2.398s1.048-2.4 2.4-2.4z"/></svg>
+                                {% else %}
+                                <span class="material-symbols-outlined text-blue-300 text-lg">devices</span>
+                                {% endif %}
+                                <span class="font-bold text-white">{{ platform }}</span>
+                            </div>
+                            <span class="material-symbols-outlined text-gray-400 group-hover:text-white transition-all transform text-lg font-bold" id="icon-{{ pid }}">expand_more</span>
+                        </button>
+                        <div id="content-{{ pid }}" class="instructions-content hidden max-h-0 overflow-hidden transition-all duration-300">
+                            <div class="space-y-4 px-6 py-4 bg-blue-900/20 border-t border-blue-500/30">
+                                <div class="text-sm text-gray-300 leading-relaxed whitespace-pre-line">{{ steps|replace('\\n', '\n') }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Modding Support Section - Show if mod_links or mod_instructions exist -->
+            {% if game.mod_links or game.mod_instructions %}
+            <section>
+                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-purple-400">build</span>
+                    Modding Support
+                </h3>
+                <div class="border border-purple-700/50 rounded-lg overflow-hidden bg-gray-900/30">
+                    <!-- Mod Site Link -->
+                    {% if game.mod_links %}
+                    <div class="px-6 py-4 border-b border-purple-700/30">
+                        <div class="flex flex-col gap-2">
+                            {% for link in game.mod_links %}
+                            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" 
+                               class="group flex items-center justify-between px-4 py-3 bg-purple-900/40 hover:bg-purple-800/60 border border-purple-600/50 rounded-lg transition-all hover:border-purple-400/50 hover:shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-purple-800/50 p-2 rounded-md group-hover:bg-purple-700/50 transition-colors">
+                                        <span class="material-symbols-outlined text-purple-200">hub</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-purple-100 font-bold group-hover:text-white transition-colors">Mod Repository</span>
+                                        <span class="text-xs text-purple-300 group-hover:text-purple-200 transition-colors">Visit {{ link.name }}</span>
+                                    </div>
+                                </div>
+                                <span class="material-symbols-outlined text-purple-400 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Mod Instructions -->
+                    {% if game.mod_instructions %}
+                    <div class="px-6 py-4">
+                        <h4 class="text-sm font-bold text-purple-300 mb-3 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-sm">menu_book</span>
+                            How to Install Mods
+                        </h4>
+                        <div class="text-xs text-gray-400 leading-relaxed whitespace-pre-line bg-[#151518] p-4 rounded-lg border border-gray-700/50">{{ game.mod_instructions|replace('\\n', '\n') }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
             {% endif %}
         </div>
 
         <!-- Info Sidebar on Right -->
-        <div class="lg:col-span-1 space-y-6">
-            <div class="bg-gray-900/50 border border-gray-800 p-6 rounded-lg sticky top-24">
-                <div class="mb-4">
+        <div class="lg:col-span-1 space-y-6 order-2 lg:order-2">
+            <div class="bg-gray-900/50 border border-gray-700/50 p-6 rounded-xl sticky top-24 shadow-lg">
+                <div class="mb-6">
                     <div class="text-xs text-gray-500 uppercase font-bold mb-1">Base Game</div>
                     <div class="text-sm text-gray-300">{{ game.base_game }}</div>
                 </div>
@@ -170,147 +263,83 @@
                 </div>
                 {% endif %}
 
-                <a href="{{ game.download_link }}" target="_blank" onclick="trackDownload('{{ game.id }}')" class="btn-retro w-full justify-center text-center py-4 mb-4">
+                <a href="{{ game.download_link }}" target="_blank" onclick="trackDownload('{{ game.id }}')" class="btn-retro w-full justify-center text-center py-4 mb-2">
                     Download Port
                 </a>
+                <p class="text-[10px] text-gray-500 text-center mb-4 italic">Redirects to official download page</p>
 
                 <div class="flex items-center justify-between px-2 py-2 mb-4">
                     <span class="inline-flex items-center gap-2 text-[12px] font-mono text-gray-300">
                         <span class="material-symbols-outlined text-[14px] text-blue-400">download</span>
-                        <span id="download-count">{{ download_count | default(0) | download_count_label }}</span> downloads
+                        {{ download_count | default(0) | download_count_label }} downloads
                     </span>
                 </div>
 
+                {% if game.features %}
                 <div class="border-t border-gray-800 pt-4 mt-4">
-                    <p class="text-[10px] text-gray-500 mb-2">Have the file?</p>
-                    <a href="/patcher" class="block text-center text-blue-400 text-xs hover:text-white border border-blue-500/30 hover:border-blue-500 py-2 transition-all">
+                    <div class="text-xs text-gray-500 uppercase font-bold mb-3">Key Features</div>
+                    <ul class="space-y-2">
+                        {% if game.online_play %}
+                        <li class="flex items-center gap-2 text-xs text-green-300">
+                            <span class="material-symbols-outlined text-green-400 text-sm">lan</span> 
+                            Online Play
+                        </li>
+                        {% endif %}
+                        {% for feature in game.features %}
+                        <li class="flex items-center gap-2 text-xs text-gray-300">
+                            <span class="material-symbols-outlined text-blue-500 text-sm">check_circle</span> 
+                            {{ feature }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% elif game.online_play %}
+                <div class="border-t border-gray-800 pt-4 mt-4">
+                    <div class="text-xs text-gray-500 uppercase font-bold mb-3">Features</div>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-2 text-xs text-green-300">
+                            <span class="material-symbols-outlined text-green-400 text-sm">lan</span> 
+                            Online Play
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+
+                <!-- Need Help Section -->
+                {% if social_links %}
+                <div class="border border-gray-700/50 rounded-lg p-4 bg-gray-900/30 mt-4">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="material-symbols-outlined text-yellow-500 text-lg">help</span>
+                        <h4 class="text-sm font-bold text-white">Need Help?</h4>
+                    </div>
+                    <div class="space-y-2 text-xs text-gray-400">
+                        <p class="mb-2">Experiencing problems? Check out these resources:</p>
+                        <div class="flex flex-col gap-2">
+                            {% for link in social_links %}
+                            {% if link.type == 'discord' %}
+                            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-all">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.369a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.211.375-.445.864-.607 1.25a18.27 18.27 0 00-5.487 0c-.162-.386-.395-.875-.607-1.25a.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.08.08 0 00.087-.027c.461-.63.873-1.295 1.226-1.994a.076.076 0 00-.042-.106 13.107 13.107 0 01-1.872-.892.077.077 0 00-.008-.128 10.72 10.72 0 00.372-.294.075.075 0 00.076-.01c3.928 1.793 8.18 1.793 12.062 0a.075.075 0 00.076.009c.12.098.246.198.373.294a.077.077 0 00-.006.127 12.299 12.299 0 01-1.873.892.076.076 0 00-.041.107c.36.699.772 1.365 1.225 1.994a.08.08 0 00.087.028 19.86 19.86 0 006.002-3.03.077.077 0 00.032-.056c.5-5.094-.838-9.52-3.549-13.442a.06.06 0 00-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                                <span>Discord Server</span>
+                            </a>
+                            {% elif link.type == 'github' %}
+                            <a href="{{ link.url }}/issues" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-all">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                <span>Report Issues on GitHub</span>
+                            </a>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="border-t border-gray-800 pt-4 mt-4">
+                    <p class="text-[10px] text-gray-500 mb-2">Have the base file?</p>
+                    <a href="/patcher" class="block text-center text-blue-400 text-xs hover:text-white border border-blue-500/30 hover:border-blue-500 py-2 rounded-lg transition-all">
                         Go to Web Patcher
                     </a>
                 </div>
             </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Content Below -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="md:col-span-2 space-y-8">
-            <section>
-                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Features</h3>
-                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {% if game.online_play %}
-                    <li class="flex items-center gap-3 bg-green-900/30 p-3 rounded-lg border border-green-600/50">
-                        <span class="material-symbols-outlined text-green-400 text-sm">lan</span> 
-                        <span class="text-sm text-green-300">Online Play</span>
-                    </li>
-                    {% endif %}
-                </ul>
-            </section>
-
-            <!-- Modding Instructions Section -->
-            {% set has_mods = false %}
-            {% for feature in key_features %}
-                {% if feature.title and feature.title|lower == 'mods' %}
-                    {% set has_mods = true %}
-                {% endif %}
-            {% endfor %}
-            {% if has_mods and (game.mod_links or game.mod_instructions) %}
-            <section>
-                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-purple-400">build</span>
-                    Modding Instructions
-                </h3>
-                <div class="border border-purple-700/50 rounded-lg overflow-hidden bg-gray-900/30">
-                    <!-- Mod Links -->
-                    {% if game.mod_links %}
-                    <div class="px-6 py-4 border-b border-purple-700/30">
-                        <h4 class="text-sm font-bold text-purple-300 mb-3 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm">link</span>
-                            Mod Resources
-                        </h4>
-                        <div class="flex flex-wrap gap-3">
-                            {% set mod_links_parsed = game.mod_links %}
-                            {% if mod_links_parsed is string %}
-                                {% set mod_links_parsed = mod_links_parsed | tojson | safe %}
-                            {% endif %}
-                            {% for link in mod_links_parsed if mod_links_parsed is iterable and mod_links_parsed is not string %}
-                            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" 
-                               class="inline-flex items-center gap-2 px-4 py-2 bg-purple-900/50 hover:bg-purple-800/50 border border-purple-600/50 rounded-lg text-purple-200 text-sm font-medium transition-all hover:border-purple-400/50">
-                                <span class="material-symbols-outlined text-sm">open_in_new</span>
-                                {{ link.name }}
-                            </a>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Mod Instructions -->
-                    {% if game.mod_instructions %}
-                    <div class="px-6 py-4">
-                        <h4 class="text-sm font-bold text-purple-300 mb-3 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm">menu_book</span>
-                            How to Install Mods
-                        </h4>
-                        <div class="text-xs text-gray-400 leading-relaxed whitespace-pre-line bg-[#151518] p-4 rounded-lg border border-gray-700/50">{{ game.mod_instructions|replace('\\n', '\n') }}</div>
-                    </div>
-                    {% endif %}
-                </div>
-            </section>
-            {% endif %}
-
-            <!-- Modding Instructions Section -->
-            {% set has_mods = false %}
-            {% for feature in key_features %}
-                {% if feature.title and feature.title|lower == 'mods' %}
-                    {% set has_mods = true %}
-                {% endif %}
-            {% endfor %}
-            {% if has_mods and (game.mod_links or game.mod_instructions) %}
-            <section>
-                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-purple-400">build</span>
-                    Modding Instructions
-                </h3>
-                <div class="border border-purple-700/50 rounded-lg overflow-hidden bg-gray-900/30">
-                    <!-- Mod Links -->
-                    {% if game.mod_links %}
-                    <div class="px-6 py-4 border-b border-purple-700/30">
-                        <h4 class="text-sm font-bold text-purple-300 mb-3 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm">link</span>
-                            Mod Resources
-                        </h4>
-                        <div class="flex flex-wrap gap-3">
-                            {% set mod_links_parsed = game.mod_links %}
-                            {% if mod_links_parsed is string %}
-                                {% set mod_links_parsed = mod_links_parsed | tojson | safe %}
-                            {% endif %}
-                            {% for link in mod_links_parsed if mod_links_parsed is iterable and mod_links_parsed is not string %}
-                            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" 
-                               class="inline-flex items-center gap-2 px-4 py-2 bg-purple-900/50 hover:bg-purple-800/50 border border-purple-600/50 rounded-lg text-purple-200 text-sm font-medium transition-all hover:border-purple-400/50">
-                                <span class="material-symbols-outlined text-sm">open_in_new</span>
-                                {{ link.name }}
-                            </a>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Mod Instructions -->
-                    {% if game.mod_instructions %}
-                    <div class="px-6 py-4">
-                        <h4 class="text-sm font-bold text-purple-300 mb-3 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm">menu_book</span>
-                            How to Install Mods
-                        </h4>
-                        <div class="text-xs text-gray-400 leading-relaxed whitespace-pre-line bg-[#151518] p-4 rounded-lg border border-gray-700/50">{{ game.mod_instructions|replace('\\n', '\n') }}</div>
-                    </div>
-                    {% endif %}
-                </div>
-            </section>
-            {% endif %}
-        </div>
-
-        <div class="md:col-span-1">
         </div>
     </div>
 

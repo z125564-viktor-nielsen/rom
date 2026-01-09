@@ -456,3 +456,70 @@ html, body {
         padding-left: 2.75rem !important;
     }
 }
+/* Modern Development Status Badge */
+.dev-status-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    border-radius: 9999px;
+    color: #fbbf24;
+    font-family: 'Share Tech Mono', monospace;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.8rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.2s ease;
+}
+
+.dev-status-modern:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: #fbbf24;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dev-status-modern .material-symbols-outlined {
+    font-size: 1.5rem;
+}
+
+/* Status Color Variants */
+.dev-status-modern.status-complete {
+    border-color: rgba(74, 222, 128, 0.5);
+    color: #4ade80;
+}
+.dev-status-modern.status-complete:hover {
+    border-color: #4ade80;
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+}
+
+.dev-status-modern.status-alpha {
+    border-color: rgba(248, 113, 113, 0.5);
+    color: #f87171;
+}
+.dev-status-modern.status-alpha:hover {
+    border-color: #f87171;
+    box-shadow: 0 0 15px rgba(248, 113, 113, 0.3);
+}
+
+.dev-status-modern.status-demo {
+    border-color: rgba(96, 165, 250, 0.5);
+    color: #60a5fa;
+}
+.dev-status-modern.status-demo:hover {
+    border-color: #60a5fa;
+    box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+}
+
+.dev-status-modern.status-wip {
+    border-color: rgba(251, 146, 60, 0.5);
+    color: #fb923c;
+}
+.dev-status-modern.status-wip:hover {
+    border-color: #fb923c;
+    box-shadow: 0 0 15px rgba(251, 146, 60, 0.3);
+}

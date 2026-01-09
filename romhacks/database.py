@@ -7,6 +7,87 @@ import hashlib
 DB_PATH = 'requests.db'
 
 
+# ============================================
+# FILTER CONFIGURATION SYSTEM
+# ============================================
+# This system makes it easy to add new filters/tags to games and ports.
+# To add a new filter:
+# 1. Add a new entry to FILTER_CONFIGS with column name and optional auto-detect function
+# 2. The column will be automatically added to both games and ports tables
+# 3. Use get_filter_value() to extract values during game/port retrieval
+# 4. Add UI elements in templates and JavaScript filtering logic
+
+FILTER_CONFIGS = {
+    'game_series': {
+        'description': 'Game series/franchise (e.g., Pokemon, Mario, Zelda)',
+        'type': 'TEXT',
+        'auto_detect': lambda game: _auto_detect_series(game.get('base_game', ''), game.get('title', ''))
+    },
+    # Add more filters here as needed:
+    # 'genre': {
+    #     'description': 'Game genre (e.g., RPG, Platformer, Action)',
+    #     'type': 'TEXT',
+    #     'auto_detect': None
+    # },
+    # 'difficulty': {
+    #     'description': 'Difficulty level (e.g., Easy, Medium, Hard)',
+    #     'type': 'TEXT',
+    #     'auto_detect': None
+    # },
+}
+
+def _auto_detect_series(base_game, title):
+    """Auto-detect game series from base_game or title"""
+    if not base_game and not title:
+        return None
+    
+    # Normalize strings for comparison
+    text = (base_game or title).lower()
+    
+    # Series detection rules
+    series_patterns = {
+        'Pokemon': ['pokemon', 'pokémon'],
+        'Mario': ['mario', 'smb', 'super mario'],
+        'Zelda': ['zelda'],
+        'Metroid': ['metroid'],
+        'Kirby': ['kirby'],
+        'Sonic': ['sonic'],
+        'Mega Man': ['mega man', 'megaman', 'rockman'],
+        'Final Fantasy': ['final fantasy'],
+        'Dragon Quest': ['dragon quest'],
+        'Fire Emblem': ['fire emblem'],
+        'Castlevania': ['castlevania'],
+        'Contra': ['contra'],
+        'Street Fighter': ['street fighter'],
+        'Mortal Kombat': ['mortal kombat'],
+    }
+    
+    for series, patterns in series_patterns.items():
+        for pattern in patterns:
+            if pattern in text:
+                return series
+    
+    return None
+
+def get_filter_value(record, filter_name):
+    """Get the value for a filter, with auto-detection fallback"""
+    if filter_name not in FILTER_CONFIGS:
+        return None
+    
+    config = FILTER_CONFIGS[filter_name]
+    value = record.get(filter_name)
+    
+    # If value is empty and auto_detect is available, use it
+    if not value and config.get('auto_detect'):
+        value = config['auto_detect'](record)
+    
+    return value
+
+# ============================================
+# END FILTER CONFIGURATION SYSTEM
+# ============================================
+
+
 def _normalize_consoles(value):
     """Normalize console/platform field into a list of lowercase tokens.
 
@@ -151,6 +232,8 @@ def init_db():
         cursor.execute("ALTER TABLE games ADD COLUMN rom_checker_url TEXT")
     if 'wiki_url' not in game_cols:
         cursor.execute("ALTER TABLE games ADD COLUMN wiki_url TEXT")
+    if 'game_series' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN game_series TEXT")
     if 'base_hash' in game_cols:
         # Can't drop columns in SQLite, so we'll leave them but not use them
         pass
@@ -236,6 +319,8 @@ def init_db():
         cursor.execute("ALTER TABLE ports ADD COLUMN rom_checker_url TEXT")
     if 'wiki_url' not in port_cols:
         cursor.execute("ALTER TABLE ports ADD COLUMN wiki_url TEXT")
+    if 'game_series' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN game_series TEXT")
     if 'mod_links' not in port_cols:
         cursor.execute("ALTER TABLE ports ADD COLUMN mod_links TEXT")
     if 'mod_instructions' not in port_cols:
@@ -331,6 +416,38 @@ def init_db():
             status TEXT DEFAULT 'new',
             admin_notes TEXT,
             ip_hash TEXT
+        )
+    ''')
+    
+    # Monthly downloads table for tracking downloads per month
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS monthly_downloads (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            game_id TEXT NOT NULL,
+            ip_hash TEXT NOT NULL,
+            year_month TEXT NOT NULL,
+            downloaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(game_id, ip_hash, year_month)
+        )
+    ''')
+    
+    # Index for faster monthly queries
+    cursor.execute('''
+        CREATE INDEX IF NOT EXISTS idx_monthly_downloads_year_month 
+        ON monthly_downloads(year_month)
+    ''')
+    
+    # Monthly popular history table for storing past months' top games
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS monthly_popular_history (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            year_month TEXT NOT NULL,
+            game_id TEXT NOT NULL,
+            game_type TEXT NOT NULL,
+            download_count INTEGER NOT NULL,
+            rank INTEGER NOT NULL,
+            archived_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(year_month, game_id, game_type)
         )
     ''')
     
@@ -509,8 +626,8 @@ def insert_game(game_data):
             support_forum_url, troubleshooting_url, rom_checker_url, wiki_url,
             instructions_pc, instructions_android, instructions_linux,
             instructions_web, instructions_ios, instructions_mac,
-            instructions_switch, instructions_ps4, instructions_xbox
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            instructions_switch, instructions_ps4, instructions_xbox, game_series
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         game_id,
         game_data.get('title'),
@@ -553,6 +670,7 @@ def insert_game(game_data):
         game_data.get('instructions_switch'),
         game_data.get('instructions_ps4'),
         game_data.get('instructions_xbox'),
+        game_data.get('game_series') or get_filter_value(game_data, 'game_series'),
     ))
     
     conn.commit()
@@ -570,8 +688,8 @@ def insert_port(port_data):
         INSERT OR REPLACE INTO ports (
             id, title, console, version, release_date, author,
             description, features, image_url, screenshots, download_link,
-            base_game, original_platform, popular
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            base_game, original_platform, popular, game_series
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         port_id,
         port_data.get('title'),
@@ -587,6 +705,7 @@ def insert_port(port_data):
         port_data.get('base_game'),
         port_data.get('original_platform'),
         1 if port_data.get('popular', False) else 0,
+        port_data.get('game_series') or get_filter_value(port_data, 'game_series'),
     ))
     
     conn.commit()
@@ -608,6 +727,11 @@ def get_games():
         game['features'] = json.loads(game['features'])
         game['screenshots'] = json.loads(game['screenshots'])
         game['popular'] = bool(game['popular'])
+        
+        # Apply filter configurations with auto-detection
+        for filter_name in FILTER_CONFIGS:
+            game[filter_name] = get_filter_value(game, filter_name)
+        
         games.append(game)
     
     return games
@@ -627,6 +751,11 @@ def get_ports():
         port['features'] = json.loads(port['features'])
         port['screenshots'] = json.loads(port['screenshots'])
         port['popular'] = bool(port['popular'])
+        
+        # Apply filter configurations with auto-detection
+        for filter_name in FILTER_CONFIGS:
+            port[filter_name] = get_filter_value(port, filter_name)
+        
         ports.append(port)
     
     return ports
@@ -646,6 +775,11 @@ def get_game_by_id(game_id):
         game['screenshots'] = json.loads(game['screenshots'])
         game['popular'] = bool(game['popular'])
         game['online_play'] = bool(game.get('online_play'))
+        
+        # Apply filter configurations with auto-detection
+        for filter_name in FILTER_CONFIGS:
+            game[filter_name] = get_filter_value(game, filter_name)
+        
         return game
     return None
 
@@ -662,8 +796,18 @@ def get_port_by_id(port_id):
         port['consoles'] = _normalize_consoles(port.get('console'))
         port['features'] = json.loads(port['features'])
         port['screenshots'] = json.loads(port['screenshots'])
+        if port.get('mod_links'):
+            try:
+                port['mod_links'] = json.loads(port['mod_links'])
+            except:
+                port['mod_links'] = []
         port['popular'] = bool(port['popular'])
         port['online_play'] = bool(port.get('online_play'))
+        
+        # Apply filter configurations with auto-detection
+        for filter_name in FILTER_CONFIGS:
+            port[filter_name] = get_filter_value(port, filter_name)
+        
         return port
     return None
 
@@ -710,6 +854,19 @@ def track_download(game_id, ip_address):
     # Hash the IP for privacy
     ip_hash = hash_string(ip_address)
     
+    # Get current year-month for monthly tracking
+    current_month = datetime.now().strftime('%Y-%m')
+    
+    # Track in monthly_downloads table (allows one download per IP per month)
+    try:
+        cursor.execute('''
+            INSERT INTO monthly_downloads (game_id, ip_hash, year_month)
+            VALUES (?, ?, ?)
+        ''', (game_id, ip_hash, current_month))
+    except sqlite3.IntegrityError:
+        # Already downloaded this month by this IP
+        pass
+    
     try:
         cursor.execute('''
             INSERT INTO downloads (game_id, ip_hash)
@@ -720,6 +877,7 @@ def track_download(game_id, ip_address):
         return True
     except sqlite3.IntegrityError:
         # This IP has already downloaded this game
+        conn.commit()  # Still commit the monthly tracking
         conn.close()
         return False
 
@@ -861,6 +1019,20 @@ def update_feedback_status(feedback_id, status, admin_notes=None):
     conn.close()
     
     return cursor.rowcount > 0
+
+def delete_feedback(feedback_id):
+    """Delete a feedback entry"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('DELETE FROM feedback WHERE id = ?', (feedback_id,))
+    
+    conn.commit()
+    success = cursor.rowcount > 0
+    conn.close()
+    
+    return success
+
 def get_download_count(game_id):
     """Get the number of unique IPs that have downloaded a game."""
     conn = get_db_connection()
@@ -1006,7 +1178,8 @@ def update_game(game_id, data):
         'troubleshooting_url', 'rom_checker_url', 'wiki_url',
         'instructions_pc', 'instructions_android', 'instructions_linux',
         'instructions_web', 'instructions_ios', 'instructions_mac',
-        'instructions_switch', 'instructions_ps4', 'instructions_xbox'
+        'instructions_switch', 'instructions_ps4', 'instructions_xbox',
+        'game_series'
     ]
     
     update_parts = []
@@ -1061,6 +1234,7 @@ def update_port(port_id, data):
         'instructions_pc', 'instructions_android', 'instructions_linux',
         'instructions_web', 'instructions_ios', 'instructions_mac',
         'instructions_switch', 'instructions_ps4', 'instructions_xbox',
+        'game_series',
         'mod_links', 'mod_instructions'
     ]
     
@@ -1127,3 +1301,185 @@ def delete_port(port_id):
     except Exception as e:
         conn.close()
         raise e
+
+def get_monthly_download_counts(year_month=None):
+    """Get download counts for a specific month (defaults to current month)"""
+    if year_month is None:
+        year_month = datetime.now().strftime('%Y-%m')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT game_id, COUNT(*) as count
+        FROM monthly_downloads
+        WHERE year_month = ?
+        GROUP BY game_id
+    ''', (year_month,))
+    
+    counts = {row['game_id']: row['count'] for row in cursor.fetchall()}
+    conn.close()
+    return counts
+
+
+def get_monthly_download_counts_for_ids(game_ids, year_month=None):
+    """Get monthly download counts for a list of game IDs"""
+    if not game_ids:
+        return {}
+    
+    if year_month is None:
+        year_month = datetime.now().strftime('%Y-%m')
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    placeholders = ','.join(['?' for _ in game_ids])
+    params = [year_month] + list(game_ids)
+    
+    cursor.execute(f'''
+        SELECT game_id, COUNT(*) as count
+        FROM monthly_downloads
+        WHERE year_month = ? AND game_id IN ({placeholders})
+        GROUP BY game_id
+    ''', params)
+    
+    counts = {row['game_id']: row['count'] for row in cursor.fetchall()}
+    conn.close()
+    return counts
+
+
+def archive_monthly_popular(year_month=None, top_n=20):
+    """Archive the top games/ports for a given month to history.
+    
+    Call this at the start of each new month to archive the previous month's data.
+    """
+    if year_month is None:
+        # Default to previous month
+        today = datetime.now()
+        if today.month == 1:
+            year_month = f"{today.year - 1}-12"
+        else:
+            year_month = f"{today.year}-{today.month - 1:02d}"
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get top games for the month
+    cursor.execute('''
+        SELECT md.game_id, COUNT(*) as download_count
+        FROM monthly_downloads md
+        INNER JOIN games g ON md.game_id = g.id
+        WHERE md.year_month = ?
+        GROUP BY md.game_id
+        ORDER BY download_count DESC
+        LIMIT ?
+    ''', (year_month, top_n))
+    
+    games = cursor.fetchall()
+    for rank, row in enumerate(games, 1):
+        try:
+            cursor.execute('''
+                INSERT INTO monthly_popular_history 
+                (year_month, game_id, game_type, download_count, rank)
+                VALUES (?, ?, 'game', ?, ?)
+            ''', (year_month, row['game_id'], row['download_count'], rank))
+        except sqlite3.IntegrityError:
+            pass  # Already archived
+    
+    # Get top ports for the month
+    cursor.execute('''
+        SELECT md.game_id, COUNT(*) as download_count
+        FROM monthly_downloads md
+        INNER JOIN ports p ON md.game_id = p.id
+        WHERE md.year_month = ?
+        GROUP BY md.game_id
+        ORDER BY download_count DESC
+        LIMIT ?
+    ''', (year_month, top_n))
+    
+    ports = cursor.fetchall()
+    for rank, row in enumerate(ports, 1):
+        try:
+            cursor.execute('''
+                INSERT INTO monthly_popular_history 
+                (year_month, game_id, game_type, download_count, rank)
+                VALUES (?, ?, 'port', ?, ?)
+            ''', (year_month, row['game_id'], row['download_count'], rank))
+        except sqlite3.IntegrityError:
+            pass  # Already archived
+    
+    conn.commit()
+    conn.close()
+    return {'games_archived': len(games), 'ports_archived': len(ports)}
+
+
+def get_monthly_popular_history(year_month, game_type=None):
+    """Get the archived popular games/ports for a specific month"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    if game_type:
+        cursor.execute('''
+            SELECT * FROM monthly_popular_history
+            WHERE year_month = ? AND game_type = ?
+            ORDER BY rank
+        ''', (year_month, game_type))
+    else:
+        cursor.execute('''
+            SELECT * FROM monthly_popular_history
+            WHERE year_month = ?
+            ORDER BY game_type, rank
+        ''', (year_month,))
+    
+    history = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return history
+
+
+def get_all_archived_months():
+    """Get a list of all months that have been archived"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT DISTINCT year_month FROM monthly_popular_history
+        ORDER BY year_month DESC
+    ''')
+    
+    months = [row['year_month'] for row in cursor.fetchall()]
+    conn.close()
+    return months
+
+
+def check_and_archive_previous_month():
+    """Check if we need to archive the previous month's data and do so if needed.
+    
+    This should be called on app startup or periodically.
+    """
+    today = datetime.now()
+    
+    # Calculate previous month
+    if today.month == 1:
+        prev_year_month = f"{today.year - 1}-12"
+    else:
+        prev_year_month = f"{today.year}-{today.month - 1:02d}"
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Check if previous month is already archived
+    cursor.execute('''
+        SELECT COUNT(*) as count FROM monthly_popular_history
+        WHERE year_month = ?
+    ''', (prev_year_month,))
+    
+    already_archived = cursor.fetchone()['count'] > 0
+    conn.close()
+    
+    if not already_archived:
+        # Check if there's any data for the previous month to archive
+        counts = get_monthly_download_counts(prev_year_month)
+        if counts:
+            return archive_monthly_popular(prev_year_month)
+    
+    return None

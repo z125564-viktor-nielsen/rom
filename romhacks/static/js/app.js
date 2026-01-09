@@ -29,6 +29,7 @@ function applyPatchVCD(sourceData, patchData, ignoreChecksums) { var patchStream
 let activeConsole = 'all';
 let activeOriginalPlatform = 'all';
 let activeGameFilter = '';
+let activeSeriesFilter = '';
 let netplayFilter = false;
 let currentPage = 1;
 const gamesPerPage = 12;
@@ -43,6 +44,7 @@ function updatePagination() {
         const cardConsole = (card.dataset.console || '').toLowerCase();
         const cardOriginalPlatform = (card.dataset.originalPlatform || '').toLowerCase();
         const cardBaseGame = (card.dataset.baseGame || '').toLowerCase();
+        const cardGameSeries = (card.dataset.gameSeries || '').toLowerCase();
         const cardTitle = card.querySelector('h3').innerText.toLowerCase();
         
         // Check if card has any element containing "Online" text
@@ -59,10 +61,13 @@ function updatePagination() {
         // Check game filter
         let matchGame = (activeGameFilter === '' || cardBaseGame === activeGameFilter);
         
+        // Check series filter
+        let matchSeries = (activeSeriesFilter === '' || cardGameSeries === activeSeriesFilter);
+        
         const matchOriginalPlatform = (activeOriginalPlatform === 'all' || cardOriginalPlatform === activeOriginalPlatform);
         const matchSearch = (query === '' || cardTitle.includes(query));
         
-        return matchConsole && matchNetplay && matchGame && matchOriginalPlatform && matchSearch;
+        return matchConsole && matchNetplay && matchGame && matchSeries && matchOriginalPlatform && matchSearch;
     });
     
     const totalPages = Math.ceil(filteredCards.length / gamesPerPage);
@@ -89,12 +94,17 @@ function filterHacks(selectedConsole) {
     if (selectedConsole) {
         activeConsole = selectedConsole;
         activeGameFilter = ''; // Reset game filter when console changes
+        activeSeriesFilter = ''; // Reset series filter when console changes
         currentPage = 1; // Reset to first page on filter change
         
-        // Reset game dropdown
+        // Reset game and series dropdowns
         const gameFilter = document.getElementById('game-filter');
         if (gameFilter) {
             gameFilter.value = '';
+        }
+        const seriesFilter = document.getElementById('series-filter');
+        if (seriesFilter) {
+            seriesFilter.value = '';
         }
         
         // Determine page type to use correct color classes
@@ -121,6 +131,7 @@ function filterHacks(selectedConsole) {
     }
 
     updateGameDropdown();
+    updateSeriesDropdown();
     updatePagination();
 }
 
@@ -220,6 +231,54 @@ function filterByGame(baseGame) {
     updatePagination();
 }
 
+function updateSeriesDropdown() {
+    const seriesFilter = document.getElementById('series-filter');
+    if (!seriesFilter) return;
+
+    // Get unique game series for the current filter state
+    const gameSeries = new Set();
+    allCards.forEach(card => {
+        const cardConsole = (card.dataset.console || '').toLowerCase();
+        const cardOriginalPlatform = (card.dataset.originalPlatform || '').toLowerCase();
+        const cardGameSeries = (card.dataset.gameSeries || '').trim();
+        
+        const consoles = cardConsole.split(/\s+/).filter(Boolean);
+        
+        // Check if card matches current console and original platform filters
+        let matchConsole = (activeConsole === 'all' || consoles.includes(activeConsole));
+        let matchOriginalPlatform = (activeOriginalPlatform === 'all' || cardOriginalPlatform === activeOriginalPlatform);
+        
+        if (matchConsole && matchOriginalPlatform && cardGameSeries) {
+            gameSeries.add(cardGameSeries);
+        }
+    });
+
+    // Sort game series alphabetically
+    const sortedSeries = Array.from(gameSeries).sort();
+
+    // Store current selection
+    const currentValue = seriesFilter.value;
+
+    // Rebuild dropdown
+    seriesFilter.innerHTML = '<option value="">All Series</option>';
+    sortedSeries.forEach(series => {
+        const option = document.createElement('option');
+        option.value = series.toLowerCase();
+        option.textContent = series;
+        seriesFilter.appendChild(option);
+    });
+
+    // Restore selection if it still exists
+    seriesFilter.value = currentValue;
+}
+
+function filterBySeries(series) {
+    activeSeriesFilter = series.toLowerCase();
+    currentPage = 1;
+    updateSeriesDropdown();
+    updatePagination();
+}
+
 function filterByNetplay(checked) {
     // Handle checkbox change
     netplayFilter = checked;
@@ -242,6 +301,7 @@ function nextPage() {
         const cardConsole = (card.dataset.console || '').toLowerCase();
         const cardOriginalPlatform = (card.dataset.originalPlatform || '').toLowerCase();
         const cardBaseGame = (card.dataset.baseGame || '').toLowerCase();
+        const cardGameSeries = (card.dataset.gameSeries || '').toLowerCase();
         const cardTitle = card.querySelector('h3').innerText.toLowerCase();
         
         // Check if card has any element containing "Online" text
@@ -252,10 +312,11 @@ function nextPage() {
         const matchConsole = (activeConsole === 'all' || consoles.includes(activeConsole));
         const matchNetplay = !netplayFilter || hasOnlinePlay;
         const matchGame = (activeGameFilter === '' || cardBaseGame === activeGameFilter);
+        const matchSeries = (activeSeriesFilter === '' || cardGameSeries === activeSeriesFilter);
         const matchOriginalPlatform = (activeOriginalPlatform === 'all' || cardOriginalPlatform === activeOriginalPlatform);
         const matchSearch = (query === '' || cardTitle.includes(query));
         
-        return matchConsole && matchNetplay && matchGame && matchOriginalPlatform && matchSearch;
+        return matchConsole && matchNetplay && matchGame && matchSeries && matchOriginalPlatform && matchSearch;
     });
     
     const totalPages = Math.ceil(filteredCards.length / gamesPerPage);
@@ -314,6 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
     allCards = Array.from(document.querySelectorAll('.hack-card'));
     if (allCards.length > 0) {
         updateGameDropdown(); // Initialize game dropdown with all games
+        updateSeriesDropdown(); // Initialize series dropdown with all series
         updatePagination();
     }
     

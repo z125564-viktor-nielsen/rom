@@ -18,7 +18,7 @@
                 {
                     "@type": "ListItem",
                     "position": {{ loop.index }},
-                    "url": {{ url_for('game_page', game_id=game.id, _external=True) | tojson }},
+                    "url": {{ url_for('port_page', port_id=game.id, _external=True) | tojson }},
                     "name": {{ (game.title or '') | tojson }}
                 }{{ "," if not loop.last else "" }}
                 {% endfor %}
@@ -60,6 +60,8 @@
     </div>
 </section>
 
+
+
 <!-- Info Dropdowns Section -->
 <div class="flex flex-col md:flex-row justify-center gap-3 mb-8 md:mb-12 max-w-2xl mx-auto px-3 md:px-4">
     <!-- What's a ROM Hack? Dropdown -->
@@ -98,9 +100,12 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 mb-8 md:mb-12">
     {# Popular ROM Hacks Section #}
     <div>
-        <div class="flex items-center gap-2 mb-6 md:mb-8 pt-6 md:pt-8 border-t border-gradient-to-r from-transparent via-blue-500/30 to-transparent">
-            <span class="material-symbols-outlined text-blue-400 text-xl md:text-2xl">local_fire_department</span>
-            <h3 class="text-lg md:text-2xl font-bold text-white pixel-font">Popular Rom Hacks</h3>
+        <div class="flex flex-col mb-6 md:mb-8 pt-6 md:pt-8 border-t border-gradient-to-r from-transparent via-blue-500/30 to-transparent">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-400 text-xl md:text-2xl">local_fire_department</span>
+                <h3 class="text-lg md:text-2xl font-bold text-white pixel-font">Popular Rom Hacks</h3>
+            </div>
+            <p class="text-xs md:text-sm text-gray-400 mt-1 ml-7 md:ml-9">Most popular for {{ current_month }}</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8" id="popular-grid">
@@ -152,15 +157,18 @@
     {# Popular Ports Section #}
     {% if ports %}
     <div>
-        <div class="flex items-center gap-2 mb-6 md:mb-8 pt-6 md:pt-8 border-t border-gradient-to-r from-transparent via-sky-500/30 to-transparent">
-            <span class="material-symbols-outlined text-sky-400 text-xl md:text-2xl">cloud_download</span>
-            <h3 class="text-lg md:text-2xl font-bold text-white pixel-font">Popular Ports</h3>
+        <div class="flex flex-col mb-6 md:mb-8 pt-6 md:pt-8 border-t border-gradient-to-r from-transparent via-sky-500/30 to-transparent">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-sky-400 text-xl md:text-2xl">cloud_download</span>
+                <h3 class="text-lg md:text-2xl font-bold text-white pixel-font">Popular Ports</h3>
+            </div>
+            <p class="text-xs md:text-sm text-gray-400 mt-1 ml-7 md:ml-9">Most popular for {{ current_month }}</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8" id="ports-grid">
             {% for port in ports %}
             <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-sky-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-sky-500/10" data-console="{{ (port.consoles or [port.console]) | join(' ') }}">
-                <a href="{{ url_for('game_page', game_id=port.id) }}" class="block relative h-48 overflow-hidden cursor-pointer bg-gradient-to-br from-gray-800 to-gray-900">
+                <a href="{{ url_for('port_page', port_id=port.id) }}" class="block relative h-48 overflow-hidden cursor-pointer bg-gradient-to-br from-gray-800 to-gray-900">
                     <img src="{{ port.image_url }}" referrerpolicy="no-referrer" class="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105" alt="{{ port.title }} - {{ (port.consoles or [port.console]) | join('/') }} Decompiled Port by {{ port.author }}">
                     <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
                     <div class="absolute bottom-3 left-3">
@@ -190,7 +198,7 @@
                         </span>
                         {% endif %}
                     </div>
-                    <a href="{{ url_for('game_page', game_id=port.id) }}" class="w-full border border-gray-700/50 hover:border-sky-400/50 hover:text-sky-400 text-gray-300 py-2 px-4 text-xs uppercase tracking-widest transition-all rounded-lg text-center block" style="text-decoration:none">
+                    <a href="{{ url_for('port_page', port_id=port.id) }}" class="w-full border border-gray-700/50 hover:border-sky-400/50 hover:text-sky-400 text-gray-300 py-2 px-4 text-xs uppercase tracking-widest transition-all rounded-lg text-center block" style="text-decoration:none">
                         View Details
                     </a>
                 </div>
