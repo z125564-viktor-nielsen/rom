@@ -74,13 +74,13 @@ def add_cache_headers(response):
     elif request.path in ['/sitemap.xml', '/robots.txt']:
         response.cache_control.max_age = 604800  # 7 days
         response.cache_control.public = True
-    # Cache game pages for 24 hours
-    elif request.path.startswith('/game/') or request.path.endswith('-rom-hacks'):
-        response.cache_control.max_age = 86400  # 24 hours
+    # Cache game pages for 5 minutes (reduced to keep download counts fresh)
+    elif request.path.startswith('/game/') or request.path.startswith('/port/') or request.path.endswith('-rom-hacks'):
+        response.cache_control.max_age = 300  # 5 minutes
         response.cache_control.public = True
-    # Cache category pages for 12 hours
-    elif request.path in ['/romhacks', '/ports']:
-        response.cache_control.max_age = 43200  # 12 hours
+    # Cache category and index pages for 5 minutes (reduced to keep download counts fresh)
+    elif request.path in ['/romhacks', '/ports', '/']:
+        response.cache_control.max_age = 300  # 5 minutes
         response.cache_control.public = True
     # No cache for dynamic pages (admin, API, etc)
     elif '/admin/' in request.path or '/api/' in request.path:
