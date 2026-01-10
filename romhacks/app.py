@@ -328,7 +328,7 @@ def upload_proxy():
         filename = file.filename
         ext = os.path.splitext(filename)[1]
         unique_filename = f"{uuid.uuid4().hex}{ext}"
-        object_key = f"images/{unique_filename}"
+        object_key = f"screenshots/{unique_filename}"
         
         s3 = get_r2_client()
         if not s3:
@@ -344,7 +344,7 @@ def upload_proxy():
                 ExtraArgs={'ContentType': file.content_type}
             )
             
-            public_base = os.environ.get('R2_PUBLIC_BASE', '')
+            public_base = os.environ.get('R2_PUBLIC_BASE', 'https://assets.magiskmg.com')
             if public_base:
                  public_url = f"{public_base.rstrip('/')}/{object_key}"
             else:
@@ -389,7 +389,7 @@ def generate_presigned_url():
             ExpiresIn=3600
         )
         
-        public_base = os.environ.get('R2_PUBLIC_BASE', '')
+        public_base = os.environ.get('R2_PUBLIC_BASE', 'https://assets.magiskmg.com')
         if public_base:
              public_url = f"{public_base.rstrip('/')}/{object_key}"
         else:
