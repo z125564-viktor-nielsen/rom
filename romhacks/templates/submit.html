@@ -232,7 +232,15 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Cover Image URL</label>
-                    <input type="url" name="image_url" id="cover-image-input" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="https://example.com/image.jpg">
+                    <div class="flex gap-2">
+                        <input type="url" name="image_url" id="cover-image-input" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors" placeholder="https://example.com/image.jpg">
+                        {% if session.get('role') == 'admin' %}
+                        <label class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg cursor-pointer flex items-center justify-center transition-colors min-w-[50px]">
+                            <span class="material-symbols-outlined text-sm">upload</span>
+                            <input type="file" class="hidden" onchange="uploadFile(this, 'cover-image-input')">
+                        </label>
+                        {% endif %}
+                    </div>
                     <p class="text-xs text-gray-400 mt-1">Direct link to cover art image (PNG, JPG, WebP)</p>
                     <div id="cover-preview" class="mt-3 hidden">
                         <p class="text-xs text-gray-400 mb-2">Preview:</p>
@@ -242,6 +250,16 @@
 
                 <div>
                     <label class="block text-xs text-gray-500 uppercase font-bold mb-2">Screenshot URLs</label>
+                    {% if session.get('role') == 'admin' %}
+                    <div class="mb-2 flex items-center gap-2">
+                         <label class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg cursor-pointer transition-colors text-sm font-bold">
+                            <span class="material-symbols-outlined text-sm">add_photo_alternate</span>
+                            Upload Screenshot
+                            <input type="file" class="hidden" onchange="uploadFile(this, 'screenshots-input', true)">
+                        </label>
+                         <span id="upload_status" class="text-sm text-gray-400"></span>
+                    </div>
+                    {% endif %}
                     <textarea id="screenshots-input" name="screenshots" rows="4" class="w-full bg-gray-900/50 border border-gray-700 px-4 py-2.5 rounded-lg text-white focus:border-blue-500 focus:outline-none transition-colors resize-none font-mono text-xs" placeholder="https://example.com/screenshot1.jpg&#10;https://example.com/screenshot2.jpg&#10;https://example.com/screenshot3.jpg"></textarea>
                     <p class="text-xs text-gray-400 mt-1">Enter one URL per line. Each screenshot must be a direct link to an image file.</p>
                     <div id="screenshots-preview" class="mt-3 space-y-2"></div>
@@ -600,5 +618,101 @@ document.getElementById('submit-form').addEventListener('submit', async (e) => {
         setSubmitLoading(false);
     }
 });
+
+    // Image Upload Handler (Admin Only)
+    async function uploadFile(input, targetId, append = false) {
+        let file = input.files[0];
+        if (!file) return;
+
+        const statusLabel = document.getElementById('upload_status');
+        if (statusLabel) statusLabel.textContent = 'Preparing upload...';
+
+        try {
+            // 0. Convert to WebP if image
+            if (file.type.startsWith('image/') && file.type !== 'image/webp') {
+                if (statusLabel) statusLabel.textContent = 'Converting to WebP...';
+                try {
+                    file = await convertToWebP(file);
+                } catch (e) {
+                    console.warn('WebP conversion failed, uploading original', e);
+                }
+            }
+
+            // 1. Get Presigned URL
+            const res = await fetch('/admin/generate-presigned-url', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: file.name,
+                    filetype: file.type
+                })
+            });
+
+            if (!res.ok) throw new Error('Unauthorization or R2 not configured');
+            const data = await res.json();
+
+            // 2. Upload to R2
+            if (statusLabel) statusLabel.textContent = 'Uploading...';
+            
+            const uploadRes = await fetch(data.signedUrl, {
+                method: 'PUT',
+                body: file,
+                headers: {
+                    'Content-Type': file.type
+                }
+            });
+
+            if (!uploadRes.ok) throw new Error('Upload failed');
+
+            // 3. Update Input
+            const targetInput = document.getElementById(targetId);
+            if (append) {
+                const currentVal = targetInput.value;
+                targetInput.value = currentVal ? currentVal + (currentVal ? '\n' : '') + data.publicUrl : data.publicUrl;
+            } else {
+                targetInput.value = data.publicUrl;
+            }
+
+            // Trigger input event to update previews
+            targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+            if (statusLabel) statusLabel.textContent = 'Upload complete!';
+            setTimeout(() => { if(statusLabel) statusLabel.textContent = ''; }, 3000);
+
+        } catch (err) {
+            console.error(err);
+            alert('Upload failed: ' + err.message);
+            if (statusLabel) statusLabel.textContent = 'Error!';
+        }
+        
+        // Reset input
+        input.value = '';
+    }
+
+    // Client-side WebP Conversion
+    function convertToWebP(file) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        const newName = file.name.replace(/\.[^/.]+$/, "") + ".webp";
+                        resolve(new File([blob], newName, { type: 'image/webp' }));
+                    } else {
+                        reject(new Error('Canvas toBlob failed'));
+                    }
+                }, 'image/webp', 0.85);
+            };
+            img.onerror = () => reject(new Error('Image load failed'));
+            img.src = URL.createObjectURL(file);
+        });
+    }
 </script>
 {% endblock %}

@@ -45,6 +45,9 @@ from database import (
 import json
 import os
 import requests
+import boto3
+import uuid
+from botocore.config import Config
 from functools import wraps
 from datetime import datetime
 
@@ -288,6 +291,76 @@ def admin_ports():
     attach_download_counts(ports_data)
     ports_data.sort(key=lambda p: p.get('title', '').lower())
     return render_template('admin_games.html', items=ports_data, item_type='port')
+
+
+# R2 Upload Helper
+def get_r2_client():
+    account_id = os.environ.get('R2_ACCOUNT_ID')
+    access_key = os.environ.get('R2_ACCESS_KEY_ID')
+    secret_key = os.environ.get('R2_SECRET_ACCESS_KEY')
+    
+    if not all([account_id, access_key, secret_key]):
+        return None
+
+    return boto3.client(
+        's3',
+        endpoint_url=f'https://{account_id}.r2.cloudflarestorage.com',
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+        config=Config(signature_version='s3v4'),
+        region_name='auto'
+    )
+
+@app.route('/admin/generate-presigned-url', methods=['POST'])
+@login_required 
+def generate_presigned_url():
+    if session.get('role') != 'admin':
+         return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.json
+    filename = data.get('filename')
+    filetype = data.get('filetype')
+    
+    if not filename or not filetype:
+        return jsonify({'error': 'Missing filename or filetype'}), 400
+        
+    # Generate unique filename
+    ext = os.path.splitext(filename)[1]
+    unique_filename = f"{uuid.uuid4().hex}{ext}"
+    object_key = f"screenshots/{unique_filename}"
+    
+    s3 = get_r2_client()
+    if not s3:
+        return jsonify({'error': 'R2 storage not configured'}), 500
+        
+    try:
+        bucket = os.environ.get('R2_BUCKET')
+        
+        # Generate presigned URL
+        presigned_url = s3.generate_presigned_url(
+            'put_object',
+            Params={
+                'Bucket': bucket,
+                'Key': object_key,
+                'ContentType': filetype
+            },
+            ExpiresIn=3600
+        )
+        
+        public_base = os.environ.get('R2_PUBLIC_BASE', '')
+        if public_base:
+             public_url = f"{public_base.rstrip('/')}/{object_key}"
+        else:
+             public_url = f"https://{bucket}.r2.cloudflarestorage.com/{object_key}"
+
+        return jsonify({
+            'signedUrl': presigned_url,
+            'publicUrl': public_url
+        })
+        
+    except Exception as e:
+        print(f"Error generating presigned URL: {e}")
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/admin/game/<game_id>/edit', methods=['GET', 'POST'])
