@@ -1876,7 +1876,7 @@ def get_user_votes(review_ids, voter_username):
     placeholders = ','.join(['?' for _ in review_ids])
     cursor.execute(f'''
         SELECT review_id, vote_type FROM review_votes
-        WHERE review_id IN ({placeholders}) AND ra_username = ?
+        WHERE review_id IN ({placeholders}) AND voter_username = ?
     ''', review_ids + [voter_username])
     
     votes = {row['review_id']: row['vote_type'] for row in cursor.fetchall()}
