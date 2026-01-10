@@ -168,6 +168,40 @@ def migrate_add_monthly_popular_history_table():
     finally:
         conn.close()
 
+def migrate_add_reviews_columns():
+    """Add missing columns to reviews table"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    migrations_applied = []
+    
+    try:
+        # Columns to add: name, type, default value
+        columns_to_add = [
+            ('ra_game_id', 'INTEGER'),
+            ('achievements_earned', 'INTEGER DEFAULT 0'),
+            ('achievements_total', 'INTEGER DEFAULT 0'),
+            ('completion_percentage', 'REAL DEFAULT 0'),
+        ]
+        
+        for col_name, col_def in columns_to_add:
+            if not check_column_exists(cursor, 'reviews', col_name):
+                cursor.execute(f"ALTER TABLE reviews ADD COLUMN {col_name} {col_def}")
+                migrations_applied.append(f"Added {col_name} column to reviews table")
+                print(f"  ✓ Added {col_name} column to reviews table")
+            else:
+                print(f"  - {col_name} column already exists in reviews table")
+        
+        conn.commit()
+        return migrations_applied
+    
+    except Exception as e:
+        conn.rollback()
+        print(f"  ✗ Error: {e}")
+        return []
+    finally:
+        conn.close()
+
 def populate_game_series_auto_detect():
     """Auto-populate game_series for existing games and ports where not set"""
     conn = get_db_connection()
@@ -242,6 +276,15 @@ def verify_schema():
     for col in expected_port_cols:
         if col not in port_cols:
             issues.append(f"Missing column '{col}' in ports table")
+
+    # Check reviews table columns
+    expected_review_cols = ['ra_game_id', 'achievements_earned', 'achievements_total', 'completion_percentage']
+    cursor.execute("PRAGMA table_info(reviews)")
+    review_cols = {row[1] for row in cursor.fetchall()}
+    
+    for col in expected_review_cols:
+        if col not in review_cols:
+            issues.append(f"Missing column '{col}' in reviews table")
     
     # Check tables exist
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='monthly_downloads'")
@@ -296,9 +339,12 @@ def main():
     
     print("\n3. Adding monthly_popular_history table...")
     all_migrations.extend(migrate_add_monthly_popular_history_table())
+
+    print("\n4. Adding reviews columns...")
+    all_migrations.extend(migrate_add_reviews_columns())
     
     if not args.no_populate:
-        print("\n4. Auto-populating game_series...")
+        print("\n5. Auto-populating game_series...")
         all_migrations.extend(populate_game_series_auto_detect())
     
     # Verify migrations

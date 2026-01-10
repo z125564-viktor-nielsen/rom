@@ -185,17 +185,6 @@
                     Emulation Guide for {{ emulator_guide.console_name }}
                 </h3>
                 
-                {% if game.instruction and game.instruction_text %}
-                <div class="mb-6 bg-red-900/30 p-4 rounded-lg border border-red-700/50">
-                    <div class="flex items-start gap-3 mb-2">
-                        <span class="material-symbols-outlined text-red-400 text-lg flex-shrink-0 mt-0.5">warning</span>
-                        <div>
-                            <div class="text-xs text-red-300 uppercase font-bold mb-2">This game has special instructions!</div>
-                            <p class="text-xs text-red-100 leading-relaxed whitespace-pre-wrap">{{ game.instruction_text }}</p>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
                 
                 {% if emulator_guide.guides %}
                 <div class="space-y-3">
@@ -502,7 +491,7 @@
                     <form id="review-form" onsubmit="submitReview(event)">
                         <!-- Thumbs Up/Down Selection -->
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-300 mb-3">Do you recommend this ROM hack?</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-3">Do you recommend this {% if is_port %}port{% else %}ROM hack{% endif %}?</label>
                             <div class="flex gap-3">
                                 <button type="button" onclick="selectRecommendation(true)" id="btn-recommend" 
                                     class="flex-1 py-4 px-6 rounded-lg border-2 border-gray-600 bg-gray-800/50 hover:border-blue-500 transition flex items-center justify-center gap-3 group recommendation-btn">
@@ -523,7 +512,7 @@
                             <label for="review-text" class="block text-sm font-medium text-gray-300 mb-2">Your Review (optional)</label>
                             <textarea id="review-text" name="review_text" rows="4" 
                                 class="w-full bg-[#0f0f12] border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition resize-none"
-                                placeholder="Write your thoughts about this ROM hack..."></textarea>
+                                placeholder="Write your thoughts about this {% if is_port %}port{% else %}ROM hack{% endif %}..."></textarea>
                         </div>
 
                         <button type="submit" id="submit-review-btn"
@@ -966,7 +955,7 @@ function toggleEmulatorGuide(platform) {
 // REVIEW SYSTEM
 // ============================================
 const GAME_ID = '{{ game.id }}';
-const GAME_TYPE = 'romhack';
+const GAME_TYPE = '{{ "port" if is_port else "romhack" }}';
 let currentUser = null;
 let currentFilter = 'all';
 let currentSort = 'helpful';
@@ -1066,7 +1055,7 @@ async function submitReview(e) {
     e.preventDefault();
     
     if (selectedRecommendation === null) {
-        alert('Please select whether you recommend this ROM hack or not.');
+        alert('Please select whether you recommend this {% if is_port %}port{% else %}ROM hack{% endif %} or not.');
         return;
     }
     
