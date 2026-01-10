@@ -53,10 +53,15 @@
             </div>
 
             <div class="mb-6">
-                <label class="block text-sm font-bold text-gray-300 mb-2">JSON Data</label>
-                <textarea id="json_data" name="json_data" rows="15" 
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-sm font-bold text-gray-300">JSON Data</label>
+                    <button type="button" onclick="loadTemplate()" class="text-xs text-blue-400 hover:text-blue-300 transition-colors">
+                        Load Example Template
+                    </button>
+                </div>
+                <textarea id="json_data" name="json_data" rows="25" 
                     class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-blue-500"
-                    placeholder='[{"id": "my-hack", "title": "My ROM Hack", ...}]'></textarea>
+                    placeholder="JSON data will appear here..."></textarea>
             </div>
 
             <button type="button" onclick="submitJSON()" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors">
@@ -67,6 +72,99 @@
     </div>
 
     <script>
+    const GAME_TEMPLATE = [
+        {
+            "id": "my-rom-hack-id",
+            "title": "My ROM Hack Title",
+            "console": "GBA",
+            "version": "1.0",
+            "release_date": "2024-01-01",
+            "author": "Author Name",
+            "description": "Description of the hack...",
+            "features": [
+                "New Story",
+                "New Graphics",
+                "Quality of Life Improvements"
+            ],
+            "image_url": "/static/images/games/myhack.jpg",
+            "screenshots": [
+                "/static/images/games/myhack_1.jpg",
+                "/static/images/games/myhack_2.jpg"
+            ],
+            "download_link": "https://example.com/download.zip",
+            "base_game": "Pokemon FireRed",
+            "version_region": "USA",
+            "base_region": "USA",
+            "base_revision": "1.0",
+            "base_header": "POKEMON FIRE",
+            "base_checksum_crc32": "DEADBEEF",
+            "base_checksum_md5": "...",
+            "base_checksum_sha1": "...",
+            "patch_format": "ips",
+            "patch_output_ext": "gba",
+            "dev_stage": "Complete",
+            "popular": false,
+            "online_play": false,
+            "instruction": false,
+            "instruction_text": "Apply patch to clean USA ROM.",
+            "instructions_pc": "",
+            "instructions_android": "",
+            "discord_url": "",
+            "reddit_url": "",
+            "game_series": "Pokemon"
+        }
+    ];
+
+    const PORT_TEMPLATE = [
+        {
+            "id": "my-port-id",
+            "title": "My Port Title",
+            "console": "PC",
+            "version": "1.0",
+            "release_date": "2024-01-01",
+            "author": "Porter Name",
+            "description": "Description of the port...",
+            "features": [
+                "Widescreen Support",
+                "High FPS"
+            ],
+            "image_url": "/static/images/ports/myport.jpg",
+            "screenshots": [
+                "/static/images/ports/myport_1.jpg"
+            ],
+            "download_link": "https://github.com/user/project/releases/download/v1.0/release.zip",
+            "base_game": "Original Game Name",
+            "original_platform": "N64",
+            "popular": false,
+            "game_series": "Zelda"
+        }
+    ];
+
+    function loadTemplate() {
+        const type = document.getElementById('item_type').value;
+        const template = type === 'port' ? PORT_TEMPLATE : GAME_TEMPLATE;
+        document.getElementById('json_data').value = JSON.stringify(template, null, 4);
+    }
+
+    // Initialize template
+    document.addEventListener('DOMContentLoaded', function() {
+        const textarea = document.getElementById('json_data');
+        if (!textarea.value.trim()) {
+            loadTemplate();
+        }
+        
+        // Update template when type changes (if textarea matches a template or is empty)
+        document.getElementById('item_type').addEventListener('change', function() {
+            const currentVal = textarea.value.trim();
+            const gameJson = JSON.stringify(GAME_TEMPLATE, null, 4);
+            const portJson = JSON.stringify(PORT_TEMPLATE, null, 4);
+            
+            if (!currentVal || currentVal === gameJson || currentVal === portJson) {
+                loadTemplate();
+            }
+        });
+    });
+
     function submitJSON() {
         const jsonText = document.getElementById('json_data').value.trim();
         const itemType = document.getElementById('item_type').value;
