@@ -523,3 +523,114 @@ html, body {
     border-color: #fb923c;
     box-shadow: 0 0 15px rgba(251, 146, 60, 0.3);
 }
+
+/* =============================================
+   REVIEW SYSTEM STYLES - Steam-like Design
+   ============================================= */
+
+/* RetroAchievements Login Button */
+.ra-login-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    transition: all 0.2s ease;
+}
+.ra-login-btn:hover {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* Review Filter Buttons */
+.review-filter-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    background: #1b2838;
+    border: 1px solid #374151;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.review-filter-btn:hover {
+    color: #fff;
+    background: #374151;
+    border-color: #4b5563;
+}
+.review-filter-btn.active {
+    color: #60a5fa;
+    background: rgba(59, 130, 246, 0.15);
+    border-color: #3b82f6;
+}
+
+/* Review Card */
+.review-card {
+    background: linear-gradient(180deg, #171d25 0%, #1b2838 100%);
+    border: 1px solid #2a475e;
+    transition: all 0.2s ease;
+}
+.review-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+}
+
+/* Vote Buttons */
+.vote-btn {
+    transition: all 0.15s ease;
+}
+.vote-btn:hover:not(.bg-blue-600):not(.bg-red-600) {
+    background: #374151;
+}
+
+/* Recommendation Buttons */
+.recommendation-btn {
+    transition: all 0.2s ease;
+}
+.recommendation-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Toast Animation */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+}
+
+/* Rating Labels */
+.rating-overwhelmingly-positive {
+    color: #60a5fa;
+}
+.rating-very-positive {
+    color: #3b82f6;
+}
+.rating-positive {
+    color: #2563eb;
+}
+.rating-mixed {
+    color: #fbbf24;
+}
+.rating-negative {
+    color: #f97316;
+}
+.rating-overwhelmingly-negative {
+    color: #ef4444;
+}
+
+/* Animate spin for loading */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.animate-spin {
+    animation: spin 1s linear infinite;
+}

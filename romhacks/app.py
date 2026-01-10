@@ -32,14 +32,29 @@ from database import (
     check_and_archive_previous_month,
     get_all_archived_months,
     get_monthly_popular_history,
+    # Review system functions
+    submit_review,
+    get_reviews,
+    get_review_stats,
+    get_review_stats_batch,
+    has_user_reviewed,
+    vote_helpful,
+    delete_review,
+    get_user_votes,
 )
 import json
 import os
+import requests
 from functools import wraps
 from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')  # Change this!
+
+# RetroAchievements OAuth config
+RA_CLIENT_ID = os.environ.get('RA_CLIENT_ID', '')
+RA_CLIENT_SECRET = os.environ.get('RA_CLIENT_SECRET', '')
+RA_REDIRECT_URI = os.environ.get('RA_REDIRECT_URI', 'http://localhost:5000/auth/ra/callback')
 
 # Initialize rate limiter
 limiter = Limiter(
@@ -1073,6 +1088,251 @@ def submit_game_endpoint():
             'success': False,
             'error': result.get('error', 'Failed to submit game')
         }), 400
+
+
+# ============================================
+# RETROACHIEVEMENTS AUTHENTICATION
+# ============================================
+
+@app.route('/auth/ra/login')
+def ra_login():
+    """Initiate RetroAchievements OAuth login"""
+    # Store return URL if provided
+    return_url = request.args.get('return_url', '/')
+    session['ra_return_url'] = return_url
+    
+    # For now, redirect to a simple web API auth flow
+    # RA uses API key-based auth, so we'll use a simpler approach
+    return redirect(url_for('ra_login_page'))
+
+
+@app.route('/auth/ra/login-page')
+def ra_login_page():
+    """Show RetroAchievements login form"""
+    # Get return_url from query params first, then session, then default to /
+    return_url = request.args.get('return_url') or session.get('ra_return_url', '/')
+    session['ra_return_url'] = return_url
+    return render_template('ra_login.html', return_url=return_url)
+
+
+@app.route('/auth/ra/verify', methods=['POST'])
+@limiter.limit("10 per minute")
+def ra_verify():
+    """Verify RetroAchievements credentials using their Web API"""
+    data = request.get_json()
+    username = data.get('username', '').strip()
+    api_key = data.get('api_key', '').strip()
+    
+    if not username or not api_key:
+        return jsonify({'success': False, 'error': 'Username and API key are required'}), 400
+    
+    try:
+        # Verify credentials by fetching user profile
+        ra_url = f'https://retroachievements.org/API/API_GetUserSummary.php?z={username}&y={api_key}&u={username}'
+        response = requests.get(ra_url, timeout=10)
+        
+        if response.status_code == 200:
+            user_data = response.json()
+            
+            # Check if valid response (has required fields)
+            if user_data and 'ID' in user_data:
+                # Store in session
+                session['ra_user'] = {
+                    'username': username,
+                    'user_id': user_data.get('ID'),
+                    'profile_pic': f"https://retroachievements.org{user_data.get('UserPic', '/UserPic/_.png')}",
+                    'total_points': user_data.get('TotalPoints', 0),
+                    'api_key': api_key  # Store for future API calls
+                }
+                
+                return jsonify({
+                    'success': True,
+                    'user': {
+                        'username': username,
+                        'profile_pic': session['ra_user']['profile_pic'],
+                        'total_points': session['ra_user']['total_points']
+                    }
+                })
+        
+        return jsonify({'success': False, 'error': 'Invalid credentials'}), 401
+    except Exception as e:
+        return jsonify({'success': False, 'error': 'Failed to verify credentials'}), 500
+
+
+@app.route('/auth/ra/logout', methods=['POST'])
+def ra_logout():
+    """Log out RetroAchievements user"""
+    session.pop('ra_user', None)
+    return jsonify({'success': True})
+
+
+@app.route('/api/auth/status')
+def auth_status():
+    """Get current authentication status"""
+    ra_user = session.get('ra_user')
+    if ra_user:
+        return jsonify({
+            'logged_in': True,
+            'user': {
+                'username': ra_user['username'],
+                'profile_pic': ra_user['profile_pic'],
+                'total_points': ra_user['total_points']
+            }
+        })
+    return jsonify({'logged_in': False})
+
+
+# ============================================
+# REVIEW SYSTEM API ENDPOINTS
+# ============================================
+
+@app.route('/api/reviews/<game_id>', methods=['GET'])
+def get_game_reviews(game_id):
+    """Get reviews for a game"""
+    try:
+        game_type = request.args.get('type', 'romhack')
+        sort_by = request.args.get('sort', 'helpful')
+        filter_type = request.args.get('filter', 'all')
+        limit = min(int(request.args.get('limit', 50)), 100)
+        offset = int(request.args.get('offset', 0))
+        
+        # Get reviews (only with text for display)
+        reviews = get_reviews(game_id, game_type, sort_by, filter_type, limit, offset, with_text_only=True)
+        # Stats include ALL reviews (even those without text)
+        stats = get_review_stats(game_id, game_type)
+        
+        # Get current user's votes if logged in
+        ra_user = session.get('ra_user')
+        user_votes = {}
+        user_review = None
+        
+        if ra_user:
+            review_ids = [r['id'] for r in reviews]
+            if review_ids:
+                user_votes = get_user_votes(review_ids, ra_user['username'])
+            user_review = has_user_reviewed(game_id, game_type, ra_user['username'])
+        
+        return jsonify({
+            'reviews': reviews,
+            'stats': stats,
+            'user_votes': user_votes,
+            'user_review': user_review
+        })
+    except Exception as e:
+        print(f"Error fetching reviews: {e}")
+        return jsonify({
+            'reviews': [],
+            'stats': {'total': 0, 'positive': 0, 'negative': 0, 'percentage': 0, 'label': 'No Reviews', 'label_class': 'neutral'},
+            'user_votes': {},
+            'user_review': None,
+            'error': str(e)
+        })
+
+
+def fetch_ra_game_progress(username, api_key, ra_game_id):
+    """Fetch user's game progress from RetroAchievements"""
+    if not ra_game_id:
+        return None
+    try:
+        url = f'https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php?z={username}&y={api_key}&u={username}&g={ra_game_id}'
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            if data and 'NumAchievements' in data:
+                earned = data.get('NumAwardedToUser', 0) or 0
+                total = data.get('NumAchievements', 0) or 0
+                percentage = round((earned / total * 100), 1) if total > 0 else 0
+                return {
+                    'achievements_earned': earned,
+                    'achievements_total': total,
+                    'completion_percentage': percentage
+                }
+    except Exception as e:
+        print(f"Error fetching RA progress: {e}")
+    return None
+
+
+@app.route('/api/reviews/<game_id>', methods=['POST'])
+@limiter.limit("30 per hour")
+def post_game_review(game_id):
+    """Submit or update a review"""
+    try:
+        ra_user = session.get('ra_user')
+        if not ra_user:
+            return jsonify({'success': False, 'error': 'Login required'}), 401
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Invalid request data'}), 400
+            
+        game_type = data.get('type', 'romhack')
+        recommended = data.get('recommended')
+        review_text = data.get('review_text', '').strip()
+        ra_game_id = data.get('ra_game_id')  # Optional RA game ID for progress tracking
+        
+        if recommended is None:
+            return jsonify({'success': False, 'error': 'Please select thumbs up or down'}), 400
+        
+        # Fetch game progress if RA game ID provided
+        game_progress = None
+        if ra_game_id and ra_user.get('api_key'):
+            game_progress = fetch_ra_game_progress(ra_user['username'], ra_user['api_key'], ra_game_id)
+        
+        result = submit_review(
+            game_id=game_id,
+            game_type=game_type,
+            ra_username=ra_user['username'],
+            ra_user_id=ra_user.get('user_id'),
+            ra_profile_pic=ra_user.get('profile_pic'),
+            ra_total_points=ra_user.get('total_points', 0),
+            recommended=1 if recommended else 0,
+            review_text=review_text,
+            ra_game_id=ra_game_id,
+            game_progress=game_progress
+        )
+        
+        return jsonify(result)
+    except Exception as e:
+        print(f"Error submitting review: {e}")
+        return jsonify({'success': False, 'error': f'Server error: {str(e)}'}), 500
+
+
+@app.route('/api/reviews/batch', methods=['POST'])
+def get_batch_review_stats():
+    """Get review stats for multiple games at once"""
+    data = request.get_json()
+    game_ids = data.get('game_ids', [])
+    game_type = data.get('type', 'romhack')
+    
+    if not game_ids:
+        return jsonify({})
+    
+    stats = get_review_stats_batch(game_ids, game_type)
+    return jsonify(stats)
+
+
+@app.route('/api/reviews/vote/<int:review_id>', methods=['POST'])
+@limiter.limit("60 per minute")
+def vote_review(review_id):
+    """Vote on a review (helpful yes/no/funny)"""
+    ra_user = session.get('ra_user')
+    if not ra_user:
+        return jsonify({'success': False, 'error': 'Login required'}), 401
+    
+    data = request.get_json()
+    vote_type = data.get('vote_type', 'yes')
+    
+    result = vote_helpful(review_id, ra_user['username'], vote_type)
+    return jsonify(result)
+
+
+@app.route('/api/admin/reviews/<int:review_id>', methods=['DELETE'])
+@login_required
+def admin_delete_review(review_id):
+    """Admin: delete a review"""
+    result = delete_review(review_id)
+    return jsonify({'success': result})
+
 
 if __name__ == '__main__':
     app.config['TEMPLATES_AUTO_RELOAD'] = True

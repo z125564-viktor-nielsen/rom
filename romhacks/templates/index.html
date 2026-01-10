@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}ROM Hacks & Decompiled Ports | ROMHACKS.NET{% endblock %}
+{% block title %}Revive Your Library | Romhacks.net{% endblock %}
 
-{% block meta_description %}Discover popular ROM hacks and decompiled ports. Browse the database, read feature lists, and download patch files. Use the built-in web patcher locally in your browser.{% endblock %}
-{% block meta_keywords %}rom hacks, romhacks, pokemon rom hacks, decompiled ports, web patcher, patch files{% endblock %}
+{% block meta_description %}Discover ROM hacks & Decompiled Ports for your favourite platforms{% endblock %}
+{% block meta_keywords %}rom hacks, romhacks, pokemon rom hacks, pokemon romhacks, gba rom hacks, pokemon emerald rom hacks, pokemon firered rom hacks, mario rom hacks, zelda rom hacks, decompiled ports, web patcher, patch files{% endblock %}
 
 {% block json_ld %}
 <script type="application/ld+json">
@@ -49,7 +49,7 @@
 <section class="relative min-h-[320px] md:h-[380px] flex items-center justify-center overflow-hidden rounded-2xl -mt-6 mb-6 md:mb-8 mx-2 md:mx-4 bg-gradient-to-br from-blue-950 via-gray-900 to-blue-900 pixel-grid-bg">
     <div class="absolute inset-0 bg-gradient-to-t from-[#0f0f12] via-transparent to-transparent"></div>
     <div class="relative z-10 text-center px-4 max-w-4xl bg-gradient-to-br from-gray-900/95 to-blue-900/95 border border-blue-500/20 rounded-2xl py-5 px-4 md:py-7 md:px-8 backdrop-blur-md shadow-[0_8px_32px_rgba(59,130,246,0.15)] mx-2">
-        <h2 class="text-xl sm:text-2xl md:text-5xl font-bold mb-3 pixel-font text-white drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">Revive Your Library</h2>
+        <h1 class="text-xl sm:text-2xl md:text-5xl font-bold mb-3 pixel-font text-white drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">Revive Your Library</h1>
         <p class="text-sm md:text-lg text-gray-300 mb-4 md:mb-6 max-w-xl mx-auto leading-relaxed">Discover ROM hacks & Decompiled Ports for your favourite platforms</p>
         
         <div class="flex flex-col sm:flex-row justify-center gap-2 md:gap-4">
@@ -75,7 +75,7 @@
         </button>
         <div id="rom-hack-info" class="hidden overflow-hidden transition-all duration-300 max-h-0">
             <div class="px-4 py-4 bg-gray-900/50 border border-gray-700/30 border-t-0 rounded-b-lg text-left">
-                <p class="text-xs text-gray-400 leading-relaxed">A ROM hack is a modified version of an existing game created by fans. Using ROM hacking tools, developers modify game files to add new features, change gameplay mechanics, create new storylines, or improve graphics. Popular ROM hacks are based on games like Pokémon, Super Mario, The Legend of Zelda, and many more. You apply ROM hacks using patch files (.ips, .ups, .bps) combined with your own legally owned ROM of the original game.</p>
+                <p class="text-xs text-gray-400 leading-relaxed">Rom hacks (also spelled romhacks or ROM hacks) are modified versions of existing games created by fans. Pokemon rom hacks are especially popular, featuring games like Pokemon Emerald rom hacks, Pokemon FireRed rom hacks, and Pokemon Crystal rom hacks. Using rom hacking tools, developers modify game files to add new features, change gameplay mechanics, create new storylines, or improve graphics. Popular rom hacks are also based on Mario, Zelda, and many more classic games. You apply rom hacks using patch files (.ips, .ups, .bps) combined with your own legally owned ROM of the original game.</p>
             </div>
         </div>
     </div>
@@ -110,10 +110,12 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8" id="popular-grid">
             {% for game in games %}
-            <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-blue-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-blue-500/10" data-console="{{ game.console }}">
+            <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-blue-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-blue-500/10" data-console="{{ game.console }}" data-game-id="{{ game.id }}">
                 <a href="{{ url_for('game_page', game_id=game.id) }}" class="block relative h-48 overflow-hidden cursor-pointer bg-gradient-to-br from-gray-800 to-gray-900">
                     <img src="{{ game.image_url }}" referrerpolicy="no-referrer" class="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105" alt="{{ game.title }} - {{ game.console }} ROM Hack by {{ game.author }}">
                     <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
+                    <!-- Rating Badge -->
+                    <div class="rating-badge absolute top-3 right-3 hidden" data-game-id="{{ game.id }}"></div>
                     <div class="absolute bottom-3 left-3">
                         <span class="{{ styles.get(game.console | normalize_console, styles['default']) }} text-[10px] font-bold px-2 py-1 rounded-md border uppercase mb-1 inline-block">{{ game.console }}</span>
                         <h3 class="text-white font-bold text-lg leading-none shadow-black drop-shadow-md">{{ game.title }}</h3>
@@ -149,7 +151,7 @@
 
         <div class="text-center mb-12 md:mb-20">
             <a href="/romhacks" class="inline-block px-6 md:px-8 py-2.5 md:py-3 border border-blue-500/50 text-blue-400 hover:bg-blue-900/20 uppercase tracking-widest text-xs font-bold transition-all rounded-lg">
-                View All Romhacks
+                View All Rom Hacks
             </a>
         </div>
     </div>
@@ -167,10 +169,12 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8" id="ports-grid">
             {% for port in ports %}
-            <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-sky-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-sky-500/10" data-console="{{ (port.consoles or [port.console]) | join(' ') }}">
+            <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-sky-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-sky-500/10" data-console="{{ (port.consoles or [port.console]) | join(' ') }}" data-port-id="{{ port.id }}">
                 <a href="{{ url_for('port_page', port_id=port.id) }}" class="block relative h-48 overflow-hidden cursor-pointer bg-gradient-to-br from-gray-800 to-gray-900">
                     <img src="{{ port.image_url }}" referrerpolicy="no-referrer" class="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105" alt="{{ port.title }} - {{ (port.consoles or [port.console]) | join('/') }} Decompiled Port by {{ port.author }}">
                     <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
+                    <!-- Rating Badge -->
+                    <div class="rating-badge absolute top-3 right-3 hidden" data-port-id="{{ port.id }}"></div>
                     <div class="absolute bottom-3 left-3">
                         {% for c in (port.consoles or [port.console]) %}
                         <span class="{{ platform_styles.get(c, platform_styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[10px] font-bold px-2 py-1 rounded-md border uppercase mb-1 inline-block">{{ c }}</span>
@@ -313,6 +317,68 @@ function toggleDropdown(id) {
             element.classList.add('hidden');
         }, 300);
         toggleIcon.textContent = 'expand_more';
+    }
+}
+
+// Load rating badges for all games and ports
+document.addEventListener('DOMContentLoaded', async () => {
+    // Collect game IDs
+    const gameIds = [];
+    document.querySelectorAll('[data-game-id]').forEach(el => {
+        if (el.dataset.gameId) gameIds.push(el.dataset.gameId);
+    });
+    
+    // Collect port IDs
+    const portIds = [];
+    document.querySelectorAll('[data-port-id]').forEach(el => {
+        if (el.dataset.portId) portIds.push(el.dataset.portId);
+    });
+    
+    // Fetch game ratings
+    if (gameIds.length > 0) {
+        try {
+            const res = await fetch('/api/reviews/batch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ game_ids: gameIds, type: 'romhack' })
+            });
+            const stats = await res.json();
+            updateRatingBadges(stats, 'game');
+        } catch (err) { console.error('Failed to load game ratings:', err); }
+    }
+    
+    // Fetch port ratings
+    if (portIds.length > 0) {
+        try {
+            const res = await fetch('/api/reviews/batch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ game_ids: portIds, type: 'port' })
+            });
+            const stats = await res.json();
+            updateRatingBadges(stats, 'port');
+        } catch (err) { console.error('Failed to load port ratings:', err); }
+    }
+});
+
+function updateRatingBadges(stats, type) {
+    for (const [id, data] of Object.entries(stats)) {
+        if (data.total === 0) continue;
+        
+        const badge = document.querySelector(`.rating-badge[data-${type}-id="${id}"]`);
+        if (!badge) continue;
+        
+        const colorClass = data.label_class === 'positive' || data.label_class === 'very-positive' ? 'bg-blue-600' :
+                          data.label_class === 'mixed' ? 'bg-yellow-600' : 'bg-red-600';
+        const icon = data.percentage >= 70 ? 'thumb_up' : data.percentage >= 40 ? 'thumbs_up_down' : 'thumb_down';
+        
+        badge.innerHTML = `
+            <span class="${colorClass} text-white text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1 shadow-lg">
+                <span class="material-symbols-outlined text-xs">${icon}</span>
+                ${data.percentage}%
+            </span>
+        `;
+        badge.classList.remove('hidden');
     }
 }
 </script>

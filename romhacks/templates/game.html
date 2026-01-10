@@ -104,7 +104,7 @@
                 {% if social_links %}
                 <div class="flex flex-col gap-2">
                     {% for link in social_links %}
-                    <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gray-800/50 border border-gray-700/50 hover:border-blue-400/50 hover:bg-gray-800 transition-all group" title="{{ link.type|replace('_', ' ')|title }}">
+                    <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center {{ 'px-4 gap-2' if link.type == 'website' else 'w-10' }} h-10 rounded-lg bg-gray-800/50 border border-gray-700/50 hover:border-blue-400/50 hover:bg-gray-800 transition-all group" title="{{ link.type|replace('_', ' ')|title }}">
                         {% if link.type == 'twitter' %}
                         <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2s9 5 20 5a9.5 9.5 0 00-9-5.5c4.75 2.25 7-7 7-7a4.5 4.5 0 01-4.5-4.5"/></svg>
                         {% elif link.type == 'discord' %}
@@ -112,7 +112,8 @@
                         {% elif link.type == 'github' %}
                         <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v 3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                         {% elif link.type == 'website' %}
-                        <span class="material-symbols-outlined text-lg text-gray-400 group-hover:text-blue-400 transition-colors">language</span>
+                        <span class="material-symbols-outlined text-2xl text-gray-400 group-hover:text-blue-400 transition-colors">language</span>
+                        <span class="text-xs font-bold text-gray-300 group-hover:text-white">Project Website</span>
                         {% else %}
                         <span class="material-symbols-outlined text-lg text-gray-400 group-hover:text-blue-400 transition-colors">language</span>
                         {% endif %}
@@ -131,13 +132,15 @@
     </section>
 
     <!-- Screenshots and Info Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 no-crt-filter">
-        <!-- Screenshots on Left (if available) -->
-        {% if game.screenshots %}
-        <div class="lg:col-span-2 space-y-4 order-1">
-            <h3 class="text-xl font-bold text-white pixel-font flex items-center gap-2">
-                <span class="material-symbols-outlined text-blue-500">photo_library</span> Screenshots
-            </h3>
+    <div class="flex flex-col lg:flex-row gap-8 no-crt-filter">
+        <!-- LEFT COLUMN: Screenshots + Emulation Guide -->
+        <div class="flex-1 min-w-0 space-y-8">
+            <!-- Screenshots on Left (if available) -->
+            {% if game.screenshots %}
+            <div class="space-y-4">
+                <h3 class="text-xl font-bold text-white pixel-font flex items-center gap-2">
+                    <span class="material-symbols-outlined text-blue-500">photo_library</span> Screenshots
+                </h3>
             <!-- Main Screenshot Display -->
             <div id="main-screenshot-container" class="relative rounded-xl overflow-hidden border border-gray-700/50 bg-black/20 shadow-lg aspect-video group cursor-pointer">
                 <img id="main-screenshot" src="{{ game.screenshots[0] }}" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-contain" alt="{{ game.title }} Screenshot" decoding="async">
@@ -171,15 +174,110 @@
                 </div>
             </div>
             {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Emulation Guide Section - Now inside left column -->
+            {% if emulator_guide %}
+            <section>
+                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-700/50 pb-2 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-blue-500">videogame_asset</span>
+                    Emulation Guide for {{ emulator_guide.console_name }}
+                </h3>
+                
+                {% if game.instruction and game.instruction_text %}
+                <div class="mb-6 bg-red-900/30 p-4 rounded-lg border border-red-700/50">
+                    <div class="flex items-start gap-3 mb-2">
+                        <span class="material-symbols-outlined text-red-400 text-lg flex-shrink-0 mt-0.5">warning</span>
+                        <div>
+                            <div class="text-xs text-red-300 uppercase font-bold mb-2">This game has special instructions!</div>
+                            <p class="text-xs text-red-100 leading-relaxed whitespace-pre-wrap">{{ game.instruction_text }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if emulator_guide.guides %}
+                <div class="space-y-3">
+                    {% set platforms = ['windows', 'macos', 'linux', 'android', 'ios'] %}
+                    {% set platform_names = {'windows': 'PC (Windows)', 'macos': 'macOS', 'linux': 'Linux', 'android': 'Android', 'ios': 'iOS'} %}
+                    
+                    {% for platform in platforms %}
+                        {% set emulators = emulator_guide.guides.get(platform, []) %}
+                        {% if emulators %}
+                        <div class="border border-gray-700/50 rounded-lg overflow-hidden">
+                            <button 
+                                class="w-full px-6 py-4 bg-gray-900/50 hover:bg-gray-800/50 transition-all flex items-center justify-between group"
+                                onclick="toggleEmulatorGuide('{{ platform }}')">
+                                <div class="flex items-center gap-3">
+                                    {% if platform == 'windows' %}
+                                    <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M3,12V6.75L9,5.43V11.91L3,12M20,3V11.75L10,11.9V5.21L20,3M3,13L9,13.09V19.9L3,18.75V13M20,13.25V22L10,20.09V13.1L20,13.25Z"/></svg>
+                                    {% elif platform == 'macos' %}
+                                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                                    {% elif platform == 'linux' %}
+                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 00-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139z"/></svg>
+                                    {% elif platform == 'android' %}
+                                    <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.68-.04-.84.27l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.16-.31-.55-.42-.84-.27-.3.16-.42.54-.26.85L7.4 9.48c-3.5 2.55-5.4 6.2-5.4 10.52h17.98c0-4.32-1.9-7.97-5.38-10.52zM8 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm8 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+                                    {% elif platform == 'ios' %}
+                                    <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-5 18c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm5.5-3H6V4h11v13z"/></svg>
+                                    {% endif %}
+                                    <span class="font-bold text-white">{{ platform_names.get(platform, platform|title) }}</span>
+                                </div>
+                                <span class="material-symbols-outlined text-gray-400 group-hover:text-white transition-all transform text-lg font-bold" id="icon-{{ platform }}">expand_more</span>
+                            </button>
+                            
+                            <div id="guide-{{ platform }}" class="emulator-guide hidden max-h-0 overflow-hidden transition-all duration-300">
+                                <div class="space-y-4 px-6 py-4 bg-blue-900/20 border-t border-blue-500/30">
+                                    {% for emulator in emulators %}
+                                    <div class="border border-blue-500/20 rounded-lg p-4 bg-gray-800/30">
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                                            <div class="flex items-center gap-3">
+                                                {% if emulator.logo_svg %}
+                                                <div class="w-12 h-12 rounded bg-gray-700 flex items-center justify-center flex-shrink-0">
+                                                    {{ emulator.logo_svg|safe }}
+                                                </div>
+                                                {% endif %}
+                                                <div class="font-bold text-blue-300 text-lg">{{ emulator.name }}</div>
+                                            </div>
+                                            {% if emulator.link %}
+                                            <a href="{{ emulator.link }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-400/40 hover:scale-105 transform duration-200 group w-full sm:w-auto">
+                                                <span class="material-symbols-outlined text-sm text-white">language</span>
+                                                <span class="text-sm font-semibold text-white">Emulator Website</span>
+                                                <span class="material-symbols-outlined text-sm text-white group-hover:translate-x-1 transition-transform">arrow_outward</span>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mb-3">
+                                            <h5 class="text-xs font-bold text-blue-300 mb-1 flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-xs">download</span>
+                                                Installation
+                                            </h5>
+                                            <p class="text-xs text-gray-300 leading-relaxed whitespace-pre-line ml-4">{{ emulator.installation }}</p>
+                                        </div>
+                                        <div>
+                                            <h5 class="text-xs font-bold text-blue-300 mb-1 flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-xs">settings</span>
+                                                Configuration
+                                            </h5>
+                                            <p class="text-xs text-gray-300 leading-relaxed whitespace-pre-line ml-4">{{ emulator.configuration }}</p>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </section>
+            {% endif %}
         </div>
-        {% else %}
-        <!-- No screenshots - Empty left column -->
-        <div class="lg:col-span-2"></div>
-        {% endif %}
+        <!-- END LEFT COLUMN -->
 
-        <!-- Info Sidebar on Right -->
-        <div class="lg:col-span-1 space-y-6 order-2">
-            <div class="bg-gray-900/50 border border-gray-700/50 p-6 rounded-xl sticky top-24 shadow-lg">
+        <!-- RIGHT COLUMN: Info Sidebar -->
+        <div class="lg:w-80 flex-shrink-0">
+            <div class="bg-gray-900/50 border border-gray-700/50 p-6 rounded-xl shadow-lg">
                 <div class="mb-6">
                     <div class="text-xs text-gray-500 uppercase font-bold mb-1">Base Game</div>
                     <div class="text-sm text-gray-300">{{ game.base_game }}</div>
@@ -188,10 +286,29 @@
                     {% endif %}
                 </div>
 
+                {% if game.instruction and game.instruction_text %}
+                <div class="mb-6 bg-red-900/30 p-4 rounded-lg border border-red-700/50">
+                    <div class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-red-400 text-lg flex-shrink-0 mt-0.5">warning</span>
+                        <div>
+                            <div class="text-xs text-red-300 uppercase font-bold mb-2">Special Instructions!</div>
+                            <p class="text-xs text-red-100 leading-relaxed whitespace-pre-wrap">{{ game.instruction_text }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
 
+                <a href="{{ game.download_link }}" target="_blank" onclick="trackDownload('{{ game.id }}')" class="btn-retro w-full justify-center text-center py-4 mb-2">
+                    {% if is_port %}
+                        Download Port
+                    {% else %}
+                        Download Patch
+                    {% endif %}
+                </a>
+                <p class="text-[10px] text-gray-500 text-center mb-4 italic">Redirects to official download page</p>
                 
                 {% if game.base_region or game.base_revision or game.base_header or game.base_checksum_crc32 or game.base_checksum_md5 or game.base_checksum_sha1 or game.patch_format or game.patch_output_ext %}
-                <div class="mb-6 bg-black/30 p-4 rounded-lg border border-gray-700/50">
+                <div class="mb-4 bg-black/30 p-4 rounded-lg border border-gray-700/50">
                     <div class="text-xs text-gray-500 uppercase font-bold mb-3">Base Game Requirements</div>
                     <div class="space-y-2 text-xs">
                         {% if game.base_region %}
@@ -221,27 +338,6 @@
                     </div>
                 </div>
                 {% endif %}
-                
-                {% if game.instruction and game.instruction_text %}
-                <div class="mb-6 bg-red-900/30 p-4 rounded-lg border border-red-700/50">
-                    <div class="flex items-start gap-3 mb-2">
-                        <span class="material-symbols-outlined text-red-400 text-lg flex-shrink-0 mt-0.5">warning</span>
-                        <div>
-                            <div class="text-xs text-red-300 uppercase font-bold mb-2">This game has special instructions!</div>
-                            <p class="text-xs text-red-100 leading-relaxed whitespace-pre-wrap">{{ game.instruction_text }}</p>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                
-                <a href="{{ game.download_link }}" target="_blank" onclick="trackDownload('{{ game.id }}')" class="btn-retro w-full justify-center text-center py-4 mb-2">
-                    {% if is_port %}
-                        Download Port
-                    {% else %}
-                        Download Patch
-                    {% endif %}
-                </a>
-                <p class="text-[10px] text-gray-500 text-center mb-4 italic">Redirects to official download page</p>
                 
                 {% if game.official_website %}
                 <a href="{{ game.official_website }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-3 px-3 rounded-lg transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-400/40 mb-4">
@@ -358,107 +454,130 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Emulation Guide Section - Shows after download box on mobile -->
-        {% if emulator_guide %}
-        <div class="lg:col-span-2 order-3">
-            <section>
-                <h3 class="text-xl font-bold text-white mb-4 border-b border-gray-700/50 pb-2 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-blue-500">videogame_asset</span>
-                    Emulation Guide for {{ emulator_guide.console_name }}
-                </h3>
-                
-                {% if emulator_guide.guides %}
-                <div class="space-y-3">
-                    {% set platforms = ['windows', 'macos', 'linux', 'android', 'ios'] %}
-                    {% set platform_names = {'windows': 'PC (Windows)', 'macos': 'macOS', 'linux': 'Linux', 'android': 'Android', 'ios': 'iOS'} %}
-                    
-                    {% for platform in platforms %}
-                        {% set emulators = emulator_guide.guides.get(platform, []) %}
-                        {% if emulators %}
-                        <div class="border border-gray-700/50 rounded-lg overflow-hidden">
-                            <button 
-                                class="w-full px-6 py-4 bg-gray-900/50 hover:bg-gray-800/50 transition-all flex items-center justify-between group"
-                                onclick="toggleEmulatorGuide('{{ platform }}')">
-                                <div class="flex items-center gap-3">
-                                    <!-- Platform Icon -->
-                                    {% if platform == 'windows' %}
-                                    <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M3,12V6.75L9,5.43V11.91L3,12M20,3V11.75L10,11.9V5.21L20,3M3,13L9,13.09V19.9L3,18.75V13M20,13.25V22L10,20.09V13.1L20,13.25Z"/></svg>
-                                    {% elif platform == 'macos' %}
-                                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-                                    {% elif platform == 'linux' %}
-                                    <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 00-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139zm.529 3.405h.013c.213 0 .396.062.584.198.19.135.33.332.438.533.105.259.158.459.166.724 0-.02.006-.04.006-.06v.105a.086.086 0 01-.004-.021l-.004-.024a1.807 1.807 0 01-.15.706.953.953 0 01-.213.335.71.71 0 00-.088-.042c-.104-.045-.198-.064-.284-.133a1.312 1.312 0 00-.22-.066c.05-.06.146-.133.183-.198.053-.128.082-.264.088-.402v-.02a1.21 1.21 0 00-.061-.4c-.045-.134-.101-.2-.183-.333-.084-.066-.167-.132-.267-.132h-.016c-.093 0-.176.03-.262.132a.8.8 0 00-.205.334 1.18 1.18 0 00-.09.4v.019c.002.089.008.179.02.267-.193-.067-.438-.135-.607-.202a1.635 1.635 0 01-.018-.2v-.02a1.772 1.772 0 01.15-.768c.082-.22.232-.406.43-.533a.985.985 0 01.594-.2zm-2.962.059h.036c.142 0 .27.048.399.135.146.129.264.288.344.465.09.199.14.4.153.667v.004c.007.134.006.2-.002.266v.08c-.03.007-.056.018-.083.024-.152.055-.274.135-.393.2.012-.09.013-.18.003-.267v-.015c-.012-.133-.04-.2-.082-.333a.613.613 0 00-.166-.267.248.248 0 00-.183-.064h-.021c-.071.006-.13.04-.186.132a.552.552 0 00-.12.27.944.944 0 00-.023.33v.015c.012.135.037.2.08.334.046.134.098.2.166.268.01.009.02.018.034.024-.07.057-.117.07-.176.136a.304.304 0 01-.131.068 2.62 2.62 0 01-.275-.402 1.772 1.772 0 01-.155-.667 1.759 1.759 0 01.08-.668 1.43 1.43 0 01.283-.535c.128-.133.26-.2.418-.2zm1.37 1.706c.332 0 .733.065 1.216.399.293.2.523.269 1.052.468h.003c.255.136.405.266.478.399v-.131a.571.571 0 01.016.47c-.123.31-.516.643-1.063.842v.002c-.268.135-.501.333-.775.465-.276.135-.588.292-1.012.267a1.139 1.139 0 01-.448-.067 3.566 3.566 0 01-.322-.198c-.195-.135-.363-.332-.612-.465v-.005h-.005c-.4-.246-.616-.512-.686-.71-.07-.268-.005-.47.193-.6.224-.135.38-.271.483-.336.104-.074.143-.102.176-.131h.002v-.003c.169-.202.436-.47.839-.601.139-.036.294-.065.466-.065zm2.8 2.142c.358 1.417 1.196 3.475 1.735 4.473.286.534.855 1.659 1.102 3.024.156-.005.33.018.513.064.646-1.671-.546-3.467-1.089-3.966-.22-.2-.232-.335-.123-.335.59.534 1.365 1.572 1.646 2.757.13.535.16 1.104.021 1.67.067.028.135.06.205.067 1.032.534 1.413.938 1.23 1.537v-.043c-.06-.003-.12 0-.18 0h-.016c.151-.467-.182-.825-1.065-1.224-.915-.4-1.646-.336-1.77.465-.008.043-.013.066-.018.135-.068.023-.139.053-.209.064-.43.268-.662.669-.793 1.187-.13.533-.17 1.156-.205 1.869v.003c-.02.334-.17.838-.319 1.35-1.5 1.072-3.58 1.538-5.348.334a2.645 2.645 0 00-.402-.533 1.45 1.45 0 00-.275-.333c.182 0 .338-.03.465-.067a.615.615 0 00.314-.334c.108-.267 0-.697-.345-1.163-.345-.467-.931-.995-1.788-1.521-.63-.4-.986-.87-1.15-1.396-.165-.534-.143-1.085-.015-1.645.245-1.07.873-2.11 1.274-2.763.107-.065.037.135-.408.974-.396.751-1.14 2.497-.122 3.854a8.123 8.123 0 01.647-2.876c.564-1.278 1.743-3.504 1.836-5.268.048.036.217.135.289.202.218.133.38.333.59.465.21.201.477.335.876.335.039.003.075.006.11.006.412 0 .73-.134.997-.268.29-.134.52-.334.74-.4h.005c.467-.135.835-.402 1.044-.7zm2.185 8.958c.037.6.343 1.245.882 1.377.588.134 1.434-.333 1.791-.765l.211-.01c.315-.007.577.01.847.268l.003.003c.208.199.305.53.391.876.085.4.154.78.409 1.066.486.527.645.906.636 1.14l.003-.007v.018l-.003-.012c-.015.262-.185.396-.498.595-.63.401-1.746.712-2.457 1.57-.618.737-1.37 1.14-2.036 1.191-.664.053-1.237-.2-1.574-.898l-.005-.003c-.21-.4-.12-1.025.056-1.69.176-.668.428-1.344.463-1.897.037-.714.076-1.335.195-1.814.12-.465.308-.797.641-.984l.045-.022zm-10.814.049h.01c.053 0 .105.005.157.014.376.055.706.333 1.023.752l.91 1.664.003.003c.243.533.754 1.064 1.189 1.637.434.598.77 1.131.729 1.57v.006c-.057.744-.48 1.148-1.125 1.294-.645.135-1.52.002-2.395-.464-.968-.536-2.118-.469-2.857-.602-.369-.066-.61-.2-.723-.4-.11-.2-.113-.602.123-1.23v-.004l.002-.003c.117-.334.03-.752-.027-1.118-.055-.401-.083-.71.043-.94.16-.334.396-.4.69-.533.294-.135.64-.202.915-.47h.002v-.002c.256-.268.445-.601.668-.838.19-.201.38-.336.663-.336zm7.159-9.074c-.435.201-.945.535-1.488.535-.542 0-.97-.267-1.28-.466-.154-.134-.28-.268-.373-.335-.164-.134-.144-.333-.074-.333.109.016.129.134.199.2.096.066.215.2.36.333.292.2.68.467 1.167.467.485 0 1.053-.267 1.398-.466.195-.135.445-.334.648-.467.156-.136.149-.267.279-.267.128.016.034.134-.147.332a8.097 8.097 0 01-.69.468zm-1.082-1.583V5.64c-.006-.02.013-.042.029-.05.074-.043.18-.027.26.004.063 0 .16.067.15.135-.006.049-.085.066-.135.066-.055 0-.092-.043-.141-.068-.052-.018-.146-.008-.163-.065zm-.551 0c-.02.058-.113.049-.166.066-.047.025-.086.068-.14.068-.05 0-.13-.02-.136-.068-.01-.066.088-.133.15-.133.08-.031.184-.047.259-.005.019.009.036.03.03.05v.02h.003z"/></svg>
-                                    {% elif platform == 'android' %}
-                                    <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.68-.04-.84.27l-1.88 3.24c-2.86-1.21-6.08-1.21-8.94 0L5.65 5.67c-.16-.31-.55-.42-.84-.27-.3.16-.42.54-.26.85L7.4 9.48c-3.5 2.55-5.4 6.2-5.4 10.52h17.98c0-4.32-1.9-7.97-5.38-10.52zM8 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm8 0c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
-                                    {% elif platform == 'ios' %}
-                                    <svg class="w-5 h-5 text-gray-300" fill="currentColor" viewBox="0 0 24 24"><path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-5 18c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm5.5-3H6V4h11v13z"/></svg>
-                                    {% endif %}
-                                    <span class="font-bold text-white">{{ platform_names.get(platform, platform|title) }}</span>
-                                </div>
-                                <span class="material-symbols-outlined text-gray-400 group-hover:text-white transition-all transform text-lg font-bold" id="icon-{{ platform }}">expand_more</span>
-                            </button>
-                            
-                            <!-- Emulators for this platform -->
-                            <div 
-                                id="guide-{{ platform }}"
-                                class="emulator-guide hidden max-h-0 overflow-hidden transition-all duration-300">
-                                <div class="space-y-4 px-6 py-4 bg-blue-900/20 border-t border-blue-500/30">
-                                    {% for emulator in emulators %}
-                                    <div class="border border-blue-500/20 rounded-lg p-4 bg-gray-800/30">
-                                        <!-- Emulator Header with Logo and Link -->
-                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                                            <div class="flex items-center gap-3">
-                                                <!-- Emulator Logo -->
-                                                {% if emulator.logo_svg %}
-                                                <div class="w-12 h-12 rounded bg-gray-700 flex items-center justify-center flex-shrink-0">
-                                                    {{ emulator.logo_svg|safe }}
-                                                </div>
-                                                {% endif %}
-                                                <div>
-                                                    <div class="font-bold text-blue-300 text-lg">{{ emulator.name }}</div>
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- Link to emulator website -->
-                                            {% if emulator.link %}
-                                            <a href="{{ emulator.link }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-400/40 hover:scale-105 transform duration-200 group w-full sm:w-auto">
-                                                <span class="material-symbols-outlined text-sm text-white">language</span>
-                                                <span class="text-sm font-semibold text-white">Emulator Website</span>
-                                                <span class="material-symbols-outlined text-sm text-white group-hover:translate-x-1 transition-transform">arrow_outward</span>
-                                            </a>
-                                            {% endif %}
-                                        </div>
-                                        
-                                        <!-- Installation -->
-                                        <div class="mb-3">
-                                            <h5 class="text-xs font-bold text-blue-300 mb-1 flex items-center gap-1">
-                                                <span class="material-symbols-outlined text-xs">download</span>
-                                                Installation
-                                            </h5>
-                                            <p class="text-xs text-gray-300 leading-relaxed whitespace-pre-line ml-4">{{ emulator.installation }}</p>
-                                        </div>
-                                        
-                                        <!-- Configuration -->
-                                        <div>
-                                            <h5 class="text-xs font-bold text-blue-300 mb-1 flex items-center gap-1">
-                                                <span class="material-symbols-outlined text-xs">settings</span>
-                                                Configuration
-                                            </h5>
-                                            <p class="text-xs text-gray-300 leading-relaxed whitespace-pre-line ml-4">{{ emulator.configuration }}</p>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                </div>
+        <!-- END RIGHT COLUMN -->
+    </div>
+    <!-- END Screenshots and Info Section -->
+
+    <!-- ============================================ -->
+    <!-- REVIEWS SECTION - Steam-style with RA Login -->
+    <!-- ============================================ -->
+    <section class="mt-12 w-full max-w-6xl mx-auto px-4" id="reviews-section">
+        <div class="flex flex-col md:flex-row gap-6 w-full">
+            <!-- Left: Reviews Feed -->
+            <div class="flex-1 min-w-0 w-full">
+                <!-- Header -->
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-3xl text-blue-400">reviews</span>
+                    <h2 class="text-2xl font-bold text-white pixel-font">Reviews</h2>
+                </div>
+
+                <!-- Login CTA (shown when not logged in) -->
+                <div id="login-cta" class="hidden bg-gradient-to-r from-[#16202d] to-[#1b2838] p-6 rounded-xl border border-[#2a475e] shadow-lg mb-6">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg text-white font-bold mb-1">Played {{ game.title }}?</h3>
+                            <p class="text-sm text-gray-400">Log in with RetroAchievements to share your experience!</p>
+                        </div>
+                        <button onclick="openRALogin()" class="ra-login-btn text-white px-6 py-3 rounded-lg font-bold shadow-lg flex items-center gap-2 whitespace-nowrap">
+                            <span class="material-symbols-outlined text-yellow-300">emoji_events</span>
+                            Login with RA
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Review Form (shown when logged in) -->
+                <div id="review-form-container" class="hidden bg-[#16202d] p-6 rounded-xl border border-gray-700/50 mb-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img id="user-avatar" src="" alt="" class="w-12 h-12 rounded-lg border border-gray-600">
+                        <div>
+                            <div id="user-name" class="text-white font-bold"></div>
+                            <div class="text-xs text-gray-500 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs text-yellow-500">emoji_events</span>
+                                <span id="user-points">0</span> points
                             </div>
                         </div>
-                        {% endif %}
-                    {% endfor %}
+                        <button onclick="logoutRA()" class="ml-auto text-xs text-gray-500 hover:text-red-400 transition">Logout</button>
+                    </div>
+
+                    <form id="review-form" onsubmit="submitReview(event)">
+                        <!-- Thumbs Up/Down Selection -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-300 mb-3">Do you recommend this ROM hack?</label>
+                            <div class="flex gap-3">
+                                <button type="button" onclick="selectRecommendation(true)" id="btn-recommend" 
+                                    class="flex-1 py-4 px-6 rounded-lg border-2 border-gray-600 bg-gray-800/50 hover:border-blue-500 transition flex items-center justify-center gap-3 group recommendation-btn">
+                                    <span class="material-symbols-outlined text-3xl text-gray-400 group-hover:text-blue-400 transition">thumb_up</span>
+                                    <span class="text-gray-300 font-medium">Yes</span>
+                                </button>
+                                <button type="button" onclick="selectRecommendation(false)" id="btn-not-recommend"
+                                    class="flex-1 py-4 px-6 rounded-lg border-2 border-gray-600 bg-gray-800/50 hover:border-red-500 transition flex items-center justify-center gap-3 group recommendation-btn">
+                                    <span class="material-symbols-outlined text-3xl text-gray-400 group-hover:text-red-400 transition">thumb_down</span>
+                                    <span class="text-gray-300 font-medium">No</span>
+                                </button>
+                            </div>
+                            <input type="hidden" name="recommended" id="recommended-input" value="">
+                        </div>
+
+                        <!-- Review Text -->
+                        <div class="mb-4">
+                            <label for="review-text" class="block text-sm font-medium text-gray-300 mb-2">Your Review (optional)</label>
+                            <textarea id="review-text" name="review_text" rows="4" 
+                                class="w-full bg-[#0f0f12] border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition resize-none"
+                                placeholder="Write your thoughts about this ROM hack..."></textarea>
+                        </div>
+
+                        <button type="submit" id="submit-review-btn"
+                            class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg font-bold transition flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">send</span>
+                            Post Review
+                        </button>
+                    </form>
                 </div>
-                {% endif %}
-            </section>
+
+                <!-- Filter Bar -->
+                <div class="bg-[#101822] p-4 rounded-lg flex flex-col sm:flex-row justify-between items-center border border-gray-800 gap-4 mb-4">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button onclick="filterReviews('all')" class="review-filter-btn active" data-filter="all">All</button>
+                        <button onclick="filterReviews('positive')" class="review-filter-btn" data-filter="positive">
+                            <span class="material-symbols-outlined text-sm text-blue-400">thumb_up</span> Positive
+                        </button>
+                        <button onclick="filterReviews('negative')" class="review-filter-btn" data-filter="negative">
+                            <span class="material-symbols-outlined text-sm text-red-400">thumb_down</span> Negative
+                        </button>
+                    </div>
+                    <select id="sort-select" onchange="sortReviews(this.value)" class="bg-[#1b2838] text-sm text-blue-400 border border-gray-700 rounded px-3 py-2 outline-none focus:border-blue-500">
+                        <option value="helpful">Most Helpful</option>
+                        <option value="recent">Most Recent</option>
+                    </select>
+                </div>
+
+                <!-- Reviews List -->
+                <div id="reviews-list" class="space-y-4 min-h-[300px] overflow-hidden break-words w-full">
+                    <div class="text-center py-8 text-gray-500">
+                        <span class="material-symbols-outlined text-4xl mb-2 block">hourglass_empty</span>
+                        Loading reviews...
+                    </div>
+                </div>
+
+                <!-- Load More -->
+                <button id="load-more-btn" onclick="loadMoreReviews()" class="hidden w-full py-3 bg-gray-800 hover:bg-gray-700 text-white text-sm font-bold rounded-lg transition mt-4">
+                    Load More Reviews
+                </button>
+            </div>
+
+            <!-- Right: Stats Sidebar -->
+            <aside class="w-full md:w-72 flex-shrink-0">
+                <div class="bg-[#121921] p-6 rounded-xl border border-gray-800 sticky top-24">
+                    <h3 class="text-sm text-blue-400 font-bold uppercase mb-4">Overall Rating</h3>
+                    
+                    <div id="rating-summary" class="text-center py-6">
+                        <div class="text-5xl font-bold text-gray-500 mb-2">—</div>
+                        <div class="text-gray-500 text-sm">No reviews yet</div>
+                    </div>
+                </div>
+            </aside>
         </div>
-        {% endif %}
-    </div>
+    </section>
 
     <!-- Claim It Section -->
     <div class="mt-16 mb-12 bg-[#1a1a20] border border-gray-800/50 rounded-xl p-8 text-center max-w-6xl mx-auto">
@@ -841,6 +960,448 @@ function toggleEmulatorGuide(platform) {
         }, 300);
         if (icon) icon.textContent = 'expand_more';
     }
+}
+
+// ============================================
+// REVIEW SYSTEM
+// ============================================
+const GAME_ID = '{{ game.id }}';
+const GAME_TYPE = 'romhack';
+let currentUser = null;
+let currentFilter = 'all';
+let currentSort = 'helpful';
+let reviewsOffset = 0;
+const REVIEWS_LIMIT = 20;
+let selectedRecommendation = null;
+
+// Initialize review system
+document.addEventListener('DOMContentLoaded', () => {
+    checkAuthStatus();
+    loadReviews();
+});
+
+// Check if user is logged in
+async function checkAuthStatus() {
+    try {
+        const res = await fetch('/api/auth/status');
+        const data = await res.json();
+        
+        if (data.logged_in) {
+            currentUser = data.user;
+            showLoggedInUI();
+        } else {
+            showLoginCTA();
+        }
+    } catch (err) {
+        showLoginCTA();
+    }
+}
+
+function showLoginCTA() {
+    document.getElementById('login-cta').classList.remove('hidden');
+    document.getElementById('review-form-container').classList.add('hidden');
+}
+
+function showLoggedInUI() {
+    document.getElementById('login-cta').classList.add('hidden');
+    document.getElementById('review-form-container').classList.remove('hidden');
+    
+    // Set user info
+    document.getElementById('user-avatar').src = currentUser.profile_pic;
+    document.getElementById('user-avatar').alt = currentUser.username;
+    document.getElementById('user-name').textContent = currentUser.username;
+    document.getElementById('user-points').textContent = currentUser.total_points.toLocaleString();
+    
+    // Reset button text (will be updated by loadReviews if user has reviewed)
+    const submitBtn = document.getElementById('submit-review-btn');
+    submitBtn.innerHTML = '<span class="material-symbols-outlined">send</span> Post Review';
+}
+
+function openRALogin() {
+    window.location.href = `/auth/ra/login-page?return_url=${encodeURIComponent(window.location.pathname + '#reviews-section')}`;
+}
+
+async function logoutRA() {
+    try {
+        await fetch('/auth/ra/logout', { method: 'POST' });
+        currentUser = null;
+        showLoginCTA();
+        loadReviews(); // Reload to clear user votes
+    } catch (err) {
+        console.error('Logout failed:', err);
+    }
+}
+
+// Select recommendation (thumbs up/down)
+function selectRecommendation(recommended) {
+    selectedRecommendation = recommended;
+    
+    const yesBtn = document.getElementById('btn-recommend');
+    const noBtn = document.getElementById('btn-not-recommend');
+    
+    // Reset both
+    yesBtn.classList.remove('border-blue-500', 'bg-blue-500/20');
+    noBtn.classList.remove('border-red-500', 'bg-red-500/20');
+    yesBtn.querySelector('.material-symbols-outlined').classList.remove('text-blue-400');
+    noBtn.querySelector('.material-symbols-outlined').classList.remove('text-red-400');
+    yesBtn.querySelector('.material-symbols-outlined').classList.add('text-gray-400');
+    noBtn.querySelector('.material-symbols-outlined').classList.add('text-gray-400');
+    
+    if (recommended === true) {
+        yesBtn.classList.add('border-blue-500', 'bg-blue-500/20');
+        yesBtn.querySelector('.material-symbols-outlined').classList.remove('text-gray-400');
+        yesBtn.querySelector('.material-symbols-outlined').classList.add('text-blue-400');
+    } else if (recommended === false) {
+        noBtn.classList.add('border-red-500', 'bg-red-500/20');
+        noBtn.querySelector('.material-symbols-outlined').classList.remove('text-gray-400');
+        noBtn.querySelector('.material-symbols-outlined').classList.add('text-red-400');
+    }
+    // If recommended is null, both stay reset (gray)
+    
+    document.getElementById('recommended-input').value = recommended === true ? '1' : (recommended === false ? '0' : '');
+}
+
+// Submit review
+async function submitReview(e) {
+    e.preventDefault();
+    
+    if (selectedRecommendation === null) {
+        alert('Please select whether you recommend this ROM hack or not.');
+        return;
+    }
+    
+    const btn = document.getElementById('submit-review-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Submitting...';
+    
+    try {
+        const res = await fetch(`/api/reviews/${GAME_ID}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: GAME_TYPE,
+                recommended: selectedRecommendation,
+                review_text: document.getElementById('review-text').value.trim()
+            })
+        });
+        
+        // Handle rate limiting (429)
+        if (res.status === 429) {
+            alert('Too many requests. Please wait a few minutes before submitting another review.');
+            return;
+        }
+        
+        // Check if response is JSON
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            console.error('Non-JSON response:', res.status);
+            alert('Server error. Please try again later.');
+            return;
+        }
+        
+        const data = await res.json();
+        
+        if (data.success) {
+            // Show success message
+            const reviewText = document.getElementById('review-text').value.trim();
+            const confirmMsg = reviewText 
+                ? '✓ Review posted successfully!' 
+                : '✓ Rating submitted! (Add text to display in reviews)';
+            
+            // Create toast notification
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 animate-fade-in';
+            toast.innerHTML = `
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>${confirmMsg}</span>
+            `;
+            document.body.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+            
+            // Reset form
+            document.getElementById('review-text').value = '';
+            selectedRecommendation = null;
+            selectRecommendation(null);
+            
+            // Reload reviews without showing loader to prevent flicker
+            reviewsOffset = 0;
+            loadReviews(false, false);
+        } else {
+            console.error('Submit error:', data.error);
+            alert(data.error || 'Failed to submit review');
+        }
+    } catch (err) {
+        console.error('Connection error:', err);
+        alert('Failed to submit review. Please try again.');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined">send</span> Post Review';
+    }
+}
+
+// Load reviews
+async function loadReviews(append = false, showLoader = true) {
+    if (!append) {
+        reviewsOffset = 0;
+        if (showLoader) {
+            document.getElementById('reviews-list').innerHTML = `
+                <div class="text-center py-8 text-gray-500">
+                    <span class="material-symbols-outlined text-4xl mb-2 block animate-spin">refresh</span>
+                    Loading reviews...
+                </div>
+            `;
+        }
+    }
+    
+    try {
+        const res = await fetch(`/api/reviews/${GAME_ID}?type=${GAME_TYPE}&sort=${currentSort}&filter=${currentFilter}&limit=${REVIEWS_LIMIT}&offset=${reviewsOffset}`);
+        
+        // Check if response is JSON
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            console.error('Non-JSON response:', res.status, await res.text());
+            throw new Error('Server returned non-JSON response');
+        }
+        
+        const data = await res.json();
+        console.log('Reviews API response:', data);
+        
+        if (data.error) {
+            console.error('API Error:', data.error);
+        }
+        
+        renderReviewStats(data.stats || {total: 0, positive: 0, negative: 0, percentage: 0, label: 'No Reviews', label_class: 'neutral'});
+        renderReviews(data.reviews || [], data.user_votes || {}, data.user_review, append);
+        
+        // Show/hide load more button
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        if (data.reviews.length >= REVIEWS_LIMIT) {
+            loadMoreBtn.classList.remove('hidden');
+        } else {
+            loadMoreBtn.classList.add('hidden');
+        }
+        
+        // If user has already reviewed, populate form
+        if (data.user_review && currentUser) {
+            document.getElementById('review-text').value = data.user_review.review_text || '';
+            selectRecommendation(data.user_review.recommended === 1);
+            
+            // Update button text to show it's an update
+            const submitBtn = document.getElementById('submit-review-btn');
+            submitBtn.innerHTML = '<span class="material-symbols-outlined">edit</span> Update Review';
+        } else if (currentUser) {
+            // Reset button text if no review exists
+            const submitBtn = document.getElementById('submit-review-btn');
+            submitBtn.innerHTML = '<span class="material-symbols-outlined">send</span> Post Review';
+        }
+    } catch (err) {
+        console.error('Failed to load reviews:', err);
+        document.getElementById('reviews-list').innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <span class="material-symbols-outlined text-4xl mb-2 block">error</span>
+                Failed to load reviews
+            </div>
+        `;
+    }
+}
+
+function renderReviewStats(stats) {
+    const summaryEl = document.getElementById('rating-summary');
+    
+    if (stats.total === 0) {
+        summaryEl.innerHTML = `
+            <div class="text-5xl font-bold text-gray-500 mb-2">—</div>
+            <div class="text-gray-500 text-sm">No reviews yet</div>
+            <div class="text-gray-600 text-xs mt-1">Be the first to review!</div>
+        `;
+    } else {
+        const labelClass = stats.label_class === 'very-positive' ? 'text-blue-400' :
+                          stats.label_class === 'positive' ? 'text-blue-300' :
+                          stats.label_class === 'mixed' ? 'text-yellow-400' :
+                          stats.label_class === 'negative' ? 'text-orange-400' :
+                          stats.label_class === 'very-negative' ? 'text-red-400' : 'text-gray-400';
+        
+        const reviewCount = stats.total.toLocaleString();
+        
+        summaryEl.innerHTML = `
+            <div class="text-4xl font-bold ${labelClass} mb-1">${stats.percentage}%</div>
+            <div class="${labelClass} font-bold text-lg mb-2">${stats.label}</div>
+            <div class="text-gray-500 text-sm">(${reviewCount} review${stats.total !== 1 ? 's' : ''})</div>
+        `;
+    }
+}
+
+function renderReviews(reviews, userVotes, userReview, append) {
+    const container = document.getElementById('reviews-list');
+    
+    if (!append) {
+        container.innerHTML = '';
+    }
+    
+    if (reviews.length === 0 && !append) {
+        // Determine message based on filter
+        let message = 'No written reviews yet';
+        let subMessage = 'Be the first to write a review!';
+        
+        if (currentFilter === 'positive') {
+            message = 'No positive reviews yet';
+            subMessage = 'Be the first to recommend this!';
+        } else if (currentFilter === 'negative') {
+            message = 'No negative reviews yet';
+            subMessage = 'All reviews are positive so far!';
+        }
+        
+        container.innerHTML = `
+            <div class="text-center py-12 text-gray-500 w-full">
+                <span class="material-symbols-outlined text-5xl mb-3 block">rate_review</span>
+                <div class="text-lg mb-1">${message}</div>
+                <div class="text-sm">${subMessage}</div>
+            </div>
+        `;
+        return;
+    }
+    
+    reviews.forEach(review => {
+        const isRecommended = review.recommended === 1;
+        const thumbIcon = isRecommended ? 'thumb_up' : 'thumb_down';
+        const thumbColor = isRecommended ? 'text-blue-400' : 'text-red-400';
+        const recText = isRecommended ? 'Recommended' : 'Not Recommended';
+        const userVote = userVotes[review.id];
+        
+        // Build progress display
+        let progressHtml = '';
+        if (review.achievements_total > 0) {
+            progressHtml = `
+                <div class="bg-[#0f1419] px-3 py-2 rounded mt-2 text-xs flex items-center gap-3 border border-gray-800">
+                    <span class="material-symbols-outlined text-yellow-500 text-base">military_tech</span>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-gray-400">Progress</span>
+                            <span class="text-yellow-400 font-bold">${review.completion_percentage}%</span>
+                        </div>
+                        <div class="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-yellow-500 to-yellow-400" style="width: ${review.completion_percentage}%"></div>
+                        </div>
+                        <div class="text-gray-500 mt-1">${review.achievements_earned} / ${review.achievements_total} achievements</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        const card = document.createElement('div');
+        card.className = 'review-card flex p-4 rounded-lg gap-4';
+        card.innerHTML = `
+            <div class="flex flex-col items-center gap-2 min-w-[70px]">
+                <img src="${review.ra_profile_pic || '/static/img/default-avatar.png'}" 
+                     alt="${review.ra_username}" 
+                     class="w-12 h-12 rounded-lg border-2 border-gray-700">
+                <div class="text-xs text-gray-300 font-bold text-center truncate w-full">${review.ra_username}</div>
+                ${review.ra_total_points > 0 ? `
+                    <div class="text-[10px] text-gray-500 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs text-yellow-500">emoji_events</span>
+                        ${review.ra_total_points.toLocaleString()}
+                    </div>
+                ` : ''}
+            </div>
+            
+            <div class="flex-1 min-w-0">
+                <div class="bg-[#121921] p-3 mb-3 rounded flex items-center gap-3">
+                    <span class="material-symbols-outlined text-3xl ${thumbColor}">${thumbIcon}</span>
+                    <div>
+                        <div class="text-white font-bold">${recText}</div>
+                        <div class="text-xs text-gray-500">
+                            Posted ${new Date(review.created_at).toLocaleDateString()}
+                        </div>
+                    </div>
+                </div>
+                
+                ${progressHtml}
+                
+                ${review.review_text ? `
+                    <p class="text-gray-300 text-sm leading-relaxed ${progressHtml ? 'mt-3' : ''} mb-4 whitespace-pre-wrap">${escapeHtml(review.review_text)}</p>
+                ` : ''}
+                
+                <div class="border-t border-gray-700 pt-3 mt-3 flex flex-wrap items-center gap-3">
+                    <span class="text-xs text-gray-500">Helpful?</span>
+                    <button onclick="voteReview(${review.id}, 'yes')" 
+                            class="vote-btn flex items-center gap-1 px-3 py-1.5 rounded text-xs transition ${userVote === 'yes' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}">
+                        <span class="material-symbols-outlined text-sm">thumb_up</span> 
+                        <span>${review.helpful_yes}</span>
+                    </button>
+                    <button onclick="voteReview(${review.id}, 'no')" 
+                            class="vote-btn flex items-center gap-1 px-3 py-1.5 rounded text-xs transition ${userVote === 'no' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}">
+                        <span class="material-symbols-outlined text-sm">thumb_down</span>
+                        <span>${review.helpful_no}</span>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Vote on review
+async function voteReview(reviewId, voteType) {
+    if (!currentUser) {
+        openRALogin();
+        return;
+    }
+    
+    try {
+        const res = await fetch(`/api/reviews/vote/${reviewId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vote_type: voteType })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+            // Reload reviews to update counts without showing loader
+            loadReviews(false, false);
+        } else if (data.error === 'Login required') {
+            openRALogin();
+        }
+    } catch (err) {
+        console.error('Vote failed:', err);
+    }
+}
+
+// Filter and sort
+function filterReviews(filter) {
+    currentFilter = filter;
+    
+    // Update button styles
+    document.querySelectorAll('.review-filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.filter === filter) {
+            btn.classList.add('active');
+        }
+    });
+    
+    loadReviews(false, false); // Don't show loader for instant filter
+}
+
+function sortReviews(sort) {
+    currentSort = sort;
+    loadReviews(false, false); // Don't show loader for instant sort
+}
+
+function loadMoreReviews() {
+    reviewsOffset += REVIEWS_LIMIT;
+    loadReviews(true);
 }
 </script>
 {% endblock %}

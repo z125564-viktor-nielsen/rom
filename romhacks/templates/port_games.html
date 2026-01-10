@@ -62,15 +62,14 @@
                 {% if social_links %}
                 <div class="flex flex-col gap-2">
                     {% for link in social_links %}
-                    <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gray-800/50 border border-gray-700/50 hover:border-blue-400/50 hover:bg-gray-800 transition-all group" title="{{ link.type|replace('_', ' ')|title }}">
+                    <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center {{ 'px-4 gap-2' if link.type == 'website' else 'w-12' }} h-12 rounded-lg bg-gray-800/50 border border-gray-700/50 hover:border-blue-400/50 hover:bg-gray-800 transition-all group" title="{{ link.type|replace('_', ' ')|title }}">
                         {% if link.type == 'twitter' %}
                         <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2s9 5 20 5a9.5 9.5 0 00-9-5.5c4.75 2.25 7-7 7-7a4.5 4.5 0 01-4.5-4.5"/></svg>
                         {% elif link.type == 'discord' %}
                         <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.369a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.211.375-.445.864-.607 1.25a18.27 18.27 0 00-5.487 0c-.162-.386-.395-.875-.607-1.25a.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.08.08 0 00.087-.027c.461-.63.873-1.295 1.226-1.994a.076.076 0 00-.042-.106 13.107 13.107 0 01-1.872-.892.077.077 0 00-.008-.128 10.72 10.72 0 00.372-.294.075.075 0 00.076-.01c3.928 1.793 8.18 1.793 12.062 0a.075.075 0 00.076.009c.12.098.246.198.373.294a.077.077 0 00-.006.127 12.299 12.299 0 01-1.873.892.076.076 0 00-.041.107c.36.699.772 1.365 1.225 1.994a.08.08 0 00.087.028 19.86 19.86 0 006.002-3.03.077.077 0 00.032-.056c.5-4.506.8-8.987.111-13.374a.07.07 0 00-.031-.027zM8.02 15.33c-1.183 0-2.157-.965-2.157-2.156 0-1.193.964-2.157 2.157-2.157 1.193 0 2.156.964 2.156 2.157 0 1.19-.963 2.156-2.156 2.156zm7.975 0c-1.183 0-2.157-.965-2.157-2.156 0-1.193.964-2.157 2.157-2.157 1.193 0 2.157.964 2.157 2.157 0 1.19-.964 2.156-2.157 2.156z"/></svg>
-                        {% elif link.type == 'github' %}
-                        <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-400 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v 3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                         {% elif link.type == 'website' %}
-                        <span class="material-symbols-outlined text-lg text-gray-400 group-hover:text-blue-400 transition-colors">language</span>
+                        <span class="material-symbols-outlined text-2xl text-gray-400 group-hover:text-blue-400 transition-colors">language</span>
+                        <span class="text-xs font-bold text-gray-300 group-hover:text-white">Project Website</span>
                         {% else %}
                         <span class="material-symbols-outlined text-lg text-gray-400 group-hover:text-blue-400 transition-colors">language</span>
                         {% endif %}
@@ -83,7 +82,7 @@
     </div>
 
     <!-- Screenshots and Info Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-crt-filter">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-crt-filter" style="align-items: start;">
         <!-- Main Content Column -->
         <div class="lg:col-span-2 space-y-8 flex flex-col">
             <!-- Screenshots Section -->
@@ -223,7 +222,7 @@
 
         <!-- Info Sidebar on Right -->
         <div class="lg:col-span-1 space-y-6 order-2 lg:order-3">
-            <div class="bg-gray-900/50 border border-gray-700/50 p-6 rounded-xl sticky top-24 shadow-lg">
+            <div class="bg-gray-900/50 border border-gray-700/50 p-6 rounded-xl shadow-lg">
                 <div class="mb-6">
                     <div class="text-xs text-gray-500 uppercase font-bold mb-1">Base Game</div>
                     <div class="text-sm text-gray-300">{{ game.base_game }}</div>
@@ -349,6 +348,143 @@
                     </a>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- REVIEWS SECTION - Steam-style with RA Login -->
+    <!-- ============================================ -->
+    <section class="mt-12 max-w-6xl mx-auto" id="reviews-section">
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- Left: Reviews Feed -->
+            <div class="flex-1" style="min-width: 0; width: 100%;">
+                <!-- Header -->
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="material-symbols-outlined text-3xl text-blue-400">reviews</span>
+                    <h2 class="text-2xl font-bold text-white pixel-font">Customer Reviews</h2>
+                </div>
+
+                <!-- Login CTA (shown when not logged in) -->
+                <div id="login-cta" class="hidden bg-gradient-to-r from-[#16202d] to-[#1b2838] p-6 rounded-xl border border-[#2a475e] shadow-lg mb-6">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg text-white font-bold mb-1">Played {{ game.title }}?</h3>
+                            <p class="text-sm text-gray-400">Log in with RetroAchievements to share your experience!</p>
+                        </div>
+                        <button onclick="openRALogin()" class="ra-login-btn text-white px-6 py-3 rounded-lg font-bold shadow-lg flex items-center gap-2 whitespace-nowrap">
+                            <span class="material-symbols-outlined text-yellow-300">emoji_events</span>
+                            Login with RA
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Review Form (shown when logged in) -->
+                <div id="review-form-container" class="hidden bg-[#16202d] p-6 rounded-xl border border-gray-700/50 mb-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img id="user-avatar" src="" alt="" class="w-12 h-12 rounded-lg border border-gray-600">
+                        <div>
+                            <div id="user-name" class="text-white font-bold"></div>
+                            <div class="text-xs text-gray-500 flex items-center gap-1">
+                                <span class="material-symbols-outlined text-xs text-yellow-500">emoji_events</span>
+                                <span id="user-points">0</span> points
+                            </div>
+                        </div>
+                        <button onclick="logoutRA()" class="ml-auto text-xs text-gray-500 hover:text-red-400 transition">Logout</button>
+                    </div>
+
+                    <form id="review-form" onsubmit="submitReview(event)">
+                        <!-- Thumbs Up/Down Selection -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-300 mb-3">Do you recommend this port?</label>
+                            <div class="flex gap-3">
+                                <button type="button" onclick="selectRecommendation(true)" id="btn-recommend" 
+                                    class="flex-1 py-4 px-6 rounded-lg border-2 border-gray-600 bg-gray-800/50 hover:border-blue-500 transition flex items-center justify-center gap-3 group recommendation-btn">
+                                    <span class="material-symbols-outlined text-3xl text-gray-400 group-hover:text-blue-400 transition">thumb_up</span>
+                                    <span class="text-gray-300 font-medium">Yes</span>
+                                </button>
+                                <button type="button" onclick="selectRecommendation(false)" id="btn-not-recommend"
+                                    class="flex-1 py-4 px-6 rounded-lg border-2 border-gray-600 bg-gray-800/50 hover:border-red-500 transition flex items-center justify-center gap-3 group recommendation-btn">
+                                    <span class="material-symbols-outlined text-3xl text-gray-400 group-hover:text-red-400 transition">thumb_down</span>
+                                    <span class="text-gray-300 font-medium">No</span>
+                                </button>
+                            </div>
+                            <input type="hidden" name="recommended" id="recommended-input" value="">
+                        </div>
+
+                        <!-- Review Text -->
+                        <div class="mb-4">
+                            <label for="review-text" class="block text-sm font-medium text-gray-300 mb-2">Your Review (optional)</label>
+                            <textarea id="review-text" name="review_text" rows="4" 
+                                class="w-full bg-[#0f0f12] border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition resize-none"
+                                placeholder="Write your thoughts about this port..."></textarea>
+                        </div>
+
+                        <button type="submit" id="submit-review-btn"
+                            class="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-lg font-bold transition flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">send</span>
+                            Post Review
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="bg-[#101822] p-4 rounded-lg flex flex-col sm:flex-row justify-between items-center border border-gray-800 gap-4 mb-4">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button onclick="filterReviews('all')" class="review-filter-btn active" data-filter="all">All</button>
+                        <button onclick="filterReviews('positive')" class="review-filter-btn" data-filter="positive">
+                            <span class="material-symbols-outlined text-sm text-blue-400">thumb_up</span> Positive
+                        </button>
+                        <button onclick="filterReviews('negative')" class="review-filter-btn" data-filter="negative">
+                            <span class="material-symbols-outlined text-sm text-red-400">thumb_down</span> Negative
+                        </button>
+                    </div>
+                    <select id="sort-select" onchange="sortReviews(this.value)" class="bg-[#1b2838] text-sm text-blue-400 border border-gray-700 rounded px-3 py-2 outline-none focus:border-blue-500">
+                        <option value="helpful">Most Helpful</option>
+                        <option value="recent">Most Recent</option>
+                    </select>
+                </div>
+
+                <!-- Reviews List -->
+                <div id="reviews-list" class="space-y-4 min-h-[300px] overflow-hidden break-words w-full">
+                    <div class="text-center py-8 text-gray-500">
+                        <span class="material-symbols-outlined text-4xl mb-2 block">hourglass_empty</span>
+                        Loading reviews...
+                    </div>
+                </div>
+
+                <!-- Load More -->
+                <button id="load-more-btn" onclick="loadMoreReviews()" class="hidden w-full py-3 bg-gray-800 hover:bg-gray-700 text-white text-sm font-bold rounded-lg transition mt-4">
+                    Load More Reviews
+                </button>
+            </div>
+
+            <!-- Right: Stats Sidebar -->
+            <aside class="w-full md:w-72 flex-shrink-0">
+                <div class="bg-[#121921] p-6 rounded-xl border border-gray-800 sticky top-24">
+                    <h3 class="text-sm text-blue-400 font-bold uppercase mb-4">Overall Rating</h3>
+                    
+                    <div id="rating-summary" class="text-center py-6">
+                        <div class="text-5xl font-bold text-gray-500 mb-2">—</div>
+                        <div class="text-gray-500 text-sm">No reviews yet</div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <!-- Claim It Section -->
+    <div class="mt-16 mb-12 bg-[#1a1a20] border border-gray-800/50 rounded-xl p-8 text-center max-w-6xl mx-auto">
+        <h3 class="text-xl font-bold pixel-font text-white mb-2">Is this your project?</h3>
+        <p class="text-gray-400 text-sm mb-4">Help us keep the database accurate and complete.</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="{{ url_for('claim', game_id=game.id, title=game.title) }}" class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-semibold transition-all">
+                <span class="material-symbols-outlined text-base">verified_user</span>
+                Claim it!
+            </a>
+            <a href="{{ url_for('contact', type='correction', title=game.title) }}" class="inline-flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg text-sm font-semibold transition-all">
+                <span class="material-symbols-outlined text-base">flag</span>
+                Report Issue
+            </a>
         </div>
     </div>
 
@@ -646,6 +782,418 @@ function toggleInstructions(platform) {
         }, 300);
         icon.textContent = 'expand_more';
     }
+}
+
+// =====================
+// REVIEW SYSTEM SCRIPTS
+// =====================
+const GAME_ID = '{{ game.id }}';
+const GAME_TYPE = 'port';
+let currentUser = null;
+let currentFilter = 'all';
+let currentSort = 'helpful';
+let reviewsOffset = 0;
+const REVIEWS_LIMIT = 20;
+let selectedRecommendation = null;
+
+// Initialize review system
+document.addEventListener('DOMContentLoaded', () => {
+    checkAuthStatus();
+    loadReviews();
+});
+
+// Check if user is logged in
+async function checkAuthStatus() {
+    try {
+        const res = await fetch('/api/auth/status');
+        const data = await res.json();
+        
+        if (data.logged_in) {
+            currentUser = data.user;
+            showLoggedInUI();
+        } else {
+            showLoginCTA();
+        }
+    } catch (err) {
+        showLoginCTA();
+    }
+}
+
+function showLoginCTA() {
+    document.getElementById('login-cta').classList.remove('hidden');
+    document.getElementById('review-form-container').classList.add('hidden');
+}
+
+function showLoggedInUI() {
+    document.getElementById('login-cta').classList.add('hidden');
+    document.getElementById('review-form-container').classList.remove('hidden');
+    
+    // Set user info
+    document.getElementById('user-avatar').src = currentUser.profile_pic;
+    document.getElementById('user-avatar').alt = currentUser.username;
+    document.getElementById('user-name').textContent = currentUser.username;
+    document.getElementById('user-points').textContent = currentUser.total_points.toLocaleString();
+    
+    // Reset button text (will be updated by loadReviews if user has reviewed)
+    const submitBtn = document.getElementById('submit-review-btn');
+    submitBtn.innerHTML = '<span class="material-symbols-outlined">send</span> Post Review';
+}
+
+function openRALogin() {
+    window.location.href = `/auth/ra/login-page?return_url=${encodeURIComponent(window.location.pathname + '#reviews-section')}`;
+}
+
+async function logoutRA() {
+    try {
+        await fetch('/auth/ra/logout', { method: 'POST' });
+        currentUser = null;
+        showLoginCTA();
+        loadReviews();
+    } catch (err) {
+        console.error('Logout failed:', err);
+    }
+}
+
+// Select recommendation (thumbs up/down)
+function selectRecommendation(recommended) {
+    selectedRecommendation = recommended;
+    
+    const yesBtn = document.getElementById('btn-recommend');
+    const noBtn = document.getElementById('btn-not-recommend');
+    
+    // Reset both
+    yesBtn.classList.remove('border-blue-500', 'bg-blue-500/20');
+    noBtn.classList.remove('border-red-500', 'bg-red-500/20');
+    yesBtn.querySelector('.material-symbols-outlined').classList.remove('text-blue-400');
+    noBtn.querySelector('.material-symbols-outlined').classList.remove('text-red-400');
+    yesBtn.querySelector('.material-symbols-outlined').classList.add('text-gray-400');
+    noBtn.querySelector('.material-symbols-outlined').classList.add('text-gray-400');
+    
+    if (recommended === true) {
+        yesBtn.classList.add('border-blue-500', 'bg-blue-500/20');
+        yesBtn.querySelector('.material-symbols-outlined').classList.remove('text-gray-400');
+        yesBtn.querySelector('.material-symbols-outlined').classList.add('text-blue-400');
+    } else if (recommended === false) {
+        noBtn.classList.add('border-red-500', 'bg-red-500/20');
+        noBtn.querySelector('.material-symbols-outlined').classList.remove('text-gray-400');
+        noBtn.querySelector('.material-symbols-outlined').classList.add('text-red-400');
+    }
+    // If recommended is null, both stay reset (gray)
+    
+    document.getElementById('recommended-input').value = recommended === true ? '1' : (recommended === false ? '0' : '');
+}
+
+// Submit review
+async function submitReview(e) {
+    e.preventDefault();
+    
+    if (selectedRecommendation === null) {
+        alert('Please select whether you recommend this port or not.');
+        return;
+    }
+    
+    const btn = document.getElementById('submit-review-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Submitting...';
+    
+    try {
+        const res = await fetch(`/api/reviews/${GAME_ID}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: GAME_TYPE,
+                recommended: selectedRecommendation,
+                review_text: document.getElementById('review-text').value.trim()
+            })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+            // Show success message
+            const reviewText = document.getElementById('review-text').value.trim();
+            const confirmMsg = reviewText 
+                ? '✓ Review posted successfully!' 
+                : '✓ Rating submitted! (Add text to display in reviews)';
+            
+            // Create toast notification
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2 animate-fade-in';
+            toast.innerHTML = `
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>${confirmMsg}</span>
+            `;
+            document.body.appendChild(toast);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+            
+            document.getElementById('review-text').value = '';
+            selectedRecommendation = null;
+            selectRecommendation(null);
+            reviewsOffset = 0;
+            loadReviews(false, false);
+        } else {
+            console.error('Submit error:', data.error);
+            alert(data.error || 'Failed to submit review');
+        }
+    } catch (err) {
+        console.error('Connection error:', err);
+        alert('Connection error: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined">send</span> Post Review';
+    }
+}
+
+// Load reviews
+async function loadReviews(append = false, showLoader = true) {
+    if (!append) {
+        reviewsOffset = 0;
+        if (showLoader) {
+            document.getElementById('reviews-list').innerHTML = `
+                <div class="text-center py-8 text-gray-500">
+                    <span class="material-symbols-outlined text-4xl mb-2 block animate-spin">refresh</span>
+                    Loading reviews...
+                </div>
+            `;
+        }
+    }
+    
+    try {
+        const res = await fetch(`/api/reviews/${GAME_ID}?type=${GAME_TYPE}&sort=${currentSort}&filter=${currentFilter}&limit=${REVIEWS_LIMIT}&offset=${reviewsOffset}`);
+        const data = await res.json();
+        
+        if (data.error) {
+            console.error('API Error:', data.error);
+        }
+        
+        renderReviewStats(data.stats);
+        renderReviews(data.reviews, data.user_votes, data.user_review, append);
+        
+        const loadMoreBtn = document.getElementById('load-more-btn');
+        if (data.reviews.length >= REVIEWS_LIMIT) {
+            loadMoreBtn.classList.remove('hidden');
+        } else {
+            loadMoreBtn.classList.add('hidden');
+        }
+        
+        if (data.user_review && currentUser) {
+            document.getElementById('review-text').value = data.user_review.review_text || '';
+            selectRecommendation(data.user_review.recommended === 1);
+            
+            // Update button text to show it's an update
+            const submitBtn = document.getElementById('submit-review-btn');
+            submitBtn.innerHTML = '<span class="material-symbols-outlined">edit</span> Update Review';
+        } else if (currentUser) {
+            // Reset button text if no review exists
+            const submitBtn = document.getElementById('submit-review-btn');
+            submitBtn.innerHTML = '<span class="material-symbols-outlined">send</span> Post Review';
+        }
+    } catch (err) {
+        console.error('Failed to load reviews:', err);
+        document.getElementById('reviews-list').innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <span class="material-symbols-outlined text-4xl mb-2 block">error</span>
+                Failed to load reviews
+            </div>
+        `;
+    }
+}
+
+function renderReviewStats(stats) {
+    const summaryEl = document.getElementById('rating-summary');
+    
+    if (stats.total === 0) {
+        summaryEl.innerHTML = `
+            <div class="text-5xl font-bold text-gray-500 mb-2">—</div>
+            <div class="text-gray-500 text-sm">No reviews yet</div>
+            <div class="text-gray-600 text-xs mt-1">Be the first to review!</div>
+        `;
+    } else {
+        const labelClass = stats.label_class === 'very-positive' ? 'text-blue-400' :
+                          stats.label_class === 'positive' ? 'text-blue-300' :
+                          stats.label_class === 'mixed' ? 'text-yellow-400' :
+                          stats.label_class === 'negative' ? 'text-orange-400' :
+                          stats.label_class === 'very-negative' ? 'text-red-400' : 'text-gray-400';
+        
+        const reviewCount = stats.total.toLocaleString();
+        
+        summaryEl.innerHTML = `
+            <div class="text-4xl font-bold ${labelClass} mb-1">${stats.percentage}%</div>
+            <div class="${labelClass} font-bold text-lg mb-2">${stats.label}</div>
+            <div class="text-gray-500 text-sm">(${reviewCount} review${stats.total !== 1 ? 's' : ''})</div>
+        `;
+    }
+}
+
+function renderReviews(reviews, userVotes, userReview, append) {
+    const container = document.getElementById('reviews-list');
+    
+    if (!append) {
+        container.innerHTML = '';
+    }
+    
+    if (reviews.length === 0 && !append) {
+        // Determine message based on filter
+        let message = 'No written reviews yet';
+        let subMessage = 'Be the first to write a review!';
+        
+        if (currentFilter === 'positive') {
+            message = 'No positive reviews yet';
+            subMessage = 'Be the first to recommend this!';
+        } else if (currentFilter === 'negative') {
+            message = 'No negative reviews yet';
+            subMessage = 'All reviews are positive so far!';
+        }
+        
+        container.innerHTML = `
+            <div class="text-center py-12 text-gray-500 w-full">
+                <span class="material-symbols-outlined text-5xl mb-3 block">rate_review</span>
+                <div class="text-lg mb-1">${message}</div>
+                <div class="text-sm">${subMessage}</div>
+            </div>
+        `;
+        return;
+    }
+    
+    reviews.forEach(review => {
+        const isRecommended = review.recommended === 1;
+        const thumbIcon = isRecommended ? 'thumb_up' : 'thumb_down';
+        const thumbColor = isRecommended ? 'text-blue-400' : 'text-red-400';
+        const recText = isRecommended ? 'Recommended' : 'Not Recommended';
+        const userVote = userVotes[review.id];
+        
+        // Build progress display
+        let progressHtml = '';
+        if (review.achievements_total > 0) {
+            progressHtml = `
+                <div class="bg-[#0f1419] px-3 py-2 rounded mt-2 text-xs flex items-center gap-3 border border-gray-800">
+                    <span class="material-symbols-outlined text-yellow-500 text-base">military_tech</span>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-gray-400">Progress</span>
+                            <span class="text-yellow-400 font-bold">${review.completion_percentage}%</span>
+                        </div>
+                        <div class="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-yellow-500 to-yellow-400" style="width: ${review.completion_percentage}%"></div>
+                        </div>
+                        <div class="text-gray-500 mt-1">${review.achievements_earned} / ${review.achievements_total} achievements</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        const card = document.createElement('div');
+        card.className = 'review-card flex p-4 rounded-lg gap-4';
+        card.innerHTML = `
+            <div class="flex flex-col items-center gap-2 min-w-[70px]">
+                <img src="${review.ra_profile_pic || '/static/img/default-avatar.png'}" 
+                     alt="${review.ra_username}" 
+                     class="w-12 h-12 rounded-lg border-2 border-gray-700">
+                <div class="text-xs text-gray-300 font-bold text-center truncate w-full">${review.ra_username}</div>
+                ${review.ra_total_points > 0 ? `
+                    <div class="text-[10px] text-gray-500 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xs text-yellow-500">emoji_events</span>
+                        ${review.ra_total_points.toLocaleString()}
+                    </div>
+                ` : ''}
+            </div>
+            
+            <div class="flex-1 min-w-0">
+                <div class="bg-[#121921] p-3 mb-3 rounded flex items-center gap-3">
+                    <span class="material-symbols-outlined text-3xl ${thumbColor}">${thumbIcon}</span>
+                    <div>
+                        <div class="text-white font-bold">${recText}</div>
+                        <div class="text-xs text-gray-500">
+                            Posted ${new Date(review.created_at).toLocaleDateString()}
+                        </div>
+                    </div>
+                </div>
+                
+                ${progressHtml}
+                
+                ${review.review_text ? `
+                    <p class="text-gray-300 text-sm leading-relaxed ${progressHtml ? 'mt-3' : ''} mb-4 whitespace-pre-wrap">${escapeHtml(review.review_text)}</p>
+                ` : ''}
+                
+                <div class="border-t border-gray-700 pt-3 mt-3 flex flex-wrap items-center gap-3">
+                    <span class="text-xs text-gray-500">Helpful?</span>
+                    <button onclick="voteReview(${review.id}, 'yes')" 
+                            class="vote-btn flex items-center gap-1 px-3 py-1.5 rounded text-xs transition ${userVote === 'yes' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}">
+                        <span class="material-symbols-outlined text-sm">thumb_up</span> 
+                        <span>${review.helpful_yes}</span>
+                    </button>
+                    <button onclick="voteReview(${review.id}, 'no')" 
+                            class="vote-btn flex items-center gap-1 px-3 py-1.5 rounded text-xs transition ${userVote === 'no' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}">
+                        <span class="material-symbols-outlined text-sm">thumb_down</span>
+                        <span>${review.helpful_no}</span>
+                    </button>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Vote on review
+async function voteReview(reviewId, voteType) {
+    if (!currentUser) {
+        openRALogin();
+        return;
+    }
+    
+    try {
+        const res = await fetch(`/api/reviews/vote/${reviewId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vote_type: voteType })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+            loadReviews(false, false);
+        } else if (data.error === 'Login required') {
+            openRALogin();
+        }
+    } catch (err) {
+        console.error('Vote failed:', err);
+    }
+}
+
+// Filter and sort
+function filterReviews(filter) {
+    currentFilter = filter;
+    
+    document.querySelectorAll('.review-filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.filter === filter) {
+            btn.classList.add('active');
+        }
+    });
+    
+    loadReviews(false, false);
+}
+
+function sortReviews(sort) {
+    currentSort = sort;
+    loadReviews(false, false);
+}
+
+function loadMoreReviews() {
+    reviewsOffset += REVIEWS_LIMIT;
+    loadReviews(true);
 }
 </script>
 {% endblock %}

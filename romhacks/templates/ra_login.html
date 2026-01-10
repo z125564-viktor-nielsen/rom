@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Login with RetroAchievements | ROMHACKS.NET{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-12 mb-20">
+    <div class="bg-[#1b2838] rounded-xl border border-gray-700/50 overflow-hidden shadow-2xl">
+        <!-- Header -->
+        <div class="h-1 w-full bg-gradient-to-r from-[#0088CC] to-[#00aaff]"></div>
+        
+        <div class="p-8 text-center">
+            <!-- Logo -->
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#16202d] mb-6 border border-[#2a475e] shadow-inner">
+                <span class="material-symbols-outlined text-5xl text-[#0088CC]">emoji_events</span>
+            </div>
+            
+            <h1 class="text-2xl font-bold text-white mb-2 pixel-font">RetroAchievements Login</h1>
+            <p class="text-gray-400 text-sm mb-6">
+                Log in with your RA account to write reviews and track your progress.
+            </p>
+            
+            <!-- Error Message -->
+            <div id="error-message" class="hidden bg-red-500/20 border border-red-500/50 text-red-300 text-sm p-3 rounded-lg mb-6">
+            </div>
+            
+            <!-- Login Form -->
+            <form id="ra-login-form" class="space-y-4 text-left">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-300 mb-1">RA Username</label>
+                    <input type="text" id="username" name="username" required
+                        class="w-full bg-[#0f0f12] border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-[#0088CC] focus:outline-none focus:ring-1 focus:ring-[#0088CC] transition"
+                        placeholder="Your RetroAchievements username">
+                </div>
+                
+                <div>
+                    <label for="api_key" class="block text-sm font-medium text-gray-300 mb-1">
+                        API Key
+                        <a href="https://retroachievements.org/controlpanel.php" target="_blank" class="text-[#0088CC] hover:underline ml-1 text-xs">(Get your key)</a>
+                    </label>
+                    <input type="password" id="api_key" name="api_key" required
+                        class="w-full bg-[#0f0f12] border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-[#0088CC] focus:outline-none focus:ring-1 focus:ring-[#0088CC] transition"
+                        placeholder="Your Web API Key">
+                </div>
+                
+                <button type="submit" id="submit-btn"
+                    class="w-full bg-[#0088CC] hover:bg-[#00aaff] text-white py-3 rounded-lg font-bold shadow-lg flex items-center justify-center gap-3 transition transform hover:-translate-y-0.5">
+                    <span class="material-symbols-outlined">login</span>
+                    <span>Login</span>
+                </button>
+            </form>
+            
+            <div class="mt-6 pt-6 border-t border-gray-700">
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    <span class="material-symbols-outlined text-sm align-middle text-[#0088CC]">security</span>
+                    Your API key is stored securely in your session and never shared. 
+                    <br>Find your key in your 
+                    <a href="https://retroachievements.org/controlpanel.php" target="_blank" class="text-[#0088CC] hover:underline">RA Settings → Keys</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- What is RA? -->
+    <div class="mt-6 bg-[#16202d] rounded-xl border border-gray-700/50 p-6">
+        <h3 class="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-yellow-400">help</span>
+            What is RetroAchievements?
+        </h3>
+        <p class="text-sm text-gray-400 leading-relaxed mb-4">
+            RetroAchievements is a community-driven project that adds achievements to retro games. 
+            By linking your RA account, we can verify your gaming experience and show your achievement progress.
+        </p>
+        <a href="https://retroachievements.org/" target="_blank" 
+           class="inline-flex items-center gap-2 text-[#0088CC] hover:text-[#00aaff] text-sm font-medium transition">
+            <span>Learn more at RetroAchievements.org</span>
+            <span class="material-symbols-outlined text-sm">open_in_new</span>
+        </a>
+    </div>
+</div>
+
+<script>
+document.getElementById('ra-login-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value.trim();
+    const apiKey = document.getElementById('api_key').value.trim();
+    const submitBtn = document.getElementById('submit-btn');
+    const errorDiv = document.getElementById('error-message');
+    
+    // Hide error
+    errorDiv.classList.add('hidden');
+    
+    // Show loading
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span><span>Verifying...</span>';
+    
+    try {
+        const response = await fetch('/auth/ra/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, api_key: apiKey })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Redirect back to the original page
+            const returnUrl = '{{ return_url }}' || '/';
+            window.location.href = returnUrl;
+        } else {
+            errorDiv.textContent = data.error || 'Login failed. Please check your credentials.';
+            errorDiv.classList.remove('hidden');
+        }
+    } catch (err) {
+        errorDiv.textContent = 'Connection error. Please try again.';
+        errorDiv.classList.remove('hidden');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span class="material-symbols-outlined">login</span><span>Login</span>';
+    }
+});
+</script>
+{% endblock %}

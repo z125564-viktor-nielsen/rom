@@ -150,10 +150,12 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="hacks-grid">
     {% for game in games %}
-    <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-sky-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-sky-500/10" data-console="{{ (game.consoles or [game.console]) | join(' ') }}" data-original-platform="{{ game.original_platform or '' }}" data-release-date="{{ game.release_date }}" data-base-game="{{ game.base_game or '' }}" data-game-series="{{ game.game_series or '' }}" data-monthly-downloads="{{ game.monthly_download_count or 0 }}">
+    <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-sky-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-sky-500/10" data-console="{{ (game.consoles or [game.console]) | join(' ') }}" data-original-platform="{{ game.original_platform or '' }}" data-release-date="{{ game.release_date }}" data-base-game="{{ game.base_game or '' }}" data-game-series="{{ game.game_series or '' }}" data-monthly-downloads="{{ game.monthly_download_count or 0 }}" data-port-id="{{ game.id }}">
         <a href="{{ url_for('port_page', port_id=game.id) }}" class="block relative h-48 overflow-hidden cursor-pointer bg-gradient-to-br from-gray-800 to-gray-900">
             <img src="{{ game.image_url }}" referrerpolicy="no-referrer" loading="lazy" decoding="async" class="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105" alt="{{ game.title }} - {{ (game.consoles or [game.console]) | join('/') }} Port Cover">
             <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
+            <!-- Rating Badge -->
+            <div class="rating-badge absolute top-3 right-3 hidden" data-port-id="{{ game.id }}"></div>
             <div class="absolute bottom-3 left-3">
                 {% for c in (game.consoles or [game.console]) %}
                 <span class="{{ styles.get(c, styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[10px] font-bold px-2 py-1 rounded border uppercase mb-1 inline-block">{{ c }}</span>
@@ -207,4 +209,47 @@
     <span id="page-indicator" class="text-xs text-gray-500 font-mono py-2 bg-[#1a1a20] px-4 border border-gray-800">Page 1</span>
     <button onclick="nextPage()" id="btn-next" class="px-6 py-2 border border-gray-700 bg-gray-800 text-gray-400 text-xs uppercase hover:text-white hover:border-blue-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all">Next</button>
 </div>
+
+<script>
+// Load rating badges for all ports
+document.addEventListener('DOMContentLoaded', async () => {
+    const portIds = [];
+    document.querySelectorAll('.rating-badge[data-port-id]').forEach(el => {
+        if (el.dataset.portId) portIds.push(el.dataset.portId);
+    });
+    
+    if (portIds.length > 0) {
+        try {
+            const res = await fetch('/api/reviews/batch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ game_ids: portIds, type: 'port' })
+            });
+            const stats = await res.json();
+            updateRatingBadges(stats);
+        } catch (err) { console.error('Failed to load ratings:', err); }
+    }
+});
+
+function updateRatingBadges(stats) {
+    for (const [id, data] of Object.entries(stats)) {
+        if (data.total === 0) continue;
+        
+        const badge = document.querySelector(`.rating-badge[data-port-id="${id}"]`);
+        if (!badge) continue;
+        
+        const colorClass = data.label_class === 'positive' || data.label_class === 'very-positive' ? 'bg-blue-600' :
+                          data.label_class === 'mixed' ? 'bg-yellow-600' : 'bg-red-600';
+        const icon = data.percentage >= 70 ? 'thumb_up' : data.percentage >= 40 ? 'thumbs_up_down' : 'thumb_down';
+        
+        badge.innerHTML = `
+            <span class="${colorClass} text-white text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1 shadow-lg">
+                <span class="material-symbols-outlined text-xs">${icon}</span>
+                ${data.percentage}%
+            </span>
+        `;
+        badge.classList.remove('hidden');
+    }
+}
+</script>
 {% endblock %}

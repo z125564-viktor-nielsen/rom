@@ -92,8 +92,26 @@
             "@graph": [
                 {
                     "@type": "WebSite",
-                    "name": {{ (site_name or 'romhacks_') | tojson }},
-                    "url": {{ (site_url or request.url_root.rstrip('/')) | tojson }}
+                    "name": "Romhacks.net - Rom Hacks & Pokemon Rom Hacks Database",
+                    "alternateName": ["Rom Hacks", "romhacks", "Pokemon Rom Hacks"],
+                    "url": {{ (site_url or request.url_root.rstrip('/')) | tojson }},
+                    "description": "Download rom hacks and pokemon rom hacks for GBA, NDS, SNES, N64. Free patch files with web patcher.",
+                    "potentialAction": {
+                        "@type": "SearchAction",
+                        "target": {
+                            "@type": "EntryPoint",
+                            "urlTemplate": "https://romhacks.net/romhacks?search={search_term_string}"
+                        },
+                        "query-input": "required name=search_term_string"
+                    }
+                },
+                {
+                    "@type": "Organization",
+                    "name": "Romhacks.net",
+                    "url": "https://romhacks.net",
+                    "logo": "https://romhacks.net/logo/favicon.png",
+                    "description": "The largest database of rom hacks and pokemon rom hacks with free downloads and web-based patching tool",
+                    "sameAs": []
                 },
                 {
                     "@type": "WebPage",
@@ -129,7 +147,7 @@
                     <a class="px-4 py-2 rounded-lg text-sm font-medium transition-all
                               {% if request.path == '/romhacks' %} bg-white/10 text-white {% else %} text-gray-400 hover:text-white hover:bg-white/5 {% endif %}" 
                        href="/romhacks">
-                        Romhacks
+                        Rom Hacks
                     </a>
                     <a class="px-4 py-2 rounded-lg text-sm font-medium transition-all
                               {% if request.path == '/ports' %} bg-white/10 text-white {% else %} text-gray-400 hover:text-white hover:bg-white/5 {% endif %}" 
@@ -177,7 +195,7 @@
                           {% if request.path == '/romhacks' %} bg-white/10 text-white {% else %} text-gray-400 hover:text-white hover:bg-white/5 {% endif %}" 
                    href="/romhacks">
                     <span class="material-symbols-outlined text-[20px]">sports_esports</span>
-                    Romhacks
+                    Rom Hacks
                 </a>
                 <a class="px-4 py-3 rounded-lg text-base font-medium transition-all flex items-center gap-3
                           {% if request.path == '/ports' %} bg-white/10 text-white {% else %} text-gray-400 hover:text-white hover:bg-white/5 {% endif %}" 
@@ -212,7 +230,7 @@
                     <h4 class="text-white font-bold text-sm uppercase tracking-wider mb-3 md:mb-4"><span class="text-[#e5f0ff]">rom</span><span class="text-[#9bb6ff]">hacks</span><span class="text-[#4d7cff]">_</span></h4>
                     <ul class="space-y-2">
                         <li><a href="/" class="text-gray-400 text-xs hover:text-blue-400 transition">Home</a></li>
-                        <li><a href="/romhacks" class="text-gray-400 text-xs hover:text-blue-400 transition">ROM Hacks</a></li>
+                        <li><a href="/romhacks" class="text-gray-400 text-xs hover:text-blue-400 transition">Rom Hacks</a></li>
                         <li><a href="/ports" class="text-gray-400 text-xs hover:text-blue-400 transition">Decompiled Ports</a></li>
                         <li><a href="/patcher" class="text-gray-400 text-xs hover:text-blue-400 transition">Web Patcher</a></li>
                     </ul>

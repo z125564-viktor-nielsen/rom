@@ -455,6 +455,47 @@ def init_db():
         )
     ''')
     
+    # Reviews table - Steam-style thumbs up/down with RetroAchievements integration
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS reviews (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            game_id TEXT NOT NULL,
+            game_type TEXT NOT NULL DEFAULT 'romhack',
+            ra_username TEXT NOT NULL,
+            ra_user_id INTEGER,
+            ra_profile_pic TEXT,
+            ra_total_points INTEGER DEFAULT 0,
+            recommended INTEGER NOT NULL,
+            review_text TEXT,
+            playtime_hours REAL DEFAULT 0,
+            helpful_yes INTEGER DEFAULT 0,
+            helpful_no INTEGER DEFAULT 0,
+            status TEXT DEFAULT 'visible',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(game_id, game_type, ra_username)
+        )
+    ''')
+    
+    # Index for faster review queries
+    cursor.execute('''
+        CREATE INDEX IF NOT EXISTS idx_reviews_game 
+        ON reviews(game_id, game_type)
+    ''')
+    
+    # Review votes table - track who voted helpful
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS review_votes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            review_id INTEGER NOT NULL,
+            voter_username TEXT NOT NULL,
+            vote_type TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(review_id, voter_username),
+            FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE
+        )
+    ''')
+    
     conn.commit()
     conn.close()
 
@@ -1493,3 +1534,351 @@ def check_and_archive_previous_month():
             return archive_monthly_popular(prev_year_month)
     
     return None
+
+
+# ============================================
+# REVIEW SYSTEM FUNCTIONS (Steam-style)
+# ============================================
+
+def submit_review(game_id, game_type, ra_username, ra_user_id, ra_profile_pic, 
+                  ra_total_points, recommended, review_text, ra_game_id=None, game_progress=None):
+    """Submit or update a review for a game"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Extract game progress data
+    achievements_earned = 0
+    achievements_total = 0
+    completion_percentage = 0
+    if game_progress:
+        achievements_earned = game_progress.get('achievements_earned', 0)
+        achievements_total = game_progress.get('achievements_total', 0)
+        completion_percentage = game_progress.get('completion_percentage', 0)
+    
+    try:
+        # Check if user already reviewed this game
+        cursor.execute('''
+            SELECT id FROM reviews 
+            WHERE game_id = ? AND game_type = ? AND ra_username = ?
+        ''', (game_id, game_type, ra_username))
+        
+        existing = cursor.fetchone()
+        
+        if existing:
+            # Update existing review
+            cursor.execute('''
+                UPDATE reviews SET
+                    recommended = ?,
+                    review_text = ?,
+                    ra_profile_pic = ?,
+                    ra_total_points = ?,
+                    ra_game_id = ?,
+                    achievements_earned = ?,
+                    achievements_total = ?,
+                    completion_percentage = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            ''', (recommended, review_text, ra_profile_pic, ra_total_points,
+                  ra_game_id, achievements_earned, achievements_total, completion_percentage,
+                  existing['id']))
+            review_id = existing['id']
+        else:
+            # Insert new review
+            cursor.execute('''
+                INSERT INTO reviews (
+                    game_id, game_type, ra_username, ra_user_id, ra_profile_pic,
+                    ra_total_points, recommended, review_text, ra_game_id,
+                    achievements_earned, achievements_total, completion_percentage, status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'visible')
+            ''', (game_id, game_type, ra_username, ra_user_id, ra_profile_pic,
+                  ra_total_points, recommended, review_text, ra_game_id,
+                  achievements_earned, achievements_total, completion_percentage))
+            review_id = cursor.lastrowid
+        
+        conn.commit()
+        conn.close()
+        return {'success': True, 'review_id': review_id}
+    except Exception as e:
+        conn.close()
+        return {'success': False, 'error': str(e)}
+
+
+def get_reviews(game_id, game_type='romhack', sort_by='helpful', filter_type='all', limit=50, offset=0, with_text_only=True):
+    """Get reviews for a game with sorting and filtering"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Build query based on filters
+    where_clauses = ['game_id = ?', 'game_type = ?', "status = 'visible'"]
+    params = [game_id, game_type]
+    
+    # Only show reviews that have text content
+    if with_text_only:
+        where_clauses.append("review_text IS NOT NULL AND review_text != ''")
+    
+    if filter_type == 'positive':
+        where_clauses.append('recommended = 1')
+    elif filter_type == 'negative':
+        where_clauses.append('recommended = 0')
+    
+    where_sql = ' AND '.join(where_clauses)
+    
+    # Sort order
+    if sort_by == 'recent':
+        order_sql = 'created_at DESC'
+    else:  # helpful
+        order_sql = '(helpful_yes - helpful_no) DESC, created_at DESC'
+    
+    cursor.execute(f'''
+        SELECT * FROM reviews
+        WHERE {where_sql}
+        ORDER BY {order_sql}
+        LIMIT ? OFFSET ?
+    ''', params + [limit, offset])
+    
+    reviews = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return reviews
+
+
+def get_review_stats(game_id, game_type='romhack'):
+    """Get review statistics for a game (total, positive %, rating label)"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN recommended = 1 THEN 1 ELSE 0 END) as positive,
+            SUM(CASE WHEN recommended = 0 THEN 1 ELSE 0 END) as negative
+        FROM reviews
+        WHERE game_id = ? AND game_type = ? AND status = 'visible'
+    ''', (game_id, game_type))
+    
+    row = cursor.fetchone()
+    conn.close()
+    
+    total = row['total'] or 0
+    positive = row['positive'] or 0
+    negative = row['negative'] or 0
+    
+    if total == 0:
+        return {
+            'total': 0,
+            'positive': 0,
+            'negative': 0,
+            'percentage': 0,
+            'label': 'No Reviews',
+            'label_class': 'neutral'
+        }
+    
+    percentage = round((positive / total) * 100)
+    
+    # Steam-style rating labels
+    if percentage >= 95:
+        label = 'Overwhelmingly Positive'
+        label_class = 'very-positive'
+    elif percentage >= 80:
+        label = 'Very Positive'
+        label_class = 'very-positive'
+    elif percentage >= 70:
+        label = 'Mostly Positive'
+        label_class = 'positive'
+    elif percentage >= 40:
+        label = 'Mixed'
+        label_class = 'mixed'
+    elif percentage >= 20:
+        label = 'Mostly Negative'
+        label_class = 'negative'
+    elif percentage >= 10:
+        label = 'Very Negative'
+        label_class = 'very-negative'
+    else:
+        label = 'Overwhelmingly Negative'
+        label_class = 'very-negative'
+    
+    return {
+        'total': total,
+        'positive': positive,
+        'negative': negative,
+        'percentage': percentage,
+        'label': label,
+        'label_class': label_class
+    }
+
+
+def get_review_stats_batch(game_ids, game_type='romhack'):
+    """Get review statistics for multiple games at once"""
+    if not game_ids:
+        return {}
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    placeholders = ','.join(['?' for _ in game_ids])
+    cursor.execute(f'''
+        SELECT 
+            game_id,
+            COUNT(*) as total,
+            SUM(CASE WHEN recommended = 1 THEN 1 ELSE 0 END) as positive
+        FROM reviews
+        WHERE game_id IN ({placeholders}) AND game_type = ? AND status = 'visible'
+        GROUP BY game_id
+    ''', game_ids + [game_type])
+    
+    results = {}
+    for row in cursor.fetchall():
+        total = row['total'] or 0
+        positive = row['positive'] or 0
+        percentage = round((positive / total) * 100) if total > 0 else 0
+        
+        # Simplified labels for badges
+        if total == 0:
+            label = 'No Reviews'
+            label_class = 'neutral'
+        elif percentage >= 70:
+            label = f'{percentage}%'
+            label_class = 'positive'
+        elif percentage >= 40:
+            label = f'{percentage}%'
+            label_class = 'mixed'
+        else:
+            label = f'{percentage}%'
+            label_class = 'negative'
+        
+        results[row['game_id']] = {
+            'total': total,
+            'positive': positive,
+            'percentage': percentage,
+            'label': label,
+            'label_class': label_class
+        }
+    
+    conn.close()
+    return results
+
+
+def has_user_reviewed(game_id, game_type, ra_username):
+    """Check if a user has already reviewed a game"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT id, recommended, review_text FROM reviews
+        WHERE game_id = ? AND game_type = ? AND ra_username = ?
+    ''', (game_id, game_type, ra_username))
+    
+    result = cursor.fetchone()
+    conn.close()
+    
+    return dict(result) if result else None
+
+
+def vote_helpful(review_id, voter_username, vote_type):
+    """Vote a review as helpful (yes/no/funny)"""
+    if vote_type not in ('yes', 'no', 'funny'):
+        return {'success': False, 'error': 'Invalid vote type'}
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Check if user already voted
+        cursor.execute('''
+            SELECT vote_type FROM review_votes
+            WHERE review_id = ? AND ra_username = ?
+        ''', (review_id, voter_username))
+        
+        existing = cursor.fetchone()
+        
+        if existing:
+            if existing['vote_type'] == vote_type:
+                # Remove vote (toggle off)
+                cursor.execute('''
+                    DELETE FROM review_votes
+                    WHERE review_id = ? AND ra_username = ?
+                ''', (review_id, voter_username))
+                
+                # Decrement counter
+                if vote_type == 'yes':
+                    cursor.execute('UPDATE reviews SET helpful_yes = helpful_yes - 1 WHERE id = ?', (review_id,))
+                elif vote_type == 'no':
+                    cursor.execute('UPDATE reviews SET helpful_no = helpful_no - 1 WHERE id = ?', (review_id,))
+            else:
+                # Change vote
+                old_type = existing['vote_type']
+                cursor.execute('''
+                    UPDATE review_votes SET vote_type = ?, created_at = CURRENT_TIMESTAMP
+                    WHERE review_id = ? AND ra_username = ?
+                ''', (vote_type, review_id, voter_username))
+                
+                # Adjust counters
+                if old_type == 'yes':
+                    cursor.execute('UPDATE reviews SET helpful_yes = helpful_yes - 1 WHERE id = ?', (review_id,))
+                elif old_type == 'no':
+                    cursor.execute('UPDATE reviews SET helpful_no = helpful_no - 1 WHERE id = ?', (review_id,))
+                
+                if vote_type == 'yes':
+                    cursor.execute('UPDATE reviews SET helpful_yes = helpful_yes + 1 WHERE id = ?', (review_id,))
+                elif vote_type == 'no':
+                    cursor.execute('UPDATE reviews SET helpful_no = helpful_no + 1 WHERE id = ?', (review_id,))
+        else:
+            # New vote
+            cursor.execute('''
+                INSERT INTO review_votes (review_id, ra_username, vote_type)
+                VALUES (?, ?, ?)
+            ''', (review_id, voter_username, vote_type))
+            
+            # Increment counter
+            if vote_type == 'yes':
+                cursor.execute('UPDATE reviews SET helpful_yes = helpful_yes + 1 WHERE id = ?', (review_id,))
+            elif vote_type == 'no':
+                cursor.execute('UPDATE reviews SET helpful_no = helpful_no + 1 WHERE id = ?', (review_id,))
+        
+        conn.commit()
+        
+        # Get updated counts
+        cursor.execute('SELECT helpful_yes, helpful_no FROM reviews WHERE id = ?', (review_id,))
+        updated = cursor.fetchone()
+        conn.close()
+        
+        return {
+            'success': True,
+            'helpful_yes': updated['helpful_yes'],
+            'helpful_no': updated['helpful_no']
+        }
+    except Exception as e:
+        conn.close()
+        return {'success': False, 'error': str(e)}
+
+
+def delete_review(review_id):
+    """Delete a review (admin function)"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('DELETE FROM review_votes WHERE review_id = ?', (review_id,))
+    cursor.execute('DELETE FROM reviews WHERE id = ?', (review_id,))
+    
+    conn.commit()
+    conn.close()
+    return True
+
+
+def get_user_votes(review_ids, voter_username):
+    """Get user's votes for a list of reviews"""
+    if not review_ids or not voter_username:
+        return {}
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    placeholders = ','.join(['?' for _ in review_ids])
+    cursor.execute(f'''
+        SELECT review_id, vote_type FROM review_votes
+        WHERE review_id IN ({placeholders}) AND ra_username = ?
+    ''', review_ids + [voter_username])
+    
+    votes = {row['review_id']: row['vote_type'] for row in cursor.fetchall()}
+    conn.close()
+    return votes

@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}ROM Hacks Database — Download Patches for Pokemon, Mario, Zelda & More | ROMHACKS.NET{% endblock %}
+{% block title %}Rom Hacks - Pokemon Rom Hacks Database | Download GBA, NDS, SNES Romhacks{% endblock %}
 
-{% block meta_description %}Browse verified ROM hacks for GBA, SNES, N64, NDS, 3DS & more. Download patch files, read features, find tutorials. Use our web patcher to patch locally in your browser. Pokemon FireRed, Emerald, Ruby, and thousands of mods available.{% endblock %}
-{% block meta_keywords %}rom hacks, romhacks, pokemon rom hacks, gba rom hacks, snes rom hacks, n64 rom hacks, nds rom hacks, 3ds rom hacks, patch files, how to install, rom hack patch, download rom hack{% endblock %}
+{% block meta_description %}Download Rom Hacks and Pokemon Rom Hacks for free. Browse verified romhacks for Pokemon Emerald, FireRed, Crystal, Mario, Zelda. GBA rom hacks, NDS rom hacks, SNES rom hacks. Free patch files with web patcher.{% endblock %}
+{% block meta_keywords %}rom hacks, romhacks, pokemon rom hacks, pokemon romhacks, gba rom hacks, pokemon emerald rom hacks, pokemon firered rom hacks, pokemon crystal rom hacks, snes rom hacks, n64 rom hacks, nds rom hacks, 3ds rom hacks, mario rom hacks, zelda rom hacks, patch files, download rom hack{% endblock %}
 
 {% block json_ld %}
 <script type="application/ld+json">
@@ -43,8 +43,8 @@
 {% block content %}
 <div class="flex justify-between items-end mb-8">
     <div>
-         <h2 class="text-3xl font-bold pixel-font text-white mb-2">Romhacks</h2>
-         <p class="text-gray-500 text-sm">Most popular for {{ current_month }}</p>
+         <h1 class="text-3xl font-bold pixel-font text-white mb-2">Rom Hacks</h1>
+         
          
          <div class="flex flex-wrap gap-2 mt-3">
             <span class="text-xs text-gray-400 py-1.5">Popular:</span>
@@ -160,10 +160,12 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="hacks-grid">
     {% for game in games %}
-    <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-blue-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-blue-500/10" data-console="{{ game.console }}" data-release-date="{{ game.release_date }}" data-base-game="{{ game.base_game }}" data-game-series="{{ game.game_series or '' }}" data-monthly-downloads="{{ game.monthly_download_count or 0 }}">
+    <div class="hack-card bg-[#151518] border border-gray-700/50 hover:border-blue-500/50 transition-all group overflow-hidden flex flex-col rounded-xl shadow-lg hover:shadow-blue-500/10" data-console="{{ game.console }}" data-release-date="{{ game.release_date }}" data-base-game="{{ game.base_game }}" data-game-series="{{ game.game_series or '' }}" data-monthly-downloads="{{ game.monthly_download_count or 0 }}" data-game-id="{{ game.id }}">
         <a href="{{ url_for('game_page', game_id=game.id) }}" class="block relative h-48 overflow-hidden cursor-pointer bg-gradient-to-br from-gray-800 to-gray-900">
             <img src="{{ game.image_url }}" referrerpolicy="no-referrer" loading="lazy" decoding="async" class="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105" alt="{{ game.title }} - {{ game.console }} ROM Hack Cover">
             <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
+            <!-- Rating Badge -->
+            <div class="rating-badge absolute top-3 right-3 hidden" data-game-id="{{ game.id }}"></div>
             <div class="absolute bottom-3 left-3">
                 <span class="{{ styles.get(game.console | normalize_console, styles['default']) }} text-[10px] font-bold px-2 py-1 rounded-md border uppercase mb-1 inline-block">{{ game.console }}</span>
                 <h3 class="text-white font-bold text-lg leading-none shadow-black drop-shadow-md">{{ game.title }}</h3>
@@ -209,4 +211,47 @@
         Incorrect info?
     </a>
 </div>
+
+<script>
+// Load rating badges for all ROM hacks
+document.addEventListener('DOMContentLoaded', async () => {
+    const gameIds = [];
+    document.querySelectorAll('.rating-badge[data-game-id]').forEach(el => {
+        if (el.dataset.gameId) gameIds.push(el.dataset.gameId);
+    });
+    
+    if (gameIds.length > 0) {
+        try {
+            const res = await fetch('/api/reviews/batch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ game_ids: gameIds, type: 'romhack' })
+            });
+            const stats = await res.json();
+            updateRatingBadges(stats);
+        } catch (err) { console.error('Failed to load ratings:', err); }
+    }
+});
+
+function updateRatingBadges(stats) {
+    for (const [id, data] of Object.entries(stats)) {
+        if (data.total === 0) continue;
+        
+        const badge = document.querySelector(`.rating-badge[data-game-id="${id}"]`);
+        if (!badge) continue;
+        
+        const colorClass = data.label_class === 'positive' || data.label_class === 'very-positive' ? 'bg-blue-600' :
+                          data.label_class === 'mixed' ? 'bg-yellow-600' : 'bg-red-600';
+        const icon = data.percentage >= 70 ? 'thumb_up' : data.percentage >= 40 ? 'thumbs_up_down' : 'thumb_down';
+        
+        badge.innerHTML = `
+            <span class="${colorClass} text-white text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1 shadow-lg">
+                <span class="material-symbols-outlined text-xs">${icon}</span>
+                ${data.percentage}%
+            </span>
+        `;
+        badge.classList.remove('hidden');
+    }
+}
+</script>
 {% endblock %}
