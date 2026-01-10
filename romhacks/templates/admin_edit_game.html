@@ -437,7 +437,13 @@
                 body: formData
             });
 
-            if (!res.ok) throw new Error('Upload failed');
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                const errorMsg = errData.error || 'Upload failed';
+                if (statusLabel) statusLabel.textContent = 'Error: ' + errorMsg;
+                alert('Upload Error: ' + errorMsg);
+                throw new Error(errorMsg);
+            }
             const data = await res.json();
 
             // 2. Update Input

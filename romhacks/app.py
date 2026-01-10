@@ -328,7 +328,7 @@ def upload_proxy():
         filename = file.filename
         ext = os.path.splitext(filename)[1]
         unique_filename = f"{uuid.uuid4().hex}{ext}"
-        object_key = f"screenshots/{unique_filename}"
+        object_key = f"images/{unique_filename}"
         
         s3 = get_r2_client()
         if not s3:
