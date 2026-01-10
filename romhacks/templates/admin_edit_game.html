@@ -270,6 +270,13 @@
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
+                    <label class="block text-sm font-bold text-gray-300 mb-2">Official Website</label>
+                    <input type="url" name="official_website" value="{{ item.official_website or '' }}"
+                           class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                           placeholder="https://example.com">
+                    <p class="text-xs text-gray-500 mt-1">Main website for this game/port</p>
+                </div>
+                <div>
                     <label class="block text-sm font-bold text-gray-300 mb-2">Discord URL</label>
                     <input type="url" name="discord_url" value="{{ item.discord_url or '' }}"
                            class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500">

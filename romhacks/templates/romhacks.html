@@ -44,7 +44,7 @@
 <div class="flex justify-between items-end mb-8">
     <div>
          <h2 class="text-3xl font-bold pixel-font text-white mb-2">Romhacks</h2>
-         <p class="text-gray-500 text-sm">Browsing all verified ROM hacks.</p>
+         <p class="text-gray-500 text-sm">Most popular for {{ current_month }}</p>
          
          <div class="flex flex-wrap gap-2 mt-3">
             <span class="text-xs text-gray-400 py-1.5">Popular:</span>
@@ -165,7 +165,7 @@
             <img src="{{ game.image_url }}" referrerpolicy="no-referrer" loading="lazy" decoding="async" class="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105" alt="{{ game.title }} - {{ game.console }} ROM Hack Cover">
             <div class="absolute inset-0 bg-gradient-to-t from-[#151518] to-transparent opacity-80"></div>
             <div class="absolute bottom-3 left-3">
-                <span class="{{ styles.get(game.console, styles['default']) }} text-[10px] font-bold px-2 py-1 rounded-md border uppercase mb-1 inline-block">{{ game.console }}</span>
+                <span class="{{ styles.get(game.console | normalize_console, styles['default']) }} text-[10px] font-bold px-2 py-1 rounded-md border uppercase mb-1 inline-block">{{ game.console }}</span>
                 <h3 class="text-white font-bold text-lg leading-none shadow-black drop-shadow-md">{{ game.title }}</h3>
             </div>
         </a>

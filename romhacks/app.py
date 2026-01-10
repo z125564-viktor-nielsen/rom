@@ -289,7 +289,7 @@ def admin_edit_game(game_id):
                       'image_url', 'base_region', 'base_revision', 'base_header',
                       'base_checksum_crc32', 'base_checksum_md5', 'base_checksum_sha1',
                       'patch_format', 'patch_output_ext', 'dev_stage',
-                      'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
+                      'official_website', 'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
                       'rom_checker_url', 'instructions_pc', 'instructions_android',
                       'instructions_linux', 'instructions_ios',
                       'instructions_mac', 'instructions_switch']:
@@ -335,7 +335,7 @@ def admin_edit_port(port_id):
         for field in ['title', 'console', 'version', 'release_date', 'author',
                       'description', 'base_game', 'original_platform', 'download_link',
                       'image_url',
-                      'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
+                      'official_website', 'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
                       'rom_checker_url', 'instructions_pc', 'instructions_android',
                       'instructions_linux', 'instructions_ios',
                       'instructions_mac', 'instructions_switch',
@@ -632,6 +632,41 @@ def format_download_count(count):
 def download_count_label(count):
     return format_download_count(count)
 
+
+def normalize_console_name(console):
+    """Normalize console names to match CONSOLE_STYLES keys"""
+    if not console:
+        return 'default'
+    
+    # Convert to lowercase and remove spaces/hyphens
+    normalized = console.lower().strip().replace(' ', '').replace('-', '')
+    
+    # Map full names to abbreviations
+    console_mapping = {
+        'gameboy': 'gb',
+        'gameboycolor': 'gbc',
+        'gameboyadvance': 'gba',
+        'supernintendo': 'snes',
+        'nintendo64': 'n64',
+        'nintendods': 'nds',
+        'nintendo3ds': '3ds',
+        'gamecube': 'gcn'
+    }
+    
+    # Check if it's a full name that needs mapping
+    if normalized in console_mapping:
+        return console_mapping[normalized]
+    
+    # Return as-is (already abbreviated) or default
+    return normalized if normalized in CONSOLE_STYLES else 'default'
+
+
+@app.template_filter('normalize_console')
+def normalize_console_filter(console):
+    """Template filter to normalize console names"""
+    return normalize_console_name(console)
+
+
 # --- COLOR CODING LOGIC ---
 CONSOLE_STYLES = {
     'gb': 'bg-emerald-900/70 text-emerald-200 border-emerald-500/50',
@@ -694,18 +729,26 @@ def ports():
     ports_data = get_ports()
     attach_download_counts(ports_data)
     attach_monthly_download_counts(ports_data)
-    ports_data.sort(key=lambda p: p.get('download_count', 0), reverse=True)
+    ports_data.sort(key=lambda p: (p.get('monthly_download_count', 0), p.get('download_count', 0)), reverse=True)
     ports_data = ports_data[:12]
-    return render_template('ports.html', games=ports_data, styles=PLATFORM_STYLE)
+    
+    # Get current month name for display
+    current_month = datetime.now().strftime('%B %Y')
+    
+    return render_template('ports.html', games=ports_data, styles=PLATFORM_STYLE, current_month=current_month)
 
 @app.route('/romhacks')
 def romhacks():
     games = get_games()
     attach_download_counts(games)
     attach_monthly_download_counts(games)
-    games.sort(key=lambda g: g.get('download_count', 0), reverse=True)
+    games.sort(key=lambda g: (g.get('monthly_download_count', 0), g.get('download_count', 0)), reverse=True)
     games = games[:12]
-    return render_template('romhacks.html', games=games, styles=CONSOLE_STYLES)
+    
+    # Get current month name for display
+    current_month = datetime.now().strftime('%B %Y')
+    
+    return render_template('romhacks.html', games=games, styles=CONSOLE_STYLES, current_month=current_month)
 
 @app.route('/patcher')
 def patcher():

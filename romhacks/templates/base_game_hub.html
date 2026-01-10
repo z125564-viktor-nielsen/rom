@@ -166,7 +166,7 @@
                     <img src="{{ game.image_url }}" loading="lazy" decoding="async" class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105 opacity-50" alt="{{ game.title }} cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                     <div class="absolute top-3 right-3">
-                        <span class="{{ styles.get(game.console, styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[9px] font-bold px-2 py-1 rounded border uppercase">{{ game.console }}</span>
+                        <span class="{{ styles.get(game.console | normalize_console, styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[9px] font-bold px-2 py-1 rounded border uppercase">{{ game.console }}</span>
                     </div>
                     <div class="absolute bottom-3 left-3">
                         <h3 class="text-lg font-bold text-white">{{ game.title }}</h3>
@@ -220,7 +220,7 @@
                             <h3 class="text-base font-bold text-white group-hover:text-blue-400 transition">{{ game.title }}</h3>
                             <p class="text-xs text-gray-400">by {{ game.author }} • v{{ game.version }}</p>
                         </div>
-                        <span class="{{ styles.get(game.console, styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[9px] font-bold px-2 py-1 rounded border uppercase flex-shrink-0">{{ game.console }}</span>
+                        <span class="{{ styles.get(game.console | normalize_console, styles.get('default', 'bg-gray-800 text-gray-300 border-gray-600')) }} text-[9px] font-bold px-2 py-1 rounded border uppercase flex-shrink-0">{{ game.console }}</span>
                     </div>
                     
                     <p class="text-sm text-gray-400 line-clamp-2 mb-3">{{ game.description }}</p>

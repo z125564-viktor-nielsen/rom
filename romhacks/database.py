@@ -232,6 +232,8 @@ def init_db():
         cursor.execute("ALTER TABLE games ADD COLUMN rom_checker_url TEXT")
     if 'wiki_url' not in game_cols:
         cursor.execute("ALTER TABLE games ADD COLUMN wiki_url TEXT")
+    if 'official_website' not in game_cols:
+        cursor.execute("ALTER TABLE games ADD COLUMN official_website TEXT")
     if 'game_series' not in game_cols:
         cursor.execute("ALTER TABLE games ADD COLUMN game_series TEXT")
     if 'base_hash' in game_cols:
@@ -319,6 +321,8 @@ def init_db():
         cursor.execute("ALTER TABLE ports ADD COLUMN rom_checker_url TEXT")
     if 'wiki_url' not in port_cols:
         cursor.execute("ALTER TABLE ports ADD COLUMN wiki_url TEXT")
+    if 'official_website' not in port_cols:
+        cursor.execute("ALTER TABLE ports ADD COLUMN official_website TEXT")
     if 'game_series' not in port_cols:
         cursor.execute("ALTER TABLE ports ADD COLUMN game_series TEXT")
     if 'mod_links' not in port_cols:

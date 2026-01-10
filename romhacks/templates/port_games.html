@@ -268,6 +268,14 @@
                 </a>
                 <p class="text-[10px] text-gray-500 text-center mb-4 italic">Redirects to official download page</p>
 
+                {% if game.official_website %}
+                <a href="{{ game.official_website }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-400/40 mb-4">
+                    <span class="material-symbols-outlined text-lg">language</span>
+                    <span>Official Website</span>
+                    <span class="material-symbols-outlined text-sm">open_in_new</span>
+                </a>
+                {% endif %}
+
                 <div class="flex items-center justify-between px-2 py-2 mb-4">
                     <span class="inline-flex items-center gap-2 text-[12px] font-mono text-gray-300">
                         <span class="material-symbols-outlined text-[14px] text-blue-400">download</span>
