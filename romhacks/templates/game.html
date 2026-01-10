@@ -139,15 +139,15 @@
                 <span class="material-symbols-outlined text-blue-500">photo_library</span> Screenshots
             </h3>
             <!-- Main Screenshot Display -->
-            <div class="relative rounded-xl overflow-hidden border border-gray-700/50 bg-black/20 shadow-lg aspect-video group cursor-pointer" onclick="openScreenshotModal(currentScreenshotIndex)">
+            <div id="main-screenshot-container" class="relative rounded-xl overflow-hidden border border-gray-700/50 bg-black/20 shadow-lg aspect-video group cursor-pointer">
                 <img id="main-screenshot" src="{{ game.screenshots[0] }}" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-contain" alt="{{ game.title }} Screenshot" decoding="async">
                 
                 <!-- Navigation Arrows Overlay -->
                 {% if game.screenshots|length > 1 %}
-                <button onclick="selectScreenshot(currentScreenshotIndex - 1); event.stopPropagation();" class="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all opacity-0 group-hover:opacity-100 p-2 z-20" id="prev-arrow">
+                <button class="nav-arrow-prev absolute left-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all opacity-0 group-hover:opacity-100 p-2 z-20" id="prev-arrow">
                     <span class="material-symbols-outlined text-4xl">chevron_left</span>
                 </button>
-                <button onclick="selectScreenshot(currentScreenshotIndex + 1); event.stopPropagation();" class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all opacity-0 group-hover:opacity-100 p-2 z-20" id="next-arrow">
+                <button class="nav-arrow-next absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all opacity-0 group-hover:opacity-100 p-2 z-20" id="next-arrow">
                     <span class="material-symbols-outlined text-4xl">chevron_right</span>
                 </button>
                 {% endif %}
@@ -161,8 +161,8 @@
                     <div id="thumbnail-container" class="flex gap-2 transition-transform duration-300">
                         {% for shot in game.screenshots %}
                         <button 
-                            class="flex-shrink-0 w-20 h-20 rounded border-2 transition-all cursor-pointer hover:border-blue-400 {% if loop.first %}border-blue-400{% else %}border-gray-700/50{% endif %} overflow-hidden"
-                            onclick="selectScreenshot({{ loop.index0 }})"
+                            class="screenshot-thumbnail flex-shrink-0 w-20 h-20 rounded border-2 transition-all cursor-pointer hover:border-blue-400 {% if loop.first %}border-blue-400{% else %}border-gray-700/50{% endif %} overflow-hidden"
+                            data-index="{{ loop.index0 }}"
                             title="Screenshot {{ loop.index }}">
                             <img src="{{ shot }}" loading="lazy" referrerpolicy="no-referrer" class="w-full h-full object-cover" alt="Screenshot {{ loop.index }}" decoding="async">
                         </button>
@@ -242,6 +242,14 @@
                     {% endif %}
                 </a>
                 <p class="text-[10px] text-gray-500 text-center mb-4 italic">Redirects to official download page</p>
+                
+                {% if game.official_website %}
+                <a href="{{ game.official_website }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-400/40 mb-4">
+                    <span class="material-symbols-outlined text-lg">language</span>
+                    <span>Official Website</span>
+                    <span class="material-symbols-outlined text-sm">open_in_new</span>
+                </a>
+                {% endif %}
                 
                 <div class="flex items-center justify-between px-2 py-2 mb-4">
                     {% if not is_port %}
@@ -398,7 +406,7 @@
                                     {% for emulator in emulators %}
                                     <div class="border border-blue-500/20 rounded-lg p-4 bg-gray-800/30">
                                         <!-- Emulator Header with Logo and Link -->
-                                        <div class="flex items-center justify-between mb-4">
+                                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                                             <div class="flex items-center gap-3">
                                                 <!-- Emulator Logo -->
                                                 {% if emulator.logo_svg %}
@@ -413,7 +421,7 @@
                                             
                                             <!-- Link to emulator website -->
                                             {% if emulator.link %}
-                                            <a href="{{ emulator.link }}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-400/40 hover:scale-105 transform duration-200 group flex-shrink-0">
+                                            <a href="{{ emulator.link }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-400/40 hover:scale-105 transform duration-200 group w-full sm:w-auto">
                                                 <span class="material-symbols-outlined text-sm text-white">language</span>
                                                 <span class="text-sm font-semibold text-white">Emulator Website</span>
                                                 <span class="material-symbols-outlined text-sm text-white group-hover:translate-x-1 transition-transform">arrow_outward</span>
@@ -494,11 +502,13 @@
     </div>
 </div>
 
+<!-- Screenshot data for JavaScript -->
+<script id="screenshot-data" type="application/json">{{ game.screenshots | tojson }}</script>
+
 <!-- Screenshot Navigation Scripts -->
 <script>
-const allScreenshots = [
-    {% for shot in game.screenshots %}'{{ shot }}'{{ "," if not loop.last }}{% endfor %}
-];
+const screenshotData = document.getElementById('screenshot-data');
+const allScreenshots = screenshotData ? JSON.parse(screenshotData.textContent) : [];
 
 let currentScreenshotIndex = 0;
 const thumbnailWidth = 88; // width (80px) + gap (8px)
@@ -561,6 +571,43 @@ document.addEventListener('keydown', (e) => {
         selectScreenshot(currentScreenshotIndex - 1);
     } else if (e.key === 'ArrowRight' && currentScreenshotIndex < allScreenshots.length - 1) {
         selectScreenshot(currentScreenshotIndex + 1);
+    }
+});
+
+// Add click listeners to thumbnails
+document.addEventListener('DOMContentLoaded', () => {
+    const thumbnails = document.querySelectorAll('.screenshot-thumbnail');
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', () => {
+            const index = parseInt(thumbnail.getAttribute('data-index'), 10);
+            selectScreenshot(index);
+        });
+    });
+    
+    // Add click listeners to navigation arrows
+    const prevArrow = document.querySelector('.nav-arrow-prev');
+    const nextArrow = document.querySelector('.nav-arrow-next');
+    
+    if (prevArrow) {
+        prevArrow.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectScreenshot(currentScreenshotIndex - 1);
+        });
+    }
+    
+    if (nextArrow) {
+        nextArrow.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectScreenshot(currentScreenshotIndex + 1);
+        });
+    }
+    
+    // Add click listener to main screenshot container
+    const mainContainer = document.getElementById('main-screenshot-container');
+    if (mainContainer) {
+        mainContainer.addEventListener('click', () => {
+            openScreenshotModal(currentScreenshotIndex);
+        });
     }
 });
 
