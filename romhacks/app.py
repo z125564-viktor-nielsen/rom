@@ -314,9 +314,6 @@ def get_r2_client():
 @app.route('/admin/generate-presigned-url', methods=['POST'])
 @login_required 
 def generate_presigned_url():
-    if session.get('role') != 'admin':
-         return jsonify({'error': 'Unauthorized'}), 403
-
     data = request.json
     filename = data.get('filename')
     filetype = data.get('filetype')

@@ -136,7 +136,7 @@
     </div>
 
     <!-- Online Multiplayer Toggle -->
-    <div class="px-4 pb-4">
+    <div class="px-4 pb-4 flex gap-6">
         <label class="inline-flex items-center gap-2 cursor-pointer group">
             <div class="relative">
                 <input type="checkbox" id="netplay-checkbox" onchange="filterByNetplay(this.checked)" class="sr-only peer">
@@ -144,6 +144,15 @@
                 <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-gray-300 rounded-full peer-checked:translate-x-4 peer-checked:bg-white transition-all"></div>
             </div>
             <span class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors">Online Multiplayer Only</span>
+        </label>
+        
+        <label class="inline-flex items-center gap-2 cursor-pointer group">
+            <div class="relative">
+                <input type="checkbox" id="mods-checkbox" onchange="filterByMods(this.checked)" class="sr-only peer">
+                <div class="w-9 h-5 bg-gray-700 rounded-full peer peer-checked:bg-purple-600 transition-colors"></div>
+                <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-gray-300 rounded-full peer-checked:translate-x-4 peer-checked:bg-white transition-all"></div>
+            </div>
+            <span class="text-xs text-gray-400 group-hover:text-gray-300 transition-colors">Mods Only</span>
         </label>
     </div>
 </div>

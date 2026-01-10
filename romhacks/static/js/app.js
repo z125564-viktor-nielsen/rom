@@ -31,6 +31,7 @@ let activeOriginalPlatform = 'all';
 let activeGameFilter = '';
 let activeSeriesFilter = '';
 let netplayFilter = false;
+let modsFilter = false;
 let currentPage = 1;
 const gamesPerPage = 12;
 let allCards = [];
@@ -49,6 +50,9 @@ function updatePagination() {
         
         // Check if card has any element containing "Online" text
         const hasOnlinePlay = Array.from(card.querySelectorAll('*')).some(el => el.textContent.includes('Online'));
+        
+        // Check if card has any element containing "Mods" text
+        const hasMods = Array.from(card.querySelectorAll('*')).some(el => el.textContent.includes('Mods'));
 
         const consoles = cardConsole.split(/\s+/).filter(Boolean);
         
@@ -57,6 +61,9 @@ function updatePagination() {
         
         // Check netplay filter
         let matchNetplay = !netplayFilter || hasOnlinePlay;
+        
+        // Check mods filter
+        let matchMods = !modsFilter || hasMods;
         
         // Check game filter
         let matchGame = (activeGameFilter === '' || cardBaseGame === activeGameFilter);
@@ -67,7 +74,7 @@ function updatePagination() {
         const matchOriginalPlatform = (activeOriginalPlatform === 'all' || cardOriginalPlatform === activeOriginalPlatform);
         const matchSearch = (query === '' || cardTitle.includes(query));
         
-        return matchConsole && matchNetplay && matchGame && matchSeries && matchOriginalPlatform && matchSearch;
+        return matchConsole && matchNetplay && matchMods && matchGame && matchSeries && matchOriginalPlatform && matchSearch;
     });
     
     const totalPages = Math.ceil(filteredCards.length / gamesPerPage);
@@ -282,6 +289,13 @@ function filterBySeries(series) {
 function filterByNetplay(checked) {
     // Handle checkbox change
     netplayFilter = checked;
+    currentPage = 1;
+    updatePagination();
+}
+
+function filterByMods(checked) {
+    // Handle checkbox change
+    modsFilter = checked;
     currentPage = 1;
     updatePagination();
 }
