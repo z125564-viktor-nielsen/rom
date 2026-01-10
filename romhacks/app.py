@@ -289,7 +289,7 @@ def admin_edit_game(game_id):
                       'image_url', 'base_region', 'base_revision', 'base_header',
                       'base_checksum_crc32', 'base_checksum_md5', 'base_checksum_sha1',
                       'patch_format', 'patch_output_ext', 'dev_stage',
-                      'official_website', 'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
+                      'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
                       'rom_checker_url', 'instructions_pc', 'instructions_android',
                       'instructions_linux', 'instructions_ios',
                       'instructions_mac', 'instructions_switch']:
@@ -335,7 +335,7 @@ def admin_edit_port(port_id):
         for field in ['title', 'console', 'version', 'release_date', 'author',
                       'description', 'base_game', 'original_platform', 'download_link',
                       'image_url',
-                      'official_website', 'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
+                      'discord_url', 'reddit_url', 'support_forum_url', 'troubleshooting_url',
                       'rom_checker_url', 'instructions_pc', 'instructions_android',
                       'instructions_linux', 'instructions_ios',
                       'instructions_mac', 'instructions_switch',
