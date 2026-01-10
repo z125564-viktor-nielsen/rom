@@ -671,12 +671,12 @@ def insert_game(game_data):
             base_game, version_region, base_region, base_revision, base_header,
             base_checksum_crc32, base_checksum_md5, base_checksum_sha1,
             patch_format, patch_output_ext, dev_stage, popular, online_play,
-            instruction, instruction_text, discord_url, reddit_url,
+            instruction, instruction_text, official_website, discord_url, reddit_url,
             support_forum_url, troubleshooting_url, rom_checker_url, wiki_url,
             instructions_pc, instructions_android, instructions_linux,
             instructions_web, instructions_ios, instructions_mac,
             instructions_switch, instructions_ps4, instructions_xbox, game_series
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         game_id,
         game_data.get('title'),
@@ -704,6 +704,7 @@ def insert_game(game_data):
         1 if game_data.get('online_play', False) else 0,
         1 if game_data.get('instruction', False) else 0,
         game_data.get('instruction_text'),
+        game_data.get('official_website'),
         game_data.get('discord_url'),
         game_data.get('reddit_url'),
         game_data.get('support_forum_url'),
@@ -737,8 +738,10 @@ def insert_port(port_data):
         INSERT OR REPLACE INTO ports (
             id, title, console, version, release_date, author,
             description, features, image_url, screenshots, download_link,
-            base_game, original_platform, popular, game_series
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            base_game, original_platform, popular, game_series,
+            official_website, discord_url, reddit_url, support_forum_url,
+            troubleshooting_url, rom_checker_url, wiki_url
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         port_id,
         port_data.get('title'),
@@ -755,6 +758,13 @@ def insert_port(port_data):
         port_data.get('original_platform'),
         1 if port_data.get('popular', False) else 0,
         port_data.get('game_series') or get_filter_value(port_data, 'game_series'),
+        port_data.get('official_website'),
+        port_data.get('discord_url'),
+        port_data.get('reddit_url'),
+        port_data.get('support_forum_url'),
+        port_data.get('troubleshooting_url'),
+        port_data.get('rom_checker_url'),
+        port_data.get('wiki_url'),
     ))
     
     conn.commit()
@@ -1228,7 +1238,7 @@ def update_game(game_id, data):
         'instruction', 'instruction_text', 'base_region', 'base_revision',
         'base_header', 'base_checksum_crc32', 'base_checksum_md5',
         'base_checksum_sha1', 'patch_format', 'patch_output_ext',
-        'online_play', 'dev_stage', 'social_links',
+        'online_play', 'dev_stage', 'social_links', 'official_website',
         'support_forum_url', 'discord_url', 'reddit_url',
         'troubleshooting_url', 'rom_checker_url', 'wiki_url',
         'instructions_pc', 'instructions_android', 'instructions_linux',
@@ -1283,7 +1293,7 @@ def update_port(port_id, data):
         'instruction', 'instruction_text', 'base_region', 'base_revision',
         'base_header', 'base_checksum_crc32', 'base_checksum_md5',
         'base_checksum_sha1', 'patch_format', 'patch_output_ext',
-        'online_play', 'social_links',
+        'online_play', 'social_links', 'official_website',
         'support_forum_url', 'discord_url', 'reddit_url',
         'troubleshooting_url', 'rom_checker_url', 'wiki_url',
         'instructions_pc', 'instructions_android', 'instructions_linux',

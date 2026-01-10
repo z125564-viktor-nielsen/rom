@@ -1,6 +1,8 @@
 from flask import Flask, render_template, abort, send_from_directory, request, jsonify, session, redirect, url_for
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from dotenv import load_dotenv
+
 from database import (
     get_db_connection,
     init_db,
@@ -47,9 +49,11 @@ import os
 import requests
 import boto3
 import uuid
+from datetime import datetime
 from botocore.config import Config
 from functools import wraps
-from datetime import datetime
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')  # Change this!
@@ -310,6 +314,47 @@ def get_r2_client():
         config=Config(signature_version='s3v4'),
         region_name='auto'
     )
+
+@app.route('/admin/upload-proxy', methods=['POST'])
+@login_required
+def upload_proxy():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+        
+    if file:
+        filename = file.filename
+        ext = os.path.splitext(filename)[1]
+        unique_filename = f"{uuid.uuid4().hex}{ext}"
+        object_key = f"screenshots/{unique_filename}"
+        
+        s3 = get_r2_client()
+        if not s3:
+             return jsonify({'error': 'R2 storage not configured'}), 500
+             
+        try:
+            bucket = os.environ.get('R2_BUCKET')
+            # Upload file
+            s3.upload_fileobj(
+                file,
+                bucket,
+                object_key,
+                ExtraArgs={'ContentType': file.content_type}
+            )
+            
+            public_base = os.environ.get('R2_PUBLIC_BASE', '')
+            if public_base:
+                 public_url = f"{public_base.rstrip('/')}/{object_key}"
+            else:
+                 public_url = f"https://{bucket}.r2.cloudflarestorage.com/{object_key}"
+            
+            return jsonify({'publicUrl': public_url})
+            
+        except Exception as e:
+            print(f"Error uploading file: {e}")
+            return jsonify({'error': str(e)}), 500
 
 @app.route('/admin/generate-presigned-url', methods=['POST'])
 @login_required 
@@ -678,7 +723,24 @@ def get_social_links(game):
             links = json.loads(game['social_links'])
         except (json.JSONDecodeError, TypeError):
             links = []
-    
+
+    # Helper to check if a type already exists
+    def has_type(t):
+        return any(l.get('type') == t for l in links)
+
+    # Add items from individual columns if they exist
+    if game.get('official_website') and not has_type('website'):
+        links.append({'type': 'website', 'url': game['official_website']})
+        
+    if game.get('discord_url') and not has_type('discord'):
+        links.append({'type': 'discord', 'url': game['discord_url']})
+        
+    if game.get('reddit_url') and not has_type('reddit'):
+        links.append({'type': 'reddit', 'url': game['reddit_url']})
+        
+    if game.get('twitter_url') and not has_type('twitter'):
+        links.append({'type': 'twitter', 'url': game['twitter_url']})
+
     return links
 
 

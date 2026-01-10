@@ -426,35 +426,21 @@
                 }
             }
 
-            // 1. Get Presigned URL
-            const res = await fetch('/admin/generate-presigned-url', {
+            // 1. Upload to Proxy
+            if (statusLabel) statusLabel.textContent = 'Uploading...';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await fetch('/admin/upload-proxy', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    filename: file.name,
-                    filetype: file.type
-                })
+                body: formData
             });
 
-            if (!res.ok) throw new Error('Failed to get upload URL');
+            if (!res.ok) throw new Error('Upload failed');
             const data = await res.json();
 
-            // 2. Upload to R2
-            if (statusLabel) statusLabel.textContent = 'Uploading...';
-            
-            const uploadRes = await fetch(data.signedUrl, {
-                method: 'PUT',
-                body: file,
-                headers: {
-                    'Content-Type': file.type
-                }
-            });
-
-            if (!uploadRes.ok) throw new Error('Upload failed');
-
-            // 3. Update Input
+            // 2. Update Input
             const targetInput = document.getElementById(targetId);
             if (append) {
                 const currentVal = targetInput.value;
